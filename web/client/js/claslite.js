@@ -248,7 +248,7 @@
 		var mt = google.maps.MapTypeId;
 		app.map = new S.Map( app.$mapwrap, {
 			v3: {
-				mapTypeId: mt.ROADMAP,
+				mapTypeId: mt.TERRAIN,
 				streetViewControl: false,
 				mapTypeControlOptions: {
 					mapTypeIds: [
