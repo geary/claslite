@@ -4,3 +4,7 @@ config = {}
 
 import private
 config['private'] = private.private
+
+config['proxy'] = {
+	'base': '/ee/'
+}
