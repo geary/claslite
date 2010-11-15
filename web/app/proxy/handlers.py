@@ -10,15 +10,14 @@
 
 from tipfy import RequestHandler, Response
 
-import cgi, urllib2
+import cgi, re, urllib2
 
 class ProxyHandler( RequestHandler ):
 	'''
 		Proxy an Earth Engine request
 	'''
 	def get( self, path=None ):
-		base = self.get_config( 'proxy', 'base' )
-		api = self.request.url.split( base, 1 )[1]
+		api = re.sub( r'http(s)?://[^/]+/\w+/', '', self.request.url )
 		debug = api.startswith( 'debug/' )
 		if debug:
 			api = api.replace( 'debug/', '', 1 )
