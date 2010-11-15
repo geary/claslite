@@ -1,0 +1,9 @@
+# -*- coding: utf-8 -*-
+'''
+    private.py
+'''
+
+private = {
+	'earth-engine-api': 'http://earthengine.googleapis.com/api/',
+	'earth-engine=auth': 'YOUR_AUTH_KEY_HERE',
+}
