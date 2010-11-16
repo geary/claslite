@@ -14,10 +14,10 @@
 		imageFolder: 'images/mColorPicker/'
 	});
 	S.extend( $.fn.mColorPicker.init, {
-		replace: '.color-picker',
+		replace: false,
 		showLogo: false
 	});
-
+	
 	//var monthNames = [
 	//	'January', 'February', 'March', 'April', 'May', 'June',
 	//	'July', 'August', 'September', 'October', 'November', 'December'
@@ -168,6 +168,7 @@
 	}
 	
 	function initColorPickers() {
+		$('input.color-picker').mColorPicker()
 		$('input.mColorPickerInput').click( function( event ) {
 			$(this).next().trigger( 'click', event );
 		});
