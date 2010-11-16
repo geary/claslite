@@ -145,7 +145,7 @@
 	
 	function initForestCoverDateSelect() {
 		app.$forestCoverDate
-			.dateSelect( [ 'test', 2007, 2008, 2009 ], 'test', function( event ) {
+			.dateSelect( [ 'Test 1', 'Test 2', 2007, 2008, 2009 ], 'Test 1', function( event ) {
 			});
 	}
 	
@@ -205,7 +205,7 @@
 		app.geoclick && app.geoclick.disable();
 	}
 	
-	function addTestLayer() {
+	function addTestLayer1() {
 		var image = {
 			creator: 'LANDSAT/CalibratedSurfaceReflectance',
 			args: [ 'LANDSAT/L7_L1T/LE70050672005171EDC00' ]
@@ -218,6 +218,46 @@
 			gamma: 1.6
 		};
 		
+		addEarthEngineLayer( request );
+	}
+	
+	function addTestLayer2() {
+		var dates = [ '2010_06_26', '2010_06_30' ];
+		var images = dates.map( function( date ) {
+			return {
+				creator: 'SAD/ModisCombiner',
+				args: [ 'MOD09GA_005_' + date, 'MOD09GA_005_' + date ]
+			}
+		});
+		
+		var bands = [
+			'sur_refl_b01_250m', 'sur_refl_b02_250m', 'sur_refl_b03_500m',
+			'sur_refl_b04_500m', 'sur_refl_b06_500m', 'sur_refl_b07_500m'
+		];
+		
+		var image = {
+			creator: 'SAD/UnmixModis',
+			args: [{
+				creator: 'SAD/KrigingStub',
+				args: [{
+					creator: 'SAD/MakeMosaic',
+					args: [ images, bands ]
+				}]
+			}]
+		};
+		
+		var request = {
+			image: JSON.stringify( image ),
+			bands: 'soil,gv,npv',
+			//bias: ?,
+			//gamma: ?,
+			gain: 256
+		};
+		
+		addEarthEngineLayer( request );
+	}
+	
+	function addEarthEngineLayer( request ) {
 		var ee = new S.EarthEngine;
 		ee.getTiles( request, function( tiles ) {
 			var opid = 'forestcover';
@@ -235,8 +275,12 @@
 	
 	function addForestCoverLayer( id ) {
 		var date = app.$forestCoverDate.val();
-		if( date == 'test' ) {
-			addTestLayer();
+		// TODO: temp hacky test code
+		if( date == 'Test 1' ) {
+			addTestLayer1();
+		}
+		else if( date == 'Test 2' ) {
+			addTestLayer2();
 		}
 		else {
 			addLayer( id, S(
