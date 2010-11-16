@@ -77,10 +77,12 @@
 				};
 				
 				function getTileUrl( coord, zoom ) {
-					return opt.tiles
-						.replace( '{X}', coord.x )
-						.replace( '{Y}', ( 1 << zoom ) - coord.y - 1 )
-						.replace( '{Z}', zoom );
+					return typeof opt.tiles == 'function' ?
+						opt.tiles( coord, zoom ) :
+						opt.tiles
+							.replace( '{X}', coord.x )
+							.replace( '{Y}', coord.y )
+							.replace( '{Z}', zoom );
 				}
 				
 				if( v2 ) {

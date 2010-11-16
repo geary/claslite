@@ -145,7 +145,7 @@
 	
 	function initForestCoverDateSelect() {
 		app.$forestCoverDate
-			.dateSelect( [ 2007, 2008, 2009 ], 2009, function( event ) {
+			.dateSelect( [ 'test', 2007, 2008, 2009 ], 'test', function( event ) {
 			});
 	}
 	
@@ -205,12 +205,46 @@
 		app.geoclick && app.geoclick.disable();
 	}
 	
+	function addTestLayer() {
+		var image = {
+			creator: 'LANDSAT/CalibratedSurfaceReflectance',
+			args: [ 'LANDSAT/L7_L1T/LE70050672005171EDC00' ]
+		};
+		
+		var request = {
+			image: JSON.stringify( image ),
+			bands: '30,20,10',
+			gain: 500,
+			gamma: 1.6
+		};
+		
+		var ee = new S.EarthEngine;
+		ee.getTiles( request, function( tiles ) {
+			var opid = 'forestcover';
+			app.layers[opid] = app.map.addLayer({
+				minZoom: 3,
+				maxZoom: 14,
+				opacity: $('#'+opid+'-opacity').data('rangeinput').getValue() / 100,
+				tiles: S(
+					'https://earthengine.googleapis.com/map/', tiles.mapid,
+					'/{Z}/{X}/{Y}?token=', tiles.token
+				)
+			});
+		});
+	}
+	
 	function addForestCoverLayer( id ) {
-		addLayer( id, S(
-			'forestcover/peru_redd_',
-			app.$forestCoverDate.val(),
-			'_forestcover_geotiff_rgb/'
-		) );
+		var date = app.$forestCoverDate.val();
+		if( date == 'test' ) {
+			addTestLayer();
+		}
+		else {
+			addLayer( id, S(
+				'forestcover/peru_redd_',
+				date,
+				'_forestcover_geotiff_rgb/'
+			) );
+		}
 	}
 	
 	function addForestChangeLayer( id ) {
@@ -232,7 +266,15 @@
 			minZoom: 6,
 			maxZoom: 14,
 			opacity: $('#'+opid+'-opacity').data('rangeinput').getValue() / 100,
-			tiles: tileBase + path + '{Z}/{X}/{Y}.png'
+			tiles: function( coord, zoom ) {
+				return S(
+					tileBase, path,
+					zoom, '/',
+					coord.x, '/',
+					( 1 << zoom ) - coord.y - 1,
+					'.png'
+				);
+			}
 		});
 	}
 	
