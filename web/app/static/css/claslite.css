@@ -334,8 +334,8 @@ div.color-picker-row {
 
 input.color-picker {
 	font-size: 1px;
-	width:30px;
-	height:24px;
+	width:25px;
+	height:20px;
 	/*padding: 2px;*/
 	margin-right: 2px;
 	color: transparent !important;
