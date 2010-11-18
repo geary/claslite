@@ -100,6 +100,8 @@
 		statistics: function() {
 			disableGeoclick();
 			removeLayers();
+			addStatistics();
+			addStatistics( '-1' );
 		},
 		help: function() {
 			disableGeoclick();
@@ -401,6 +403,30 @@
 		app.map.map.mapTypes.set( id,
 			new S.Map.v3.SolidMapType({ color:color, name:name, alt:alt })
 		);
+	}
+	
+	function addStatistics( suffix ) {
+		$.getJSON( 'js/statistics-test.json', function( json ) {
+			S.chart({
+				container: '#statistics-chart' + ( suffix || '' ),
+				list: json.statistics.images.map( function( image) {
+					function get( sel, prop ) {
+						return {
+							color: $(sel).val(),
+							value: image[prop]
+						}
+					}
+					return {
+						label: image.date,
+						values: [
+							get( '#statistics-forest-color', 'forestPixels' ),
+							get( '#statistics-nodata-color', 'noDataPixels' ),
+							get( '#statistics-nonforest-color', 'nonForestPixels' )
+						]
+					}
+				})
+			});
+		});
 	}
 	
 	function initSizer() {

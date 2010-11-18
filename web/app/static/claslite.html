@@ -23,6 +23,7 @@
 	
 	<script type="text/javascript" src="js/scriptino-base.js"></script>
 	<script type="text/javascript" src="js/scriptino-tabs.js"></script>
+	<script type="text/javascript" src="js/scriptino-chart.js"></script>
 	<script type="text/javascript" src="js/scriptino-map.js"></script>
 	<script type="text/javascript" src="js/scriptino-earthengine.js"></script>
 	<script type="text/javascript" src="js/rangeinput.js"></script>
@@ -145,6 +146,7 @@
 							<div class="clear-right">
 							</div>
 							
+							<!-- TODO: refactor -->
 							<div class="color-picker-row">
 								<input class="color-picker" data-hex="true" name="forest-color" id="forest-color" value="#00ff00">
 								<label for="forest-color">Forest</label>
@@ -157,6 +159,7 @@
 								<input class="color-picker" data-hex="true" name="nodata-color" id="nodata-color" value="#000000">
 								<label for="nodata-color">No data</label>
 							</div>
+							<!-- End TODO -->
 							
 						</form>
 						
@@ -259,7 +262,38 @@
 					<!-- Begin Statistics Panel -->
 					
 					<div class="tab-panel" id="statistics-panel">
-						Statistics will be here
+						
+						<div class="" id="statistics-color-pickers">
+							
+							<!-- TODO: refactor -->
+							<div class="color-picker-box">
+								<label for="statistics-forest-color">Forest</label>
+								<input class="color-picker" data-hex="true" name="forest-color" id="statistics-forest-color" value="#00ff00">
+							</div>
+							<div class="color-picker-box">
+								<label for="statistics-nodata-color">No data</label>
+								<input class="color-picker" data-hex="true" name="nodata-color" id="statistics-nodata-color" value="#000000">
+							</div>
+							<div class="color-picker-box">
+								<label for="statistics-nonforest-color">Non-forest</label>
+								<input class="color-picker" data-hex="true" name="nonforest-color" id="statistics-nonforest-color" value="#ee9a00">
+							</div>
+							<!-- End TODO -->
+							<div class="clear-left">
+							</div>
+							
+						</div>
+						
+						<div class="chart" id="statistics-chart">
+						</div>
+						
+						<div style="margin: 20px 0 16px 0;">
+							Or:
+						</div>
+						
+						<div class="chart" id="statistics-chart-1">
+						</div>
+						
 					</div>
 					
 					<!-- End Statistics Panel -->

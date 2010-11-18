@@ -1,0 +1,30 @@
+{
+	"statistics": {
+		"pixelSize": 30,
+		"width": 8155,
+		"height": 8182,
+		"images": [
+			{
+				"id": "2007",
+				"date": "2007",
+				"forestPixels": 45973004,
+				"nonForestPixels": 2057545,
+				"noDataPixels": 481183
+			},
+			{
+				"id": "2008",
+				"date": "2008",
+				"forestPixels": 46561586,
+				"nonForestPixels": 1492680,
+				"noDataPixels": 457466
+			},
+			{
+				"id": "2009",
+				"date": "2009",
+				"forestPixels": 45961019,
+				"nonForestPixels": 2057545,
+				"noDataPixels": 1
+			}
+		]
+	}
+}
