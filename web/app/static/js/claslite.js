@@ -23,22 +23,23 @@
 	//	'July', 'August', 'September', 'October', 'November', 'December'
 	//];
 	
-	$.fn.dateSelect = function( years, initial, changed ) {
-		return this
-			.html( years.map( function( year ) {
+	$.fn.fillSelect = function( list, initial, changed ) {
+		this
+			.html( list.map( function( item ) {
 				return S(
 					//'<option value="', year, '-', padDigits( month, 2 ), '">',
 					//	monthNames[ month - 1 ], ' ', year,
 					//'</option>'
-					'<option value="', year, '">',
-						year,
+					'<option value="', item.value, '">',
+						item.text,
 					'</option>'
 				);
 			}).join('') )
-			.val( initial )
 			.bind( 'change keyup', function( event ) {
 				changed && changed.apply( this, arguments );
 			});
+		if( initial != null )
+			this	.val( initial );
 	}
 	
 	$().ready( initUI );
@@ -146,20 +147,63 @@
 	}
 	
 	function initForestCoverDateSelect() {
+		function desma( year1, year2 ) {
+			year2 = year2 || ( year1 + 1 );
+			return {
+				text: year1 + '&#8211;' + year2,
+				value: S(
+					'addLayer:desmatamento/230_068_',
+					(''+year1).slice(-2), '_', (''+year2).slice(-2),
+					'_desmatamento/'
+				)
+			};
+		}
+		function desmas( first, last ) {
+			var result = [];
+			for( var year = first;  year <= last;  ++year )
+				result.push( desma( year, year + 1 ) );
+			return result;
+		}
+		function peru( year ) {
+			return {
+				text: year,
+				value: S(
+					'addLayer:forestcover/peru_redd_',
+					year,
+					'_forestcover_geotiff_rgb/'
+				)
+			};
+		}
+		function test( val ) {
+			return {
+				text: 'Test ' + val,
+				value: 'testLayer:' +val
+			};
+		}
+		var dates = [].concat(
+			desmas( 1985, 2000 ),
+			desma( 2001, 2003 ),
+			desmas( 2003, 2008 ),
+			peru( 2007 ),
+			peru( 2008 ),
+			peru( 2009 ),
+			test( 1 ),
+			test( 2 )
+		);
 		app.$forestCoverDate
-			.dateSelect( [ 'Test 1', 'Test 2', 2007, 2008, 2009 ], 'Test 1', function( event ) {
+			.fillSelect( dates, '', function( event ) {
 			});
 	}
 	
 	function initForestChangeDateSelect() {
 		app.$forestChangeStart
-			.dateSelect( [ 2007, 2008 ], 2007, function( event ) {
+			.fillSelect( [ 2007, 2008 ], 2007, function( event ) {
 				if( +this.value >= +app.$forestChangeEnd.val() )
 					app.$forestChangeEnd.val( +this.value + 1 );
 			});
 		
 		app.$forestChangeEnd
-			.dateSelect( [ 2008, 2009 ], 2009, function( event ) {
+			.fillSelect( [ 2008, 2009 ], 2009, function( event ) {
 				if( +this.value <= +app.$forestChangeStart.val() )
 					app.$forestChangeStart.val( +this.value - 1 );
 			});
@@ -277,21 +321,22 @@
 	}
 	
 	function addForestCoverLayer( id ) {
-		var date = app.$forestCoverDate.val();
+		var value = app.$forestCoverDate.val().split(':'),
+			fn = value[0], url = value[1];
+		// temp:
+		fn = ({
+			addLayer: addLayer,
+			testLayer: testLayer
+		})[fn];
+		fn && fn( id, url );
+	}
+	
+	function testLayer( id, url ) {
 		// TODO: temp hacky test code
-		if( date == 'Test 1' ) {
-			addTestLayer1();
-		}
-		else if( date == 'Test 2' ) {
-			addTestLayer2();
-		}
-		else {
-			addLayer( id, S(
-				'forestcover/peru_redd_',
-				date,
-				'_forestcover_geotiff_rgb/'
-			) );
-		}
+		({
+			1: addTestLayer1,
+			2: addTestLayer2
+		})[url]();
 	}
 	
 	function addForestChangeLayer( id ) {
