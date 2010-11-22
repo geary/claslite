@@ -147,63 +147,57 @@
 	}
 	
 	function initForestCoverDateSelect() {
-		function desma( year1, year2 ) {
-			year2 = year2 || ( year1 + 1 );
-			return {
-				text: year1 + '&#8211;' + year2,
-				value: S(
-					'addLayer:desmatamento/230_068_',
-					(''+year1).slice(-2), '_', (''+year2).slice(-2),
-					'_desmatamento/'
-				)
-			};
-		}
-		function desmas( first, last ) {
-			var result = [];
-			for( var year = first;  year <= last;  ++year )
-				result.push( desma( year, year + 1 ) );
-			return result;
-		}
-		function peru( year ) {
+		function idesam( year ) {
 			return {
 				text: year,
-				value: S(
-					'addLayer:forestcover/peru_redd_',
-					year,
-					'_forestcover_geotiff_rgb/'
-				)
+				value: S( 'addLayer:forestcover/idesam/', year, '/' )
 			};
 		}
-		function test( val ) {
-			return {
-				text: 'Test ' + val,
-				value: 'testLayer:' +val
-			};
-		}
+		//function peru( year ) {
+		//	return {
+		//		text: year,
+		//		value: S(
+		//			'addLayer:forestcover/peru_redd_',
+		//			year,
+		//			'_forestcover_geotiff_rgb/'
+		//		)
+		//	};
+		//}
+		//function test( val ) {
+		//	return {
+		//		text: 'Test ' + val,
+		//		value: 'testLayer:' +val
+		//	};
+		//}
 		var dates = [].concat(
-			desmas( 1985, 2000 ),
-			desma( 2001, 2003 ),
-			desmas( 2003, 2008 ),
-			peru( 2007 ),
-			peru( 2008 ),
-			peru( 2009 ),
-			test( 1 ),
-			test( 2 )
+			idesam( 1985 ),
+			idesam( 2009 )
+			//peru( 2007 ),
+			//peru( 2008 ),
+			//peru( 2009 ),
+			//test( 1 ),
+			//test( 2 )
 		);
 		app.$forestCoverDate
 			.fillSelect( dates, '', function( event ) {
+				//app.tabOpts.click( app.tabs.selected );
 			});
 	}
 	
 	function initForestChangeDateSelect() {
+		function arr( first, last ) {
+			var a = [];
+			for( var i = first;  i <= last;  ++i ) a.push({ text:i, value:i });
+			return a;
+		}
 		app.$forestChangeStart
-			.fillSelect( [ 2007, 2008 ], 2007, function( event ) {
+			.fillSelect( arr( 1985, 2008 ), 1985, function( event ) {
 				if( +this.value >= +app.$forestChangeEnd.val() )
 					app.$forestChangeEnd.val( +this.value + 1 );
 			});
 		
 		app.$forestChangeEnd
-			.fillSelect( [ 2008, 2009 ], 2009, function( event ) {
+			.fillSelect( arr( 1986, 2009 ), 2009, function( event ) {
 				if( +this.value <= +app.$forestChangeStart.val() )
 					app.$forestChangeStart.val( +this.value - 1 );
 			});
@@ -340,13 +334,14 @@
 	}
 	
 	function addForestChangeLayer( id ) {
+		var type = id == 'deforestation' ? 'desmatamento' : 'pertubacao';
 		addLayer( id, S(
-			'forestchange/',
+			'forestchange/idesam/230_068_',
 			app.$forestChangeStart.val().slice(-2),
 			'_',
 			app.$forestChangeEnd.val().slice(-2),
 			'_',
-			id,
+			type,
 			'/'
 		) );
 	}
