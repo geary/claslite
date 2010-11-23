@@ -509,6 +509,32 @@ div.statistics-bar {
 	position: absolute;
 	left: 356px;
 	bottom: 20px;
+	display: block;
+	text-decoration: none;
+	padding: 4px 4px 2px 4px;
+	color: #444;
+	font-size: 12px;
+	white-space: nowrap;
+	background-color: #FEFEFE;
+	border: 2px solid #AEAEB0;
+}
+
+#earth-engine-logo-powered-by {
+	display: block;
+	color: #666;
+	font-size: 11px;
+	padding: 0 0 3px 1px;
+}
+
+#earth-engine-logo-img {
+	width: 44px;
+	height: 15px;
+	padding-top: 2px;
+}
+
+#earth-engine-logo-name {
+	color: #444;
+	font-size: 12px;
 }
 
 #cis-logo {
