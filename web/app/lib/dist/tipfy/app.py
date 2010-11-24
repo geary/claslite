@@ -462,6 +462,7 @@ class Tipfy(object):
             - If no arguments are passed, returns an empty response.
             - If a single argument is passed, the returned value varies
               according to its type:
+
               - :attr:`response_class`: the response is returned unchanged.
               - :class:`str`: a response is created with the string as body.
               - :class:`unicode`: a response is created with the string
@@ -469,6 +470,7 @@ class Tipfy(object):
               - a WSGI function: the function is called as WSGI application
                 and buffered as response object.
               - None: a ValueError exception is raised.
+
             - If multiple arguments are passed, a response is created using
               the arguments.
 
@@ -493,6 +495,13 @@ class Tipfy(object):
             return self.response_class.force_type(rv, request.environ)
 
         return self.response_class(*rv)
+
+    def get_config(self, module, key=None, default=REQUIRED_VALUE):
+        """Returns a configuration value for a module.
+
+        .. seealso:: :meth:`Config.get_config`.
+        """
+        return self.config.get_config(module, key=key, default=default)
 
     def get_test_client(self):
         """Creates a test client for this application.
@@ -530,6 +539,7 @@ class Tipfy(object):
 
             if __name__ == '__main__':
                 main()
+
         """
         if DEV_APPSERVER and APPENGINE:
             # Fix issue #772.
