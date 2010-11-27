@@ -163,20 +163,21 @@
 		//		)
 		//	};
 		//}
-		//function test( val ) {
-		//	return {
-		//		text: 'Test ' + val,
-		//		value: 'testLayer:' +val
-		//	};
-		//}
+		function test( val ) {
+			return {
+				text: 'Test ' + val,
+				value: 'testLayer:' +val
+			};
+		}
 		var dates = [].concat(
+			test( 1 ),
+			test( 2 ),
+			test( 3 ),
 			idesam( 1985 ),
 			idesam( 2009 )
 			//peru( 2007 ),
 			//peru( 2008 ),
 			//peru( 2009 ),
-			//test( 1 ),
-			//test( 2 )
 		);
 		app.$forestCoverDate
 			.fillSelect( dates, '', function( event ) {
@@ -246,7 +247,33 @@
 		app.geoclick && app.geoclick.disable();
 	}
 	
+	function EarthImage() {
+		//if( this == window ) return new EarthImage();
+		S.extend( this, {
+			step: function( creator ) {
+				return {
+					creator: creator,
+					args: Array.prototype.slice.call( arguments, 1 )
+				};
+			}
+		});
+	}
+	
 	function addTestLayer1() {
+		var rawImage = 'LANDSAT/L7_L1T/LE72300681999227EDC00';
+		
+		var ei = new EarthImage;
+		var radiance = ei.step( 'CLASLITE/Calibrate', rawImage );
+		var reflectance = ei.step( 'CLASLITE/Reflectance', radiance );
+		var autoMCU = ei.step( 'CLASLITE/AutoMCU', rawImage, reflectance );
+		
+		addEarthEngineLayer({
+			image: JSON.stringify( autoMCU ),
+			bands: 'vis-red,vis-green,vis-blue'
+		});
+	}
+	
+	function addTestLayer2() {
 		var image = {
 			creator: 'LANDSAT/CalibratedSurfaceReflectance',
 			args: [ 'LANDSAT/L7_L1T/LE70050672005171EDC00' ]
@@ -262,7 +289,7 @@
 		addEarthEngineLayer( request );
 	}
 	
-	function addTestLayer2() {
+	function addTestLayer3() {
 		var dates = [ '2010_06_26', '2010_06_30' ];
 		var images = dates.map( function( date ) {
 			return {
@@ -329,7 +356,8 @@
 		// TODO: temp hacky test code
 		({
 			1: addTestLayer1,
-			2: addTestLayer2
+			2: addTestLayer2,
+			3: addTestLayer3
 		})[url]();
 	}
 	
