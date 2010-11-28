@@ -59,7 +59,7 @@ class ProxyHandler( RequestHandler ):
 		return response
 	
 	def get( self, path=None ):
-		return self._proxy( r'(info|list|map)\?' )
+		return self._proxy( r'(info|list|map|value)\?' )
 	
 	def post( self, path=None ):
 		return self._proxy( r'(mapid)$', urllib.urlencode(self.request.form) )
