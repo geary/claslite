@@ -10,6 +10,8 @@
 
 from tipfy import RequestHandler, Response
 
+from tipfy.utils import json_decode, json_encode
+
 import cgi, re, urllib, urllib2
 
 class ProxyHandler( RequestHandler ):
@@ -45,8 +47,14 @@ class ProxyHandler( RequestHandler ):
 		json = f.read()
 		f.close()
 		
+		if debug:
+			jd = json_decode( json )
+			json = json_encode( jd, indent=4 )
+			
 		response = Response( json )
-		if not debug:
+		if debug:
+			response.headers['Content-Type'] = 'text/plain'
+		else:
 			response.headers['Content-Type'] = 'application/json'
 		return response
 	
