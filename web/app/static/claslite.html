@@ -6,6 +6,11 @@
 	
 	<link type="text/css" href="css/claslite.css" rel="stylesheet" />
 	
+	<script type="text/javascript">
+		if( ! window.JSON )
+			document.write( '<script type="text/javascript" src="js/json2.js"><\/script>' );
+	</script>
+	
 	<script type="text/javascript" src="http://www.google.com/jsapi">
 	</script>
 	<script type="text/javascript">
@@ -14,11 +19,6 @@
 			google.load( 'jquery', '1.4.2', { uncompressed:true } );
 			google.load( 'maps', '3', { other_params: 'sensor=false' } );
 		})();
-	</script>
-	
-	<script type="text/javascript">
-		if( ! window.JSON )
-			document.write( '<script type="text/javascript" src="js/json2.js"><\/script>' );
 	</script>
 	
 	<script type="text/javascript" src="js/scriptino-base.js"></script>
@@ -42,7 +42,6 @@
 		<div id="header">
 			
 			<div id="header-tagline">
-				<!--Forest<br /> Monitoring-->
 				Forest Monitoring
 			</div>
 			
