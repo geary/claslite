@@ -506,7 +506,9 @@
 				data: [ [ forest.join(), nodata.join(), nonforest.join() ].join('|') ],
 				scale: scale,
 				barWidth: [ 25, 20 ],
-				axis: '2,000000,15'
+				axis: '2,000000,15',
+				legend: 'Forest|No Data|Non-Forest',
+				legendPos: '|r'
 			});
 			
 			setImg( '#forest-cover-chart', url, width, height );

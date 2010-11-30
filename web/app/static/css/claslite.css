@@ -357,10 +357,6 @@ div.color-picker-box {
 	padding-left: 20px;
 }
 
-div#statistics-color-pickers div.color-picker-box {
-	padding: 0 0 15px 0;
-}
-
 div.color-picker-box label {
 	display: block;
 	/*font-weight: bold;*/

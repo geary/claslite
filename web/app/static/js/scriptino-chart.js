@@ -77,7 +77,9 @@
 				chs: a.width + 'x' + a.height,
 				chtt: a.title,
 				chbh: a.barWidth.join(),
-				chxs: a.axis
+				chxs: a.axis,
+				chdl: a.legend,
+				chdlp: a.legendPos
 			});
 		},
 		
