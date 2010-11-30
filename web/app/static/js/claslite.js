@@ -175,14 +175,14 @@
 			};
 		}
 		var dates = [].concat(
-			test( 1 ),
-			test( 2 ),
-			test( 3 ),
 			idesam( 1985 ),
-			idesam( 2009 )
+			idesam( 2009 ),
 			//peru( 2007 ),
 			//peru( 2008 ),
 			//peru( 2009 ),
+			test( 1 ),
+			test( 2 ),
+			test( 3 )
 		);
 		app.$forestCoverDate
 			.fillSelect( dates, '', function( event ) {
