@@ -107,7 +107,6 @@
 			disableGeoclick();
 			removeLayers();
 			addStatistics();
-			addStatistics( '-1' );
 		},
 		help: function() {
 			showMap();
@@ -475,27 +474,62 @@
 		);
 	}
 	
-	function addStatistics( suffix ) {
+	function setImg( sel, url, width, height ) {
+		$(sel).html( S(
+			'<img style="width:', width, 'px; height:', height, 'px;" src="', url, '" />'
+		) );
+	}
+	
+	function U( value ) { return value * .09; }
+	
+	function addStatistics() {
 		$.getJSON( 'js/statistics-test.json', function( json ) {
-			S.chart({
-				container: '#statistics-chart' + ( suffix || '' ),
-				list: json.statistics.images.map( function( image) {
-					function get( sel, prop ) {
-						return {
-							color: $(sel).val(),
-							value: image[prop]
-						}
-					}
-					return {
-						label: image.date,
-						values: [
-							get( '#statistics-forest-color', 'forestPixels' ),
-							get( '#statistics-nodata-color', 'noDataPixels' ),
-							get( '#statistics-nonforest-color', 'nonForestPixels' )
-						]
-					}
-				})
+			
+			var region = json.regions[0];
+			
+			var labels = [], scale = [], forest = [], nodata = [], nonforest = [];
+			region.forestCover.forEach( function( cover ) {
+				labels.push( cover.date );
+				scale.push([ 0, U(cover.forest) + U(cover.nodata) + U(cover.nonforest) ]);
+				forest.push( U(cover.forest) );
+				nodata.push( U(cover.nodata) );
+				nonforest.push( U(cover.nonforest) );
 			});
+			
+			var width = 300, height = 200;
+			
+			var url = S.ChartApi.barV({
+				width: width,
+				height: height,
+				labels: labels,
+				colors: [ '00FF00', '000000', 'EE9A00' ],
+				data: [ [ forest.join(), nodata.join(), nonforest.join() ].join('|') ],
+				scale: scale,
+				barWidth: [ 25, 20 ],
+				axis: '2,000000,15'
+			});
+			
+			setImg( '#forest-cover-chart', url, width, height );
+			
+			//S.chart({
+			//	container: '#statistics-chart' + ( suffix || '' ),
+			//	list: json.statistics.images.map( function( image) {
+			//		function get( sel, prop ) {
+			//			return {
+			//				color: $(sel).val(),
+			//				value: image[prop]
+			//			}
+			//		}
+			//		return {
+			//			label: image.date,
+			//			values: [
+			//				get( '#statistics-forest-color', 'forestPixels' ),
+			//				get( '#statistics-nodata-color', 'noDataPixels' ),
+			//				get( '#statistics-nonforest-color', 'nonForestPixels' )
+			//			]
+			//		}
+			//	})
+			//});
 		});
 	}
 	

@@ -5,6 +5,12 @@
 
 (function( S, $ ) {
 	
+	S.unitSelect = function( a ) {
+		$.S(
+			
+		).appendTo( a.container );
+	};
+	
 	S.chart = function( a ) {
 		var chart = {
 		};

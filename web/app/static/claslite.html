@@ -260,35 +260,54 @@
 					
 					<div class="tab-panel" id="statistics-panel">
 						
-						<div class="" id="statistics-color-pickers">
+						<div class="statistics-section" style="width:400px;">
 							
-							<!-- TODO: refactor -->
-							<div class="color-picker-box">
-								<label for="statistics-forest-color">Forest</label>
-								<input class="color-picker" data-hex="true" name="forest-color" id="statistics-forest-color" value="#00ff00">
-							</div>
-							<div class="color-picker-box">
-								<label for="statistics-nodata-color">No data</label>
-								<input class="color-picker" data-hex="true" name="nodata-color" id="statistics-nodata-color" value="#000000">
-							</div>
-							<div class="color-picker-box">
-								<label for="statistics-nonforest-color">Non-forest</label>
-								<input class="color-picker" data-hex="true" name="nonforest-color" id="statistics-nonforest-color" value="#ee9a00">
-							</div>
-							<!-- End TODO -->
-							<div class="clear-left">
+							<h2>Forest Cover</h2>
+							
+							<div style="position:relative;">
+								
+								<div class="" id="statistics-color-pickers" style="float:left;">
+									
+									<!-- TODO: refactor -->
+									<div class="color-picker-box">
+										<label for="statistics-nonforest-color">Non-forest</label>
+										<input class="color-picker" data-hex="true" name="nonforest-color" id="statistics-nonforest-color" value="#ee9a00">
+									</div>
+									<div class="clear-left">
+									</div>
+									<div class="color-picker-box">
+										<label for="statistics-nodata-color">No data</label>
+										<input class="color-picker" data-hex="true" name="nodata-color" id="statistics-nodata-color" value="#000000">
+									</div>
+									<div class="clear-left">
+									</div>
+									<div class="color-picker-box">
+										<label for="statistics-forest-color">Forest</label>
+										<input class="color-picker" data-hex="true" name="forest-color" id="statistics-forest-color" value="#00ff00">
+									</div>
+									<div class="clear-left">
+									</div>
+									<!-- End TODO -->
+									
+								</div>
+								
+								<div class="statistics-chart" id="forest-cover-chart">
+								</div>
+								
+								<!--<div class="units" id="statistics-units">-->
+								<!--	<select id="statistics-units-select">-->
+								<!--		<option value="4046.85642|acres">Acres</option>-->
+								<!--		<option value="10000|hectares" selected="selected">Hectares</option>-->
+								<!--		<option value="1000000|km&#178;">Square Kilometers</option>-->
+								<!--		<option value="2589988.11|miles&#178;">Square Miles</option>-->
+								<!--	</select>-->
+								<!--</div>-->
+								
+								<div class="clear-left">
+								</div>
+								
 							</div>
 							
-						</div>
-						
-						<div class="chart" id="statistics-chart">
-						</div>
-						
-						<div style="margin: 20px 0 16px 0;">
-							Or:
-						</div>
-						
-						<div class="chart" id="statistics-chart-1">
 						</div>
 						
 					</div>

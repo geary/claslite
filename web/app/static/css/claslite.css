@@ -351,19 +351,19 @@ input.color-picker {
 	font-size:13px !important;
 }
 
-div#statistics-color-pickers {
-	padding-left: 25px;
-}
-
 div.color-picker-box {
 	float: left;
-	width: 70px;
+	width: 90px;
 	padding-left: 20px;
+}
+
+div#statistics-color-pickers div.color-picker-box {
+	padding: 0 0 15px 0;
 }
 
 div.color-picker-box label {
 	display: block;
-	font-weight: bold;
+	/*font-weight: bold;*/
 	margin-bottom: 6px;
 }
 
@@ -485,32 +485,8 @@ div.statistics-chart {
 	margin-top: 15px;
 }
 
-div.statistics-bar-label {
+div.statistics-section {
 	float: left;
-	padding-top: 4px;
-	width: 45px;
-}
-
-div.statistics-bar-container {
-	float: left;
-	position: relative;
-	width: 275px;
-	height: 20px;
-	border: 2px solid #666;
-	margin-bottom: -2px;
-	/*margin-bottom: 6px;*/
-}
-
-#statistics-chart-1 div.statistics-bar-container {
-	margin-bottom: 6px;
-}
-
-div.statistics-bar {
-	position: absolute;
-	left: 0;
-	top: 0;
-	border-right: 1px solid #666;
-	height: 20px;
 }
 
 /* Logos */
