@@ -496,7 +496,7 @@
 				nonforest.push( U(cover.nonforest) );
 			});
 			
-			var width = 300, height = 200;
+			var width = 200, height = 200;
 			
 			var url = S.ChartApi.barV({
 				width: width,
@@ -508,10 +508,40 @@
 				barWidth: [ 25, 20 ],
 				axis: '2,000000,15',
 				legend: 'Forest|No Data|Non-Forest',
-				legendPos: '|r'
+				legendPos: '|r',
+				axes: 'x,y',
+				axisFormat: '1N**%'
 			});
 			
 			setImg( '#forest-cover-chart', url, width, height );
+			
+			var labels = [], scaleMax = 0, deforestation = [], disturbance = [];
+			region.forestChange.forEach( function( change ) {
+				labels.push( S( change.startdate.slice(-2), '-', change.enddate.slice(-2) ) );
+				scaleMax = Math.max( scaleMax, U(change.deforestation) + U(change.disturbance) );
+				deforestation.push( U(change.deforestation) );
+				disturbance.push( U(change.disturbance) );
+			});
+			
+			var width = 870;
+			
+			var url = S.ChartApi.barV({
+				width: width,
+				height: height,
+				labels: labels,
+				colors: [ 'FF0000', 'FFFF00' ],
+				data: [ [ deforestation.join(), disturbance.join() ].join('|') ],
+				scale: [ 0, scaleMax ],
+				barWidth: [ 22, 10 ],
+				axis: '2,000000,15',
+				legend: 'Deforestation|Disturbance',
+				legendPos: '|r',
+				axes: 'x,y',
+				axisRange: [ 1, 0, scaleMax ],
+				axisFormat: '1N*s*'
+			});
+			
+			setImg( '#forest-change-area-chart', url, width, height );
 			
 			//S.chart({
 			//	container: '#statistics-chart' + ( suffix || '' ),
