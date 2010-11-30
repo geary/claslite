@@ -430,8 +430,6 @@
 			// END HACK
 		}
 		
-		removePoweredBy();
-		
 		app.geoclick = new app.map.Geoclick({
 			form: '#location-search-form',
 			input: '#location-search-input',
@@ -457,16 +455,6 @@
 		});
 	}
 	
-	function removePoweredBy() {
-		var timer = setInterval( function() {
-			var $pow = $('img[src$="/mapfiles/poweredby.png"]');
-			if( $pow.length ) {
-				$pow.remove();
-				clearInterval();
-			}
-		}, 50 );
-	}
-
 	function addSolidMapType( id, color, name, alt ) {
 		app.map.map.mapTypes.set( id,
 			new S.Map.v3.SolidMapType({ color:color, name:name, alt:alt })
