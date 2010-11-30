@@ -507,20 +507,23 @@ div.statistics-bar {
 
 #earth-engine-logo {
 	position: absolute;
-	left: 356px;
-	bottom: 20px;
+	right: 5px;
+	top: 81px;
 	display: block;
 	text-decoration: none;
 	padding: 4px 4px 2px 4px;
 	color: #444;
 	font-size: 12px;
 	white-space: nowrap;
-	background-color: #FEFEFE;
-	border: 2px solid #AEAEB0;
+	background-color: white;
+	border: 1px solid white;
+}
+
+#earth-engine-logo:hover {
+	border-color: #84B0C7;
 }
 
 #earth-engine-logo-powered-by {
-	display: block;
 	color: #666;
 	font-size: 11px;
 	padding: 0 0 3px 1px;
