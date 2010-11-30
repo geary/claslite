@@ -78,17 +78,21 @@
 	}
 	
 	var tileBase = 'http://claslite.geary.joyeurs.com/tiles/';
+	// TODO: use tab hiders to simplify this code
 	var activateTab = {
 		location: function() {
+			showMap();
 			enableGeoclick();
 			removeLayers();
 		},
 		forestcover: function() {
+			showMap();
 			disableGeoclick();
 			removeLayers();
 			addForestCoverLayer( 'forestcover' );
 		},
 		forestchange: function() {
+			showMap();
 			disableGeoclick();
 			removeLayers();
 			// TODO: there's probably a simpler way to do this:
@@ -99,12 +103,14 @@
 			if( disturbance ) addForestChangeLayer( 'disturbance' );
 		},
 		statistics: function() {
+			hideMap();
 			disableGeoclick();
 			removeLayers();
 			addStatistics();
 			addStatistics( '-1' );
 		},
 		help: function() {
+			showMap();
 			disableGeoclick();
 			removeLayers();
 		}
@@ -237,6 +243,14 @@
 				}).join(''),
 			'</div>'
 		).appendTo( legend );
+	}
+	
+	function showMap() {
+		$('#main').addClass('with-map');
+	}
+	
+	function hideMap() {
+		$('#main').removeClass('with-map');
 	}
 	
 	function enableGeoclick() {
