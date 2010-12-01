@@ -97,6 +97,20 @@ var Scriptino, S;
 			return url.match( /:/ ) ? url : S.baseUrl + url;
 		},
 		
+		formatNumber: function( n, digits ) {
+			var nn = n.toFixed( digits ).split( '.' );
+			var groups = [];
+			for(
+				var match, digin = nn[0];
+				match = digin.match( /(.+)(...)$/ );
+			) {
+				groups.unshift( match[2] );
+				digin = match[1];
+			}
+			groups.unshift( digin )
+			return S( groups.join(), '.', nn[1] );
+		},
+		
 		// Convert a plain text string into HTML code representing that text,
 		// e.g. "<div>" becomes "&lt;div&gt;".
 		htmlEscape: function( text ) {
