@@ -554,7 +554,8 @@
 			
 			var labels = [], scaleMax = 0, deforestation = [], disturbance = [];
 			region.forestChange.forEach( function( change ) {
-				labels.push( S( change.startdate.slice(-2), '-', change.enddate.slice(-2) ) );
+				//labels.push( S( change.startdate.slice(-2), '-', change.enddate.slice(-2) ) );
+				labels.push( S( '-', change.enddate.slice(-2) ) );
 				scaleMax = Math.max( scaleMax, U(change.deforestation) + U(change.disturbance) );
 				deforestation.push( U(change.deforestation) );
 				disturbance.push( U(change.disturbance) );
@@ -569,7 +570,8 @@
 				colors: [ 'FF0000', 'FFD000' ],
 				data: [ [ deforestation.join(), disturbance.join() ].join('|') ],
 				scale: [ 0, scaleMax ],
-				barWidth: [ 22, 10 ],
+				//barWidth: [ 22, 10 ],
+				barWidth: [ 10, 6 ],
 				axis: '2,000000,15',
 				legend: 'Deforestation|Disturbance',
 				legendPos: '|r',
