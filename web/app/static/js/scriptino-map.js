@@ -208,8 +208,8 @@
 					sm.hoverPoly = sm.addBoundsPoly( bounds );
 				}
 				
-				function geocode( request, opt ) {
-					opt = opt || {};
+				function geocode( request, o ) {
+					o = o || {};
 					sm.geocoder.geocode( request, function( results, status ) {
 						$ul = $('<ul class="geocode-list">');
 						if( status == gm.GeocoderStatus.OK ) {
@@ -217,7 +217,7 @@
 							results.forEach( function( result, i ) {
 								if( ! result.geometry ) return;
 								var viewport = result.geometry.viewport, bounds = result.geometry.bounds || viewport;
-								if( ! opt.click ) outer = outer.union( bounds );
+								if( ! o.click ) outer = outer.union( bounds );
 								var $li = $('<li class="geocode-item">')
 									.text( result.formatted_address )
 									.appendTo($ul)
@@ -231,10 +231,11 @@
 										$ul.find('li.active').removeClass( 'active' );
 										$li.addClass( 'active' );
 										sm.fitBounds( bounds );
+										opt.onselect && opt.onselect( bounds )
 									});
 								if( i == 0 ) hilite( $li, bounds );
 							});
-							if( ! opt.click ) map.fitBounds( outer );
+							if( ! o.click ) map.fitBounds( outer );
 						}
 						$list.html( $ul );
 					});
