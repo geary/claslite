@@ -552,8 +552,11 @@
 			
 			setImg( '#forest-cover-chart', url, width, height );
 			
+			var startdate = +app.$statsStart.val(), enddate = +app.$statsEnd.val();
 			var labels = [], scaleMax = 0, deforestation = [], disturbance = [];
 			region.forestChange.forEach( function( change ) {
+				if( +change.startdate < startdate  ||  +change.enddate > enddate )
+					return;
 				//labels.push( S( change.startdate.slice(-2), '-', change.enddate.slice(-2) ) );
 				labels.push( S( '-', change.enddate.slice(-2) ) );
 				scaleMax = Math.max( scaleMax, U(change.deforestation) + U(change.disturbance) );
