@@ -532,104 +532,121 @@
 			function U( value ) { return value * factor; }
 			
 			var region = json.regions[0];
+			var height = 200;
 			
-			var labels = [], scale = [], forest = [], nonforest = [], nodata = [];
-			region.forestCover.forEach( function( cover ) {
-				labels.push( cover.date );
-				scale.push([ 0, U(cover.forest) + U(cover.nodata) + U(cover.nonforest) ]);
-				forest.push( U(cover.forest) );
-				nonforest.push( U(cover.nonforest) );
-				nodata.push( U(cover.nodata) );
-			});
+			forestCoverBarChart();
+			forestChangeLineChart();
+			forestChangeBarChart();
 			
-			var width = 220, height = 200;
+			function forestCoverBarChart() {
+				var labels = [], scaleMax = 0, forest = [], nonforest = [], nodata = [];
+				region.forestCover.forEach( function( cover ) {
+					labels.push( cover.date );
+					scaleMax = Math.max( scaleMax,
+						U(cover.forest) + U(cover.nonforest) + U(cover.nodata)
+					);
+					forest.push( U(cover.forest) );
+					nonforest.push( U(cover.nonforest) );
+					nodata.push( U(cover.nodata) );
+				});
+				
+				var width = 220;
+				
+				var url = S.ChartApi.barV({
+					width: width,
+					height: height,
+					labels: labels,
+					colors: [ '00FF00', 'EE9A00', '000000' ],
+					data: [ [ forest.join(), nonforest.join(), nodata.join() ].join('|') ],
+					scale: [ 0, scaleMax ],
+					barWidth: [ 25, 20 ],
+					axis: '2,000000,15',
+					legend: 'Forest|Non-Forest|Unobserved',
+					legendPos: '|r',
+					axes: 'x,y',
+					axisRange: [ 1, 0, scaleMax ],
+					axisFormat: '1N*s*'
+				});
+				
+				setChart( '#forest-cover-chart', url, width, height, 'Forest Cover' );
+			}
 			
-			var url = S.ChartApi.barV({
-				width: width,
-				height: height,
-				labels: labels,
-				colors: [ '00FF00', 'EE9A00', '000000' ],
-				data: [ [ forest.join(), nonforest.join(), nodata.join() ].join('|') ],
-				scale: scale,
-				barWidth: [ 25, 20 ],
-				axis: '2,000000,15',
-				legend: 'Forest|Non-Forest|Unobserved',
-				legendPos: '|r',
-				axes: 'x,y',
-				axisFormat: '1N**%'
-			});
+			function forestChangeBarChart() {
+				var startdate = +app.$statsStart.val(), enddate = +app.$statsEnd.val();
+				var labels = [], scaleMax = 0, deforestation = [], disturbance = [];
+				region.forestChange.forEach( function( change ) {
+					if( +change.startdate < startdate  ||  +change.enddate > enddate )
+						return;
+					//labels.push( S( change.startdate.slice(-2), '-', change.enddate.slice(-2) ) );
+					labels.push( S( '-', change.enddate.slice(-2) ) );
+					scaleMax = Math.max( scaleMax,
+						U(change.deforestation) + U(change.disturbance)
+					);
+					deforestation.push( U(change.deforestation) );
+					disturbance.push( U(change.disturbance) );
+				});
+				
+				var width = 870;
+				
+				var url = S.ChartApi.barV({
+					width: width,
+					height: height,
+					labels: labels,
+					colors: [ 'FF0000', 'FFD000' ],
+					data: [ [ deforestation.join(), disturbance.join() ].join('|') ],
+					scale: [ 0, scaleMax ],
+					//barWidth: [ 22, 10 ],
+					barWidth: [ 10, 6 ],
+					axis: '2,000000,15',
+					legend: 'Deforestation|Disturbance',
+					legendPos: '|r',
+					axes: 'x,y',
+					axisRange: [ 1, 0, scaleMax ],
+					axisFormat: '1N*s*'
+				});
+				
+				setChart( '#forest-change-area-chart', url, width, height,
+					S('Forest Change - Area (', units[1], ')' )
+				);
+			}
 			
-			setChart( '#forest-cover-chart', url, width, height, 'Forest Cover' );
+			function forestChangeLineChart() {
+				var totalpix = 2753565;  // temp for demo
+				var labels = [], scaleMax = 0, deforestation = [], disturbance = [];
+				region.forestChangeRate.forEach( function( change ) {
+					labels.push( S( change.startdate.slice(-2), '-', change.enddate.slice(-2) ) );
+					var years = (+change.enddate) - (+change.startdate);
+					var de = change.deforestation / years / totalpix * 100;
+					var di = change.disturbance / years / totalpix * 100;
+					scaleMax = Math.max( scaleMax, Math.max( de, di ) );
+					deforestation.push( de );
+					disturbance.push( di );
+				});
+				
+				var width = 350;
+				
+				var url = S.ChartApi.line({
+					width: width,
+					height: height,
+					labels: labels,
+					colors: [ 'FF0000', 'FFD000' ],
+					data: [ [ deforestation.join(), disturbance.join() ].join('|') ],
+					scale: [ 0, scaleMax ],
+					barWidth: [ 22, 10 ],
+					axis: '2,000000,15',
+					legend: 'Deforestation|Disturbance',
+					legendPos: '|r',
+					axes: 'x,y',
+					axisRange: [ 1, 0, scaleMax ],
+					axisFormat: '1N**%'
+				});
+				
+				setChart( '#forest-change-rate-chart', url, width, height,
+					'Forest Change - Percent per Year'
+				);
+			}
 			
-			var startdate = +app.$statsStart.val(), enddate = +app.$statsEnd.val();
-			var labels = [], scaleMax = 0, deforestation = [], disturbance = [];
-			region.forestChange.forEach( function( change ) {
-				if( +change.startdate < startdate  ||  +change.enddate > enddate )
-					return;
-				//labels.push( S( change.startdate.slice(-2), '-', change.enddate.slice(-2) ) );
-				labels.push( S( '-', change.enddate.slice(-2) ) );
-				scaleMax = Math.max( scaleMax, U(change.deforestation) + U(change.disturbance) );
-				deforestation.push( U(change.deforestation) );
-				disturbance.push( U(change.disturbance) );
-			});
-			
-			var width = 870;
-			
-			var url = S.ChartApi.barV({
-				width: width,
-				height: height,
-				labels: labels,
-				colors: [ 'FF0000', 'FFD000' ],
-				data: [ [ deforestation.join(), disturbance.join() ].join('|') ],
-				scale: [ 0, scaleMax ],
-				//barWidth: [ 22, 10 ],
-				barWidth: [ 10, 6 ],
-				axis: '2,000000,15',
-				legend: 'Deforestation|Disturbance',
-				legendPos: '|r',
-				axes: 'x,y',
-				axisRange: [ 1, 0, scaleMax ],
-				axisFormat: '1N*s*'
-			});
-			
-			setChart( '#forest-change-area-chart', url, width, height,
-				S('Forest Change - Area (', units[1], ')' )
-			);
-			
-			var totalpix = 2753565;  // temp for demo
-			var labels = [], scaleMax = 0, deforestation = [], disturbance = [];
-			region.forestChangeRate.forEach( function( change ) {
-				labels.push( S( change.startdate.slice(-2), '-', change.enddate.slice(-2) ) );
-				var years = (+change.enddate) - (+change.startdate);
-				var de = change.deforestation / years / totalpix * 100;
-				var di = change.disturbance / years / totalpix * 100;
-				scaleMax = Math.max( scaleMax, Math.max( de, di ) );
-				deforestation.push( de );
-				disturbance.push( di );
-			});
-			
-			var width = 350;
-			
-			var url = S.ChartApi.line({
-				width: width,
-				height: height,
-				labels: labels,
-				colors: [ 'FF0000', 'FFD000' ],
-				data: [ [ deforestation.join(), disturbance.join() ].join('|') ],
-				scale: [ 0, scaleMax ],
-				barWidth: [ 22, 10 ],
-				axis: '2,000000,15',
-				legend: 'Deforestation|Disturbance',
-				legendPos: '|r',
-				axes: 'x,y',
-				axisRange: [ 1, 0, scaleMax ],
-				axisFormat: '1N**%'
-			});
-			
-			setChart( '#forest-change-rate-chart', url, width, height,
-				'Forest Change - Percent per Year'
-			);
-			
+			// Old test code
 			//S.chart({
 			//	container: '#statistics-chart' + ( suffix || '' ),
 			//	list: json.statistics.images.map( function( image) {
