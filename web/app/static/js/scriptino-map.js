@@ -67,6 +67,10 @@
 				}
 				return poly;
 			},
+
+			setZoom: function ( zoom ) {
+				map.setZoom(zoom);
+			},	
 			
 			addLayer: function( opt ) {
 				var layer = {

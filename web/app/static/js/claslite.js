@@ -185,9 +185,9 @@
 			//peru( 2007 ),
 			//peru( 2008 ),
 			//peru( 2009 ),
-			test( 1 ),
-			test( 2 ),
-			test( 3 )
+			test( 1 ),    // 1999
+			test( 2 ),   //  2006
+			test( 3 )    //  2010
 		);
 		app.$forestCoverDate
 			.fillSelect( dates, '', function( event ) {
@@ -279,21 +279,83 @@
 		});
 	}
 	
-	function addTestLayer1() {
-		var rawImage = 'LANDSAT/L7_L1T/LE72300681999227EDC00';
+
+	function deforestation() {
 		
+	}
+
+	function disturbance() {
+
+	}
+
+
+	function addTestLayer1() {
+alert("test1");
+		var rawImage = 'LANDSAT/L7_L1T/LE72300681999227EDC00';  // Aug 15, 1999
+
+				var vcfImage = 'MOD44B_C4_TREE_2000';
+		var bounds = [ -26, -89, 5, -32 ]
+		app.map.fitBounds.apply( app.map, bounds );
+		app.map.setZoom( 8 );
 		var ei = new EarthImage;
 		var radiance = ei.step( 'CLASLITE/Calibrate', rawImage );
 		var reflectance = ei.step( 'CLASLITE/Reflectance', radiance );
 		var autoMCU = ei.step( 'CLASLITE/AutoMCU', rawImage, reflectance );
+		var vcfAdjusted = ei.step( 'CLASLITE/VCFAdjustedImage', autoMCU, vcfImage );
+		var forest = ei.step('CLASLITE/ForestMask', vcfAdjusted);
 		
 		addEarthEngineLayer({
-			image: JSON.stringify( autoMCU ),
-			bands: 'vis-red,vis-green,vis-blue'
+			image: JSON.stringify( forest ),
+			bands: 'Forest_NonForest',
+			gain: 127,
+		});
+	}
+
+	function addTestLayer2() {
+alert("test2");
+		rawImage = 'LANDSAT/L7_L1T/LE72300682006134EDC00';	// 2006
+	
+		var vcfImage = 'MOD44B_C4_TREE_2000';
+		var bounds = [ -26, -89, 5, -32 ]
+		app.map.fitBounds.apply( app.map, bounds );
+		app.map.setZoom( 8 );
+		var ei = new EarthImage;
+		var radiance = ei.step( 'CLASLITE/Calibrate', rawImage );
+		var reflectance = ei.step( 'CLASLITE/Reflectance', radiance );
+		var autoMCU = ei.step( 'CLASLITE/AutoMCU', rawImage, reflectance );
+		var vcfAdjusted = ei.step( 'CLASLITE/VCFAdjustedImage', autoMCU, vcfImage );
+		var forest = ei.step('CLASLITE/ForestMask', vcfAdjusted);
+		
+		addEarthEngineLayer({
+			image: JSON.stringify( forest ),
+			bands: 'Forest_NonForest',
+			gain: 127,
+		});
+	}
+
+	function addTestLayer3() {
+alert("test3");
+		rawImage = 'LANDSAT/L7_L1T/LE72300682010289EDC00';	// 2010
+
+		var vcfImage = 'MOD44B_C4_TREE_2000';
+		var bounds = [ -26, -89, 5, -32 ]
+		app.map.fitBounds.apply( app.map, bounds );
+		app.map.setZoom( 8 );
+		var ei = new EarthImage;
+		var radiance = ei.step( 'CLASLITE/Calibrate', rawImage );
+		var reflectance = ei.step( 'CLASLITE/Reflectance', radiance );
+		var autoMCU = ei.step( 'CLASLITE/AutoMCU', rawImage, reflectance );
+		var vcfAdjusted = ei.step( 'CLASLITE/VCFAdjustedImage', autoMCU, vcfImage );
+		var forest = ei.step('CLASLITE/ForestMask', vcfAdjusted);
+		
+		addEarthEngineLayer({
+			image: JSON.stringify( forest ),
+			bands: 'Forest_NonForest',
+			gain: 127,
 		});
 	}
 	
-	function addTestLayer2() {
+	function addTestLayer2old() {
 		var image = {
 			creator: 'LANDSAT/CalibratedSurfaceReflectance',
 			args: [ 'LANDSAT/L7_L1T/LE70050672005171EDC00' ]
@@ -309,7 +371,7 @@
 		addEarthEngineLayer( request );
 	}
 	
-	function addTestLayer3() {
+	function addTestLayer3old() {
 		var dates = [ '2010_06_26', '2010_06_30' ];
 		var images = dates.map( function( date ) {
 			return {
@@ -344,6 +406,8 @@
 		
 		addEarthEngineLayer( request );
 	}
+
+
 	
 	function addEarthEngineLayer( request ) {
 		var ee = new S.EarthEngine;
@@ -402,9 +466,9 @@
 	function testLayer( id, url ) {
 		// TODO: temp hacky test code
 		({
-			1: addTestLayer1,
-			2: addTestLayer2,
-			3: addTestLayer3
+			1: addTestLayer1(),
+			2: addTestLayer2(),
+			3: addTestLayer3()
 		})[url]();
 	}
 	
@@ -485,7 +549,7 @@
 				app.tabs.select( 'location' );
 			},
 			onselect: function( bounds ) {
-				//listEarthEngineAssets( bounds );
+				listEarthEngineAssets( bounds );
 			}
 		});
 		
