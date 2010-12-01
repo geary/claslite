@@ -533,13 +533,13 @@
 			
 			var region = json.regions[0];
 			
-			var labels = [], scale = [], forest = [], nodata = [], nonforest = [];
+			var labels = [], scale = [], forest = [], nonforest = [], nodata = [];
 			region.forestCover.forEach( function( cover ) {
 				labels.push( cover.date );
 				scale.push([ 0, U(cover.forest) + U(cover.nodata) + U(cover.nonforest) ]);
 				forest.push( U(cover.forest) );
-				nodata.push( U(cover.nodata) );
 				nonforest.push( U(cover.nonforest) );
+				nodata.push( U(cover.nodata) );
 			});
 			
 			var width = 220, height = 200;
@@ -548,12 +548,12 @@
 				width: width,
 				height: height,
 				labels: labels,
-				colors: [ '00FF00', '000000', 'EE9A00' ],
-				data: [ [ forest.join(), nodata.join(), nonforest.join() ].join('|') ],
+				colors: [ '00FF00', 'EE9A00', '000000' ],
+				data: [ [ forest.join(), nonforest.join(), nodata.join() ].join('|') ],
 				scale: scale,
 				barWidth: [ 25, 20 ],
 				axis: '2,000000,15',
-				legend: 'Forest|No Data|Non-Forest',
+				legend: 'Forest|Non-Forest|Unobserved',
 				legendPos: '|r',
 				axes: 'x,y',
 				axisFormat: '1N**%'
@@ -596,7 +596,7 @@
 				S('Forest Change - Area (', units[1], ')' )
 			);
 			
-			var totalpix = 6000000;  // temp for demo - approx
+			var totalpix = 2753565;  // temp for demo
 			var labels = [], scaleMax = 0, deforestation = [], disturbance = [];
 			region.forestChangeRate.forEach( function( change ) {
 				labels.push( S( change.startdate.slice(-2), '-', change.enddate.slice(-2) ) );
