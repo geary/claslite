@@ -512,17 +512,24 @@
 	}
 	
 	function setImg( sel, url, width, height ) {
-		$(sel).css({
+		return $(sel).css({
 			width: width,
 			height: height,
 			backgroundImage: S( 'url(', url, ')' )
 		});
 	}
 	
-	function U( value ) { return value * .09; }
+	function setChart( sel, url, width, height, title ) {
+		setImg( sel, url, width, height ).prev().html( title );
+	}
 	
 	function addStatistics() {
 		$.getJSON( 'js/statistics-test.json', function( json ) {
+			
+			var units = $('#statistics-units-select').val().split('|');
+			
+			var factor = json.pixelWidth * json.pixelHeight / units[0];
+			function U( value ) { return value * factor; }
 			
 			var region = json.regions[0];
 			
@@ -552,7 +559,7 @@
 				axisFormat: '1N**%'
 			});
 			
-			setImg( '#forest-cover-chart', url, width, height );
+			setChart( '#forest-cover-chart', url, width, height, 'Forest Cover' );
 			
 			var startdate = +app.$statsStart.val(), enddate = +app.$statsEnd.val();
 			var labels = [], scaleMax = 0, deforestation = [], disturbance = [];
@@ -585,7 +592,9 @@
 				axisFormat: '1N*s*'
 			});
 			
-			setImg( '#forest-change-area-chart', url, width, height );
+			setChart( '#forest-change-area-chart', url, width, height,
+				S('Forest Change - Area (', units[1], ')' )
+			);
 			
 			var totalpix = 6000000;  // temp for demo - approx
 			var labels = [], scaleMax = 0, deforestation = [], disturbance = [];
@@ -617,7 +626,9 @@
 				axisFormat: '1N**%'
 			});
 			
-			setImg( '#forest-change-rate-chart', url, width, height );
+			setChart( '#forest-change-rate-chart', url, width, height,
+				'Forest Change - Percent per Year'
+			);
 			
 			//S.chart({
 			//	container: '#statistics-chart' + ( suffix || '' ),
