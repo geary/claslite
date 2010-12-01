@@ -486,6 +486,21 @@ div.statistics-section {
 	margin-bottom: 16px;
 }
 
+/* Spinner */
+
+#spinner {
+	/*z-index: 999999;*/
+	/*filter: alpha(opacity=70);*/
+	/*opacity: 0.70;*/
+	/*-moz-opacity: 0.70;*/
+	/*position: absolute;*/
+	display: none;
+	position: absolute;
+	width: 128px;
+	height: 128px;
+	background: url(../images/spinner.gif) no-repeat;
+}
+
 /* Logos */
 
 #earth-engine-logo {
