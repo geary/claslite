@@ -139,7 +139,8 @@
 			app.tabOpts.click( app.tabs.selected );
 		});
 		
-		app.tabs.select( 'location' );
+		var tab = location.hash.replace( /^#/, '' );
+		app.tabs.select( app.tabOpts.tabs[tab] ? tab : 'location' );
 	}
 	
 	function initRangeInputs() {
