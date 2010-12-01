@@ -25,6 +25,10 @@ class ProxyHandler( RequestHandler ):
 	def _proxy( self, allow, data=None ):
 		api = self._getApiFromUrl()
 		
+		test = api.startswith( 'test/' )
+		if test:
+			api = api.replace( 'test/', '', 1 )
+		
 		debug = api.startswith( 'debug/' )
 		if debug:
 			api = api.replace( 'debug/', '', 1 )
@@ -33,9 +37,15 @@ class ProxyHandler( RequestHandler ):
 			self.abort( 403 )
 		
 		api = cgi.escape( api )
+		url = self.get_config( 'private', 'earth-engine-api' ) + api
+		
+		if test:
+			response = Response( url )
+			response.headers['Content-Type'] = 'text/plain'
+			return response
 		
 		req = urllib2.Request(
-			url = self.get_config( 'private', 'earth-engine-api' ) + api,
+			url = url,
 			headers = {
 				'Authorization': 'GoogleLogin auth=' +
 					self.get_config( 'private', 'earth-engine-auth' )
@@ -49,6 +59,7 @@ class ProxyHandler( RequestHandler ):
 		
 		if debug:
 			jd = json_decode( json )
+			#jd['eeurl'] = url
 			json = json_encode( jd, indent=4 )
 			
 		response = Response( json )
