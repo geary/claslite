@@ -483,6 +483,7 @@ div.statistics-chart {
 
 div.statistics-section {
 	float: left;
+	margin-bottom: 16px;
 }
 
 /* Logos */
