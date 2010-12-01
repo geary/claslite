@@ -102,6 +102,7 @@
 					<!-- Begin Location Panel -->
 					
 					<div class="tab-panel" id="location-panel">
+						
 						<form id="location-search-form">
 							
 							<label for="location-search-input">Click the map or search for a location:</label>
@@ -200,13 +201,13 @@
 								<label for="forestchange-date-start">
 									<b>Years:</b>
 								</label>
-								<select class="date-select" id="forestchange-date-start">
+								<select class="date-select date-start" id="forestchange-date-start">
 								</select>
 								
 								<label for="forestchange-date-end" style="xmargin-left:4px;">
 									<b>&ndash;</b>
 								</label>
-								<select class="date-select" id="forestchange-date-end">
+								<select class="date-select date-end" id="forestchange-date-end">
 								</select>
 								
 							</div>
@@ -263,33 +264,45 @@
 					
 					<div class="tab-panel" id="statistics-panel">
 						
-						<div class="statistics-section" style="width:220px;">
-							<h2>Forest Cover</h2>
-							<div class="statistics-chart" id="forest-cover-chart">
-							</div>
-						</div>
-						
-						<div class="statistics-section" style="width:350px;">
-							<h2>Forest Change - Percent per Year</h2>
-							<div class="statistics-chart" id="forest-change-rate-chart">
-							</div>
-						</div>
-						
-						<div class="statistics-section" style="width:870px;">
-							<h2>Forest Change - Area (Hectares)</h2>
-							<div class="statistics-chart" id="forest-change-area-chart">
-							</div>
-						</div>
-						
-						<!--<div class="units" id="statistics-units">-->
-						<!--	<select id="statistics-units-select">-->
-						<!--		<option value="4046.85642|acres">Acres</option>-->
-						<!--		<option value="10000|hectares" selected="selected">Hectares</option>-->
-						<!--		<option value="1000000|km&#178;">Square Kilometers</option>-->
-						<!--		<option value="2589988.11|miles&#178;">Square Miles</option>-->
-						<!--	</select>-->
-						<!--</div>-->
+						<form class="input-form" id="statistics-input-form">
 							
+							<div class="float-right">
+								<button class="submit view-button" type="submit" id="view-statistics">View</button>
+							</div>
+							
+							<div>
+								
+								<label for="statistics-date-start">
+									<b>Years:</b>
+								</label>
+								<select class="date-select date-start" id="statistics-date-start">
+								</select>
+								
+								<label for="statistics-date-end" style="xmargin-left:4px;">
+									<b>&ndash;</b>
+								</label>
+								<select class="date-select date-end" id="statistics-date-end">
+								</select>
+								
+							</div>
+							
+							<div class="clear-right">
+							</div>
+							
+							<div class="units" id="statistics-units">
+								<label for="statistics-units-select">
+									<b>Units:</b>
+								</label>
+								<select id="statistics-units-select">
+									<option value="4046.85642|acres">Acres</option>
+									<option value="10000|hectares" selected="selected">Hectares</option>
+									<option value="1000000|km&#178;">Square Kilometers (km&#178;)</option>
+									<option value="2589988.11|mi&#178;">Square Miles (mi&#178;)</option>
+								</select>
+							</div>
+							
+						</form>
+						
 					</div>
 					
 					<!-- End Statistics Panel -->
@@ -316,6 +329,32 @@
 			</div>
 			
 			<!-- End Map -->
+			
+			<!-- Begin Statistics -->
+			
+			<div id="statswrap">
+				
+				<div class="statistics-section" style="width:220px;">
+					<h2>Forest Cover</h2>
+					<div class="statistics-chart" id="forest-cover-chart">
+					</div>
+				</div>
+				
+				<div class="statistics-section" style="width:350px;">
+					<h2>Forest Change - Percent per Year</h2>
+					<div class="statistics-chart" id="forest-change-rate-chart">
+					</div>
+				</div>
+				
+				<div class="statistics-section" style="width:870px;">
+					<h2>Forest Change - Area (Hectares)</h2>
+					<div class="statistics-chart" id="forest-change-area-chart">
+					</div>
+				</div>
+				
+			</div>
+			
+			<!-- End Statistics -->
 			
 		</div>
 		

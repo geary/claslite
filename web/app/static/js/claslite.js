@@ -72,7 +72,11 @@
 			$deforestationRadio: $('#deforestation-radio'),
 			$disturbanceRadio: $('#disturbance-radio'),
 			$bothRadio: $('#both-radio'),
+			$statsStart: $('#statistics-date-start'),
+			$statsEnd: $('#statistics-date-end'),
 			$mapwrap: $('#mapwrap'),
+			$statswrap: $('#statswrap'),
+			$mapstatswrap: $('#mapwrap,#statswrap'),
 			_: null
 		};
 	}
@@ -103,7 +107,7 @@
 			if( disturbance ) addForestChangeLayer( 'disturbance' );
 		},
 		statistics: function() {
-			hideMap();
+			showStats();
 			disableGeoclick();
 			removeLayers();
 			addStatistics();
@@ -197,16 +201,18 @@
 			for( var i = first;  i <= last;  ++i ) a.push({ text:i, value:i });
 			return a;
 		}
-		app.$forestChangeStart
+		$('select.date-start')
 			.fillSelect( arr( 1985, 2008 ), 1985, function( event ) {
-				if( +this.value >= +app.$forestChangeEnd.val() )
-					app.$forestChangeEnd.val( +this.value + 1 );
+				var $end = $(this).parent().find('.date-end');
+				if( +this.value >= +$end.val() )
+					$end.val( +this.value + 1 );
 			});
 		
-		app.$forestChangeEnd
+		$('select.date-end')
 			.fillSelect( arr( 1986, 2009 ), 2009, function( event ) {
-				if( +this.value <= +app.$forestChangeStart.val() )
-					app.$forestChangeStart.val( +this.value - 1 );
+				var $start = $(this).parent().find('.date-start');
+				if( +this.value <= +$start.val() )
+					$start.val( +this.value - 1 );
 			});
 	}
 	
@@ -246,11 +252,11 @@
 	}
 	
 	function showMap() {
-		$('#main').addClass('with-map');
+		$('#main').addClass('with-map').removeClass('with-stats');
 	}
 	
-	function hideMap() {
-		$('#main').removeClass('with-map');
+	function showStats() {
+		$('#main').addClass('with-stats').removeClass('with-map');
 	}
 	
 	function enableGeoclick() {
@@ -635,7 +641,7 @@
 	function resize() {
 		var ww = app.$window.width(), wh = app.$window.height();
 		app.$main.css({ height: wh - app.$main.offset().top });
-		app.$mapwrap.css({ width: ww - layout.sidebarWidth - 1 });
+		app.$mapstatswrap.css({ width: ww - layout.sidebarWidth - 1 });
 		app.map && app.map.resize();
 	}
 	

@@ -272,12 +272,8 @@ ul.tabs a.hover span {
 	position: absolute;
 	left: 0;
 	top: 0;
-	width: 100%;
-	height: 100%;
-}
-
-#main.with-map #sidebar-outer {
 	width: 350px;
+	height: 100%;
 }
 
 #sidebar-scrolling {
@@ -462,7 +458,7 @@ div.slider-panel {
 
 /* Map */
 
-#mapwrap {
+#mapwrap, #statswrap {
 	position: absolute;
 	border-left:1px solid #84B0C7;
 	left: 350px;
@@ -484,6 +480,18 @@ div.statistics-chart {
 div.statistics-section {
 	float: left;
 	margin-bottom: 16px;
+}
+
+#statistics-units {
+	margin-top: 12px;
+}
+
+#statswrap {
+	padding: 12px;
+}
+
+#main.with-stats #statswrap {
+	visibility: visible;
 }
 
 /* Spinner */
