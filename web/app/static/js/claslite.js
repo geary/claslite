@@ -354,6 +354,33 @@
 		});
 	}
 	
+	// TODO: turn these into an object
+	function listEarthEngineAssets( bounds ) {
+		var ne = bounds.getNorthEast(), sw = bounds.getSouthWest(),
+			n = ne.lat(), e = ne.lng(), s = sw.lat(), w = sw.lng();
+		//console.log( S( 'bbox=', w.toFixed(2), ',', s.toFixed(2), ',', e.toFixed(2), ',', n.toFixed(2) ) );
+		var ee = new S.EarthEngine;
+		var request = {
+			id: 'MOD09GA',
+			region: [ e, s, w, n ].join(),
+			fields: 'ACQUISITION_DATE'
+		};
+		ee.list( request, function( assets ) {
+			//console.dir( assets );
+			//$('#assets-list').html( S(
+			//	'<div class="assets">',
+			//		assets.map( function( asset ) {
+			//			return S(
+			//				'<div class="asset">',
+			//					asset
+			//				'</div>'
+			//			);
+			//		}).join(''),
+			//	'</div>'
+			//) );
+		});
+	}
+	
 	function addForestCoverLayer( id ) {
 		var value = app.$forestCoverDate.val().split(':'),
 			fn = value[0], url = value[1];
@@ -449,6 +476,9 @@
 			list: '#location-results-list',
 			onclick: function() {
 				app.tabs.select( 'location' );
+			},
+			onselect: function( bounds ) {
+				//listEarthEngineAssets( bounds );
 			}
 		});
 		
