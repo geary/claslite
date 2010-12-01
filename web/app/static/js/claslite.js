@@ -512,9 +512,11 @@
 	}
 	
 	function setImg( sel, url, width, height ) {
-		$(sel).html( S(
-			'<img style="width:', width, 'px; height:', height, 'px;" src="', url, '" />'
-		) );
+		$(sel).css({
+			width: width,
+			height: height,
+			backgroundImage: S( 'url(', url, ')' )
+		});
 	}
 	
 	function U( value ) { return value * .09; }
