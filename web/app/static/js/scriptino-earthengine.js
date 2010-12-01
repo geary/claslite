@@ -21,6 +21,16 @@
 				});
 			},
 			
+			list: function( request, ready ) {
+				$.ajax({
+					url: '/ee/list',
+					data: request,
+					success: function( json ) {
+						ready( json.data );
+					}
+				});
+			},
+			
 			makeLayer: function( id ) {
 				var layer = {
 					opacity: opt.opacity == null ? 1 : opt.opacity
