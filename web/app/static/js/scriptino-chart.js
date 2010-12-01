@@ -79,7 +79,10 @@
 				chbh: a.barWidth.join(),
 				chxs: a.axis,
 				chdl: a.legend,
-				chdlp: a.legendPos
+				chdlp: a.legendPos,
+				chxt: a.axes,
+				chxs: a.axisFormat,
+				chxr: a.axisRange && a.axisRange.join()
 			});
 		},
 		
@@ -91,7 +94,13 @@
 				chds: a.scale.join(),
 				chl: a.labels.join('|'),
 				chs: a.width + 'x' + a.height,
-				chtt: a.title
+				chtt: a.title,
+				chxs: a.axis,
+				chdl: a.legend,
+				chdlp: a.legendPos,
+				chxt: a.axes,
+				chxs: a.axisFormat,
+				chxr: a.axisRange && a.axisRange.join()
 			});
 		},
 		
