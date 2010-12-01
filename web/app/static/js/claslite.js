@@ -519,36 +519,69 @@
 		});
 	}
 	
-	function setChart( sel, url, width, height, title ) {
-		setImg( sel, url, width, height ).prev().html( title );
+	function setChart( sel, table, url, width, height, title ) {
+		setImg( sel, url, width, height ).prev().html( table ).prev().html( title );
 	}
 	
 	function addStatistics() {
 		$.getJSON( 'js/statistics-test.json', function( json ) {
 			
-			var units = $('#statistics-units-select').val().split('|');
-			
-			var factor = json.pixelWidth * json.pixelHeight / units[0];
+			var units = $('#statistics-units-select').val().split('|'),
+				unit = { value:units[0], name:units[1] },
+				factor = json.pixelWidth * json.pixelHeight / unit.value;
 			function U( value ) { return value * factor; }
 			
 			var region = json.regions[0];
-			var height = 200;
+			var height = 150;
 			
-			forestCoverBarChart();
-			forestChangeLineChart();
-			forestChangeBarChart();
+			forestCoverChart();
+			//forestChangeChart();
 			
-			function forestCoverBarChart() {
-				var labels = [], scaleMax = 0, forest = [], nonforest = [], nodata = [];
+			function forestCoverChart() {
+				var scaleMax = 0, labels = [], rows = [],
+					forests = [], nonforests = [], nodatas = [];
 				region.forestCover.forEach( function( cover ) {
-					labels.push( cover.date );
-					scaleMax = Math.max( scaleMax,
-						U(cover.forest) + U(cover.nonforest) + U(cover.nodata)
-					);
-					forest.push( U(cover.forest) );
-					nonforest.push( U(cover.nonforest) );
-					nodata.push( U(cover.nodata) );
+					var date = cover.date,
+						forest = U(cover.forest),
+						nonforest = U(cover.nonforest),
+						nodata = U(cover.nodata);
+					// Table
+					function num( value ) { return S.formatNumber( value, 2 ); }
+					rows.push( S(
+						'<tr>',
+							'<td>', date, '</td>',
+							'<td>', num(forest), '</td>',
+							'<td>', num(nonforest), '</td>',
+							'<td>', num(nodata), '</td>',
+						'</tr>'
+					) );
+					// Chart
+					labels.push( date );
+					scaleMax = Math.max( scaleMax, forest + nonforest + nodata );
+					forests.push( forest );
+					nonforests.push( nonforest );
+					nodatas.push( nodata );
 				});
+				
+				var table = S(
+					'<table class="stats-table">',
+						'<thead>',
+							'<tr>',
+								'<th class="stats-table-topleft">&nbsp;</th>',
+								'<th colspan="3">Area (', unit.name, ')</th>',
+							'</tr>',
+							'<tr>',
+								'<th class="stats-table-x">Year</th>',
+								'<th>Forest</th>',
+								'<th>Non-Forest</th>',
+								'<th>Unobserved</th>',
+							'</tr>',
+						'</thead>',
+						'<tbody>',
+							rows.join(''),
+						'</tbody>',
+					'</table>'
+				);
 				
 				var width = 220;
 				
@@ -557,7 +590,7 @@
 					height: height,
 					labels: labels,
 					colors: [ '00FF00', 'EE9A00', '000000' ],
-					data: [ [ forest.join(), nonforest.join(), nodata.join() ].join('|') ],
+					data: [ [ forests.join(), nonforests.join(), nodatas.join() ].join('|') ],
 					scale: [ 0, scaleMax ],
 					barWidth: [ 25, 20 ],
 					axis: '2,000000,15',
@@ -568,10 +601,10 @@
 					axisFormat: '1N*s*'
 				});
 				
-				setChart( '#forest-cover-chart', url, width, height, 'Forest Cover' );
+				setChart( '#forest-cover-chart', table, url, width, height, 'Forest Cover' );
 			}
 			
-			function forestChangeBarChart() {
+			function forestChangeChart() {
 				var startdate = +app.$statsStart.val(), enddate = +app.$statsEnd.val();
 				var labels = [], scaleMax = 0, deforestation = [], disturbance = [];
 				region.forestChange.forEach( function( change ) {
@@ -605,8 +638,8 @@
 					axisFormat: '1N*s*'
 				});
 				
-				setChart( '#forest-change-area-chart', url, width, height,
-					S('Forest Change - Area (', units[1], ')' )
+				setChart( '#forest-change-area-chart', table, url, width, height,
+					S('Forest Change - Area (', unit.name, ')' )
 				);
 			}
 			
