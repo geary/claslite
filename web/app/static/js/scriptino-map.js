@@ -34,8 +34,8 @@
 		
 		S.extend( sm, {
 			
-			addBoundsPoly: function( bounds ) {
-				var sw = bounds.getSouthWest(), ne = bounds.getNorthEast();
+			addBoundsPoly: function( a ) {
+				var sw = a.bounds.getSouthWest(), ne = a.bounds.getNorthEast();
 				var s = sw.lat(), w = sw.lng(), n = ne.lat(), e = ne.lng();
 				var path = [
 					new gm.LatLng( n, w ),
@@ -45,9 +45,11 @@
 					new gm.LatLng( n, w )
 				];
 				if( v2 ) {
-					var poly = new gm.Polygon( path, '#000000', 5, .7, '#000000', .1, {
-						clickable: false
-					});
+					var poly = new gm.Polygon(
+						path, a.strokeColor, 2, a.strokeOpacity, a.fillColor, a.fillOpacity, {
+							clickable: false
+						}
+					);
 					try {
 						// This throws an exception!
 						sm.map.addOverlay( poly );
@@ -57,16 +59,11 @@
 					}
 				}
 				else {
-					var poly = new gm.Polygon({
+					var poly = new gm.Polygon( S.extend({
 						map: map,
 						clickable: false,
-						fillColor: '#000000',
-						fillOpacity: .1,
-						paths: path,
-						strokeColor: '#000000',
-						strokeOpacity: .7,
-						strokeWeight: 2
-					});
+						paths: path
+					}, a ) );
 				}
 				return poly;
 			},
@@ -205,7 +202,14 @@
 					$ul.find('li.hover').removeClass( 'hover' );
 					if( ! $li ) return;
 					$li.addClass( 'hover' );
-					sm.hoverPoly = sm.addBoundsPoly( bounds );
+					sm.hoverPoly = sm.addBoundsPoly({
+						bounds:bounds,
+						fillColor: '#000000',
+						fillOpacity: 0,
+						strokeColor: '#000000',
+						strokeOpacity: .7,
+						strokeWeight: 1
+					});
 				}
 				
 				function geocode( request, o ) {
@@ -230,6 +234,15 @@
 									.click( function( event ) {
 										$ul.find('li.active').removeClass( 'active' );
 										$li.addClass( 'active' );
+										sm.activePoly && sm.removePoly( sm.activePoly );
+										sm.activePoly = sm.addBoundsPoly({
+											bounds:bounds,
+											fillColor: '#000000',
+											fillOpacity: .1,
+											strokeColor: '#000000',
+											strokeOpacity: .7,
+											strokeWeight: 2
+										});
 										sm.fitBounds( bounds );
 										opt.onselect && opt.onselect( bounds )
 									});
@@ -248,6 +261,8 @@
 				geoclick.disable = function() {
 					geoclick.enabled = false;
 					hilite();
+					sm.activePoly && sm.removePoly( sm.activePoly );
+					delete sm.activePoly;
 				};
 			},
 			
