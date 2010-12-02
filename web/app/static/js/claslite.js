@@ -509,16 +509,23 @@
 		);
 	}
 	
-	function setImg( sel, url, width, height ) {
-		return $(sel).css({
-			width: width,
-			height: height,
-			backgroundImage: S( 'url(', url, ')' )
-		});
-	}
-	
 	function setChart( sel, table, url, width, height, title ) {
-		setImg( sel, url, width, height ).prev().html( table ).prev().html( title );
+		$(sel).html( S(
+			'<div>',
+				'<h2>',
+					title,
+				'</h2>',
+				'<div class="statistics-block">',
+					'<div class="xfloat-left statistics-chart" style="width:', width, 'px; height:', height, 'px; background-image:url(', url, ')">',
+					'</div>',
+					'<div class="xfloat-left statistics-table-wrap">',
+						table,
+					'</div>',
+					'<div class="xfloat-clear">',
+					'</div>',
+				'</div>',
+			'</div>'
+		) );
 	}
 	
 	function addStatistics() {

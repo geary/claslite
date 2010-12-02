@@ -473,13 +473,17 @@ div.slider-panel {
 
 /* Statistics */
 
-div.statistics-chart {
-	margin-top: 15px;
-}
-
 div.statistics-section {
 	float: left;
-	margin-bottom: 16px;
+	margin-bottom: 30px;
+}
+
+div.statistics-section h2 {
+	margin-bottom: 8px;
+}
+
+div.statistics-block {
+	position: relative;
 }
 
 #statistics-units {
