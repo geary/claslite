@@ -527,7 +527,7 @@
 		$.getJSON( 'js/statistics-test.json', function( json ) {
 			
 			var units = $('#statistics-units-select').val().split('|'),
-				unit = { value:units[0], name:units[1] },
+				unit = { value:units[0], abbr:units[1], name:units[2] },
 				factor = json.pixelWidth * json.pixelHeight / unit.value;
 			function U( value ) { return value * factor; }
 			function num( value ) { return S.formatNumber( value, 2 ); }
@@ -650,9 +650,9 @@
 							'<tr>',
 								'<th class="stats-table-x">Start</th>',
 								'<th class="stats-table-x">End</th>',
-								'<th>Area (', unit.name, ')</th>',
+								'<th>Area (', unit.abbr, ')</th>',
 								'<th>Rate</th>',
-								'<th>Area (', unit.name, ')</th>',
+								'<th>Area (', unit.abbr, ')</th>',
 								'<th>Rate</th>',
 							'</tr>',
 						'</thead>',
