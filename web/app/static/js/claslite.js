@@ -409,15 +409,13 @@
 	}
 	
 	function addForestChangeLayer( id ) {
-		var type = id == 'deforestation' ? 'desmatamento' : 'pertubacao';
+		var type = id == 'deforestation' ? 'deforestation' : 'pertubacao_compiled';
 		addLayer( id, S(
-			'forestchange/idesam/230_068_',
+			'forestchange/idesam/', type, '_',
 			app.$forestChangeStart.val().slice(-2),
 			'_',
 			app.$forestChangeEnd.val().slice(-2),
-			'_',
-			type,
-			'/'
+			'_masked_rgb/'
 		) );
 	}
 	
