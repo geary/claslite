@@ -629,6 +629,7 @@
 						'</tr>'
 					) );
 					// Chart
+					if( years > 1 ) return;  // omit large ranges in demo
 					//labels.push( S( startdate.slice(-2), '-', enddate.slice(-2) ) );
 					labels.push( S( '-', enddate.slice(-2) ) );
 					scaleMax = Math.max( scaleMax, deforestation, disturbance );
