@@ -487,6 +487,10 @@ div.statistics-section {
 }
 
 #statswrap {
+	overflow: auto;
+}
+
+#stats-scroll {
 	padding: 12px;
 }
 
@@ -504,8 +508,7 @@ table.stats-table  th {
 }
 
 table.stats-table  th.stats-table-topleft {
-	border-left: none;
-	border-top: none;
+	border: none;
 }
 
 table.stats-table  td {
