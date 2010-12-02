@@ -538,7 +538,7 @@
 			function num( value ) { return S.formatNumber( value, 2 ); }
 			
 			var region = json.regions[0];
-			var height = 150;
+			var height = 100;
 			
 			forestCoverChart();
 			forestChangeChart();
