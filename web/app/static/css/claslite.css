@@ -502,9 +502,10 @@ table.stats-table {
 	margin-top: 12px;
 }
 
-table.stats-table  th {
-	border: 1px solid #666;
-	padding: 6px;
+table.stats-table  th, table.stats-table  td {
+	font-size: 14px;
+	border: 1px solid #BBB;
+	padding: 4px;
 }
 
 table.stats-table  th.stats-table-topleft {
@@ -512,8 +513,6 @@ table.stats-table  th.stats-table-topleft {
 }
 
 table.stats-table  td {
-	border: 1px solid #666;
-	padding: 6px;
 	text-align: right;
 }
 
