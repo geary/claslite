@@ -545,22 +545,22 @@
 					var date = cover.date,
 						forest = U(cover.forest),
 						nonforest = U(cover.nonforest),
-						nodata = U(cover.nodata);
+						unobserved = U(cover.unobserved);
 					// Table
 					rows.push( S(
 						'<tr>',
 							'<td>', date, '</td>',
 							'<td>', num(forest), '</td>',
 							'<td>', num(nonforest), '</td>',
-							'<td>', num(nodata), '</td>',
+							'<td>', num(unobserved), '</td>',
 						'</tr>'
 					) );
 					// Chart
 					labels.push( date );
-					scaleMax = Math.max( scaleMax, forest + nonforest + nodata );
+					scaleMax = Math.max( scaleMax, forest + nonforest + unobserved );
 					forests.push( forest );
 					nonforests.push( nonforest );
-					nodatas.push( nodata );
+					nodatas.push( unobserved );
 				});
 				
 				var table = S(
@@ -699,7 +699,7 @@
 			//			label: image.date,
 			//			values: [
 			//				get( '#statistics-forest-color', 'forestPixels' ),
-			//				get( '#statistics-nodata-color', 'noDataPixels' ),
+			//				get( '#statistics-unobserved-color', 'noDataPixels' ),
 			//				get( '#statistics-nonforest-color', 'nonForestPixels' )
 			//			]
 			//		}
