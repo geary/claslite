@@ -157,8 +157,8 @@
 								<label for="nonforest-color">Non-forest</label>
 							</div>
 							<div class="color-picker-row">
-								<input class="color-picker" data-hex="true" name="nodata-color" id="nodata-color" value="#000000">
-								<label for="nodata-color">No data</label>
+								<input class="color-picker" data-hex="true" name="unobserved-color" id="unobserved-color" value="#000000">
+								<label for="unobserved-color">No data</label>
 							</div>
 							<!-- End TODO -->
 							
@@ -294,12 +294,12 @@
 									<b>Units:</b>
 								</label>
 								<select id="statistics-units-select">
-									<option value="0.3048|ft&#178;">Square Feet (ft&#178;)</option>
-									<option value="1|m&#178;">Square Meters (m&#178;)</option>
-									<option value="4046.85642|acres">Acres</option>
-									<option value="10000|hectares" selected="selected">Hectares</option>
-									<option value="1000000|km&#178;">Square Kilometers (km&#178;)</option>
-									<option value="2589988.11|mi&#178;">Square Miles (mi&#178;)</option>
+									<option value="0.3048|ft&#178;|square feet">Square Feet (ft&#178;)</option>
+									<option value="1|m&#178;|square meters">Square Meters (m&#178;)</option>
+									<option value="4046.85642|ac|acres">Acres</option>
+									<option value="10000|ha|hectares" selected="selected">Hectares</option>
+									<option value="1000000|km&#178;|square kilometers">Square Kilometers (km&#178;)</option>
+									<option value="2589988.11|mi&#178;|square miles">Square Miles (mi&#178;)</option>
 								</select>
 							</div>
 							
@@ -335,25 +335,15 @@
 			<!-- Begin Statistics -->
 			
 			<div id="statswrap">
-				
-				<div class="statistics-section" style="width:220px;">
-					<h2></h2>
-					<div class="statistics-chart" id="forest-cover-chart">
+				<div id="stats-scroll">
+					
+					<div class="statistics-section" id="forest-cover-chart">
 					</div>
-				</div>
-				
-				<div class="statistics-section" style="width:350px;">
-					<h2></h2>
-					<div class="statistics-chart" id="forest-change-rate-chart">
+					
+					<div class="statistics-section" id="forest-change-chart">
 					</div>
+					
 				</div>
-				
-				<div class="statistics-section" style="width:870px;">
-					<h2></h2>
-					<div class="statistics-chart" id="forest-change-area-chart">
-					</div>
-				</div>
-				
 			</div>
 			
 			<!-- End Statistics -->

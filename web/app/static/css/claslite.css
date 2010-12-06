@@ -473,13 +473,17 @@ div.slider-panel {
 
 /* Statistics */
 
-div.statistics-chart {
-	margin-top: 15px;
-}
-
 div.statistics-section {
 	float: left;
-	margin-bottom: 16px;
+	margin-bottom: 30px;
+}
+
+div.statistics-section h2 {
+	margin-bottom: 8px;
+}
+
+div.statistics-block {
+	position: relative;
 }
 
 #statistics-units {
@@ -487,11 +491,33 @@ div.statistics-section {
 }
 
 #statswrap {
+	overflow: auto;
+}
+
+#stats-scroll {
 	padding: 12px;
 }
 
 #main.with-stats #statswrap {
 	visibility: visible;
+}
+
+table.stats-table {
+	margin-top: 12px;
+}
+
+table.stats-table  th, table.stats-table  td {
+	font-size: 14px;
+	border: 1px solid #BBB;
+	padding: 4px;
+}
+
+table.stats-table  th.stats-table-topleft {
+	border: none;
+}
+
+table.stats-table  td {
+	text-align: right;
 }
 
 /* Spinner */

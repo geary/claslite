@@ -17,7 +17,8 @@ base = private.private['earth-engine-api']
 auth = private.private['earth-engine-auth']
 
 sat = 'LANDSAT/L7_L1T'
-bbox = '-61.6,-11.4,-60.8,-10.6'
+#bbox = '-61.6,-11.4,-60.8,-10.6'
+bbox = '-64.0,-13.0,-60.0,-9.0'
 
 def fetch( api ):
 	req = urllib2.Request(
