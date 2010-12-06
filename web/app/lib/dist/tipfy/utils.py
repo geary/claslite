@@ -51,14 +51,19 @@ def xhtml_unescape(value):
 
 
 def json_encode(value, *args, **kwargs):
-    """JSON-encodes the given Python object."""
+    """JSON-encodes the given Python object with forward slashes escaped."""
     # JSON permits but does not require forward slashes to be escaped.
     # This is useful when json data is emitted in a <script> tag
     # in HTML, as it prevents </script> tags from prematurely terminating
     # the javscript.  Some json libraries do this escaping by default,
     # although python's standard library does not, so we do it here.
     # http://stackoverflow.com/questions/1580647/json-why-are-forward-slashes-escaped
-    return simplejson.dumps(value, *args, **kwargs).replace("</", "<\\/")
+    return json_encode_plain(value, *args, **kwargs).replace("</", "<\\/")
+
+
+def json_encode_plain(value, *args, **kwargs):
+    """JSON-encodes the given Python object."""
+    return simplejson.dumps(value, *args, **kwargs)
 
 
 def json_decode(value, *args, **kwargs):
