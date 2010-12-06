@@ -1,6 +1,18 @@
 # -*- coding: utf-8 -*-
 """App configuration."""
-config = {}
 
 import private
-config['private'] = private.private
+
+config = {
+	
+	'private': private.private,
+	
+	#'proxy': {
+	#	'base': '/ee/'
+	#},
+	
+	#'tipfy': {
+	#	'auth_store_class': 'tipfy.appengine.auth.AuthStore',
+	#},
+	
+}
