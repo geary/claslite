@@ -155,8 +155,11 @@
 		
 		$('button.view-button').click( function() {
 			$button = $(this);
-			$button.parent().find('button').removeClass('submit')
-			$button.addClass( 'submit' );
+			$button.parent()
+				.find('button.submit').removeClass('submit')
+					.find('div.icon16').removeClass('icon16-tick icon16-arrow-circle');
+			$button.addClass( 'submit' )
+				.find('div.icon16').addClass('icon16-tick');
 		});
 		
 		$('form.input-form').submit( function( event ) {
