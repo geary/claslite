@@ -304,7 +304,7 @@
 	function addTestLayer1() {
 		var rawImage = 'LANDSAT/L7_L1T/LE72300681999227EDC00';  // Aug 15, 1999
 
-				var vcfImage = 'MOD44B_C4_TREE_2000';
+		var vcfImage = 'MOD44B_C4_TREE_2000';
 		var bounds = [ -26, -89, 5, -32 ]
 		app.map.fitBounds.apply( app.map, bounds );
 		app.map.setZoom( 8 );
@@ -318,7 +318,7 @@
 		addEarthEngineLayer({
 			image: JSON.stringify( forest ),
 			bands: 'Forest_NonForest',
-			gain: 127,
+			gain: 127
 		});
 	}
 
@@ -339,7 +339,7 @@
 		addEarthEngineLayer({
 			image: JSON.stringify( forest ),
 			bands: 'Forest_NonForest',
-			gain: 127,
+			gain: 127
 		});
 	}
 
@@ -360,7 +360,7 @@
 		addEarthEngineLayer({
 			image: JSON.stringify( forest ),
 			bands: 'Forest_NonForest',
-			gain: 127,
+			gain: 127
 		});
 	}
 	
