@@ -129,6 +129,7 @@ button.submit {
 
 button.view-button {
 	margin: 1px 0 0 0;
+	width: 4em;
 }
 
 img.toggle-expand {
@@ -266,6 +267,27 @@ ul.tabs a.hover span {
 	width: 100%;
 }
 
+/* Visibility selectors */
+
+#outermost.map #mapwrap {
+	visibility: visible;
+}
+
+#outermost.stats #statswrap {
+	visibility: visible;
+}
+
+#outermost.map .for-stats,
+#outermost.stats .for-map {
+}
+
+#outermost.forestcover .forestview-forestchange,
+#outermost.forestchange .forestview-forestcover,
+#outermost.map .for-stats,
+#outermost.stats .for-map {
+	display: none;
+}
+
 /* Sidebar */
 
 #sidebar-outer {
@@ -300,7 +322,7 @@ ul.tabs a.hover span {
 	position: relative;
 }
 
-#location-search-submit {
+#view-location-map {
 	display: block;
 	float: right;
 }
@@ -467,10 +489,6 @@ div.slider-panel {
 	visibility: hidden;
 }
 
-#main.with-map #mapwrap {
-	visibility: visible;
-}
-
 /* Statistics */
 
 div.statistics-section {
@@ -496,10 +514,6 @@ div.statistics-block {
 
 #stats-scroll {
 	padding: 12px;
-}
-
-#main.with-stats #statswrap {
-	visibility: visible;
 }
 
 table.stats-table {
