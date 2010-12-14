@@ -342,14 +342,14 @@ ul.tabs a.hover span {
 	visibility: visible;
 }
 
-#outermost.map .for-stats,
-#outermost.stats .for-map {
+#outermost.map .stats-only,
+#outermost.stats .map-only {
 }
 
 #outermost.forestcover .forestview-forestchange,
 #outermost.forestchange .forestview-forestcover,
-#outermost.map .for-stats,
-#outermost.stats .for-map {
+#outermost.map .stats-only,
+#outermost.stats .map-only {
 	display: none;
 }
 
