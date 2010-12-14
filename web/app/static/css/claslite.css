@@ -165,7 +165,7 @@ div.sprite {
 div.icon16 {
 	width: 16px;
 	height: 16px;
-	background-position: 16px 0;
+	background-position: 16px 0;  /* hide */
 }
 
 div.icon16-arrow-circle {
