@@ -49,6 +49,7 @@
 		initTabs();
 		initRangeInputs();
 		initDateSelects();
+		initUnitSelects();
 		initColorPickers();
 		initLegends();
 		initSizer();
@@ -72,6 +73,7 @@
 			$deforestationRadio: $('#deforestation-radio'),
 			$disturbanceRadio: $('#disturbance-radio'),
 			$bothRadio: $('#both-radio'),
+			$units: $('#statistics-units-select'),
 			$statsStart: $('#statistics-date-start'),
 			$statsEnd: $('#statistics-date-end'),
 			$mapwrap: $('#mapwrap'),
@@ -201,6 +203,12 @@
 				if( +this.value <= +$start.val() )
 					$start.val( +this.value - 1 );
 			});
+	}
+	
+	function initUnitSelects() {
+		app.$units.bind( 'change keyup', function() {
+			$(this).closest('form').submit();
+		});
 	}
 	
 	function padDigits( value, digits ) {
@@ -556,7 +564,7 @@
 	function addStatistics( id ) {
 		$.getJSON( 'js/statistics-test.json', function( json ) {
 			
-			var units = $('#statistics-units-select').val().split('|'),
+			var units = app.$units.val().split('|'),
 				unit = { value:units[0], abbr:units[1], name:units[2] },
 				factor = json.pixelWidth * json.pixelHeight / unit.value;
 			function U( value ) { return value * factor; }
