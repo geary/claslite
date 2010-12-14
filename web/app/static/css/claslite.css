@@ -554,6 +554,10 @@ div.slider-panel {
 	visibility: hidden;
 }
 
+#mapwrap {
+	line-height: normal;
+}
+
 /* Statistics */
 
 div.statistics-section {
