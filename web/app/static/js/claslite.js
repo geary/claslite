@@ -157,7 +157,7 @@
 		
 		$('button.view-button').click( function() {
 			$button = $(this);
-			$button.parent()
+			$button.blur().parent()
 				.find('button.submit').removeClass('submit')
 					.find('div.icon16').removeClass('icon16-tick icon16-arrow-circle');
 			$button.addClass( 'submit' )
