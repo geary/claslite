@@ -126,8 +126,8 @@ button.submit {
 }
 
 button.view-button {
-	margin: 1px 0 0 0;
-	width: 4em;
+	width: 5.5em;
+	text-align: left;
 }
 
 img.toggle-expand {
@@ -137,6 +137,73 @@ img.toggle-expand {
 	margin-right: 4px;
 	cursor: pointer;
 }
+
+img.icon16 {
+	border: 0;
+	width: 16px;
+	height: 16px;
+}
+
+.block {
+	display: block;
+}
+
+.inline {
+	display: inline;
+}
+
+.inline-block {
+	display: inline-block;
+}
+
+/* Sprites */
+
+div.sprite {
+	background: url(../images/sprites.png) no-repeat;
+}
+
+div.icon16 {
+	width: 16px;
+	height: 16px;
+	background-position: 16px 0;
+}
+
+div.icon16-arrow-circle {
+	background-position: 0 0;
+}
+
+div.icon16-cross {
+	background-position: -16px 0;
+}
+
+div.icon16-cross-circle {
+	background-position: -32px 0;
+}
+
+div.icon16-plus {
+	background-position: -48px 0;
+}
+
+div.icon16-plus-circle {
+	background-position: -64px 0;
+}
+
+div.icon16-tick {
+	background-position: -80px 0;
+}
+
+div.icon16-tick-circle {
+	background-position: -96px 0;
+}
+
+div.icon16-toggle {
+	background-position: -112px 0;
+}
+
+div.icon16-toggle-expand {
+	background-position: -128px 0;
+}
+
 
 /* Header */
 
