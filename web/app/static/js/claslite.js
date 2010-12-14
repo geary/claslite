@@ -576,7 +576,7 @@
 			var charts = {
 				forestcover: function() {
 					var scaleMax = 0, labels = [], rows = [],
-						forests = [], nonforests = [], nodatas = [];
+						forests = [], nonforests = [], unobserveds = [];
 					region.forestCover.forEach( function( cover ) {
 						var date = cover.date,
 							forest = U(cover.forest),
@@ -596,7 +596,7 @@
 						scaleMax = Math.max( scaleMax, forest + nonforest + unobserved );
 						forests.push( forest );
 						nonforests.push( nonforest );
-						nodatas.push( unobserved );
+						unobserveds.push( unobserved );
 					});
 					
 					var table = S(
@@ -626,7 +626,7 @@
 						height: height,
 						labels: labels,
 						colors: [ '00FF00', 'EE9A00', '000000' ],
-						data: [ [ forests.join(), nonforests.join(), nodatas.join() ].join('|') ],
+						data: [ [ forests.join(), nonforests.join(), unobserveds.join() ].join('|') ],
 						scale: [ 0, scaleMax ],
 						barWidth: [ 25, 20 ],
 						axis: '2,000000,15',
@@ -739,7 +739,7 @@
 			//			label: image.date,
 			//			values: [
 			//				get( '#statistics-forest-color', 'forestPixels' ),
-			//				get( '#statistics-unobserved-color', 'noDataPixels' ),
+			//				get( '#statistics-unobserved-color', 'unobservedPixels' ),
 			//				get( '#statistics-nonforest-color', 'nonForestPixels' )
 			//			]
 			//		}
