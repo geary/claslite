@@ -213,8 +213,7 @@ div.icon16-toggle-expand {
 	height: 55px;
 	font-size: 15px;
 	color: #F9FDFA;
-	background: url(../images/claslite-logo.png) no-repeat #26432B;
-	background-position: -3px 0;
+	background-color: #26432B;
 	margin-bottom: 8px;
 }
 
@@ -648,6 +647,7 @@ table.stats-table  td {
 }
 
 #cis-logo {
+	display: block;
 	position: absolute;
 	right: 8px;
 	top: 8px;
@@ -655,3 +655,14 @@ table.stats-table  td {
 	height: 39px;
 	background: url(../images/cis-logo-header.gif) no-repeat;
 }
+
+#claslite-logo {
+	display: block;
+	position: absolute;
+	left: -3px;
+	top: 0;
+	width: 200px;
+	height: 54px;
+	background: url(../images/claslite-logo.png) no-repeat;
+}
+
