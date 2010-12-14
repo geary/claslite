@@ -39,6 +39,7 @@
 			$('#'+id).addClass(selectedClass);
 			a.click && a.click( id );
 			$(a.panels).children().hide();
+			id = a.subst[id] || id;
 			$('#'+id+'-panel').show();
 		}
 		return tabs;
