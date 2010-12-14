@@ -174,53 +174,15 @@
 	}
 	
 	function initDateSelects() {
-		//initForestCoverDateSelect();
-		initForestChangeDateSelect();
-	}
-	
-	function initForestCoverDateSelect() {
-		function idesam( year ) {
-			return {
-				text: year,
-				value: S( 'addLayer:forestcover/idesam/', year, '/' )
-			};
-		}
-		//function peru( year ) {
-		//	return {
-		//		text: year,
-		//		value: S(
-		//			'addLayer:forestcover/peru_redd_',
-		//			year,
-		//			'_forestcover_geotiff_rgb/'
-		//		)
-		//	};
-		//}
-		function test( val ) {
-			return {
-				text: 'Test ' + val,
-				value: 'testLayer:' +val
-			};
-		}
-		var dates = [].concat(
-			idesam( 1985 ),
-			idesam( 2009 ),
-			//peru( 2007 ),
-			//peru( 2008 ),
-			//peru( 2009 ),
-			test( 1 ),    // 1999
-			test( 2 ),   //  2006
-			test( 3 )    //  2010
-		);
-		app.$forestViewDateStart
-			.fillSelect( dates, '', function( event ) {
-				//app.tabOpts.click( app.tabs.selected );
-			});
-	}
-	
-	function initForestChangeDateSelect() {
 		function arr( first, last ) {
 			var a = [];
-			for( var i = first;  i <= last;  ++i ) a.push({ text:i, value:i });
+			for( var i = first;  i <= last;  ++i )
+				a.push({ text:i, value:i });
+			// TEST: uncomment this to add test layers to date selectors
+			//var nTests = 5;
+			//for( var i = 1;  i <= nTests;  i++ )
+			//	a.push({ text:'Test '+i, value:i });
+			// END TEST
 			return a;
 		}
 		$('select.date-start')
@@ -293,127 +255,125 @@
 		});
 	}
 	
-	function deforestation() {
+	function addTestLayer( id ) {
+		var layers = {
+			1: function() {
+				var rawImage = 'LANDSAT/L7_L1T/LE72300681999227EDC00';  // Aug 15, 1999
 		
-	}
-	
-	function disturbance() {
-
-	}
-	
-	function addTestLayer1() {
-		var rawImage = 'LANDSAT/L7_L1T/LE72300681999227EDC00';  // Aug 15, 1999
-
-		var vcfImage = 'MOD44B_C4_TREE_2000';
-		var bounds = [ -26, -89, 5, -32 ]
-		app.map.fitBounds.apply( app.map, bounds );
-		app.map.setZoom( 8 );
-		var ei = new EarthImage;
-		var radiance = ei.step( 'CLASLITE/Calibrate', rawImage );
-		var reflectance = ei.step( 'CLASLITE/Reflectance', radiance );
-		var autoMCU = ei.step( 'CLASLITE/AutoMCU', rawImage, reflectance );
-		var vcfAdjusted = ei.step( 'CLASLITE/VCFAdjustedImage', autoMCU, vcfImage );
-		var forest = ei.step('CLASLITE/ForestMask', vcfAdjusted);
+				var vcfImage = 'MOD44B_C4_TREE_2000';
+				var bounds = [ -26, -89, 5, -32 ]
+				app.map.fitBounds.apply( app.map, bounds );
+				app.map.setZoom( 8 );
+				var ei = new EarthImage;
+				var radiance = ei.step( 'CLASLITE/Calibrate', rawImage );
+				var reflectance = ei.step( 'CLASLITE/Reflectance', radiance );
+				var autoMCU = ei.step( 'CLASLITE/AutoMCU', rawImage, reflectance );
+				var vcfAdjusted = ei.step( 'CLASLITE/VCFAdjustedImage', autoMCU, vcfImage );
+				var forest = ei.step('CLASLITE/ForestMask', vcfAdjusted);
+				
+				addEarthEngineLayer({
+					image: JSON.stringify( forest ),
+					bands: 'Forest_NonForest',
+					gain: 127
+				});
+			},
+			
+			2: function() {
+				rawImage = 'LANDSAT/L7_L1T/LE72300682006134EDC00';	// 2006
+			
+				var vcfImage = 'MOD44B_C4_TREE_2000';
+				var bounds = [ -26, -89, 5, -32 ]
+				app.map.fitBounds.apply( app.map, bounds );
+				app.map.setZoom( 8 );
+				var ei = new EarthImage;
+				var radiance = ei.step( 'CLASLITE/Calibrate', rawImage );
+				var reflectance = ei.step( 'CLASLITE/Reflectance', radiance );
+				var autoMCU = ei.step( 'CLASLITE/AutoMCU', rawImage, reflectance );
+				var vcfAdjusted = ei.step( 'CLASLITE/VCFAdjustedImage', autoMCU, vcfImage );
+				var forest = ei.step('CLASLITE/ForestMask', vcfAdjusted);
+				
+				addEarthEngineLayer({
+					image: JSON.stringify( forest ),
+					bands: 'Forest_NonForest',
+					gain: 127
+				});
+			},
+			
+			3: function() {
+				rawImage = 'LANDSAT/L7_L1T/LE72300682010289EDC00';	// 2010
 		
-		addEarthEngineLayer({
-			image: JSON.stringify( forest ),
-			bands: 'Forest_NonForest',
-			gain: 127
-		});
-	}
-
-	function addTestLayer2() {
-		rawImage = 'LANDSAT/L7_L1T/LE72300682006134EDC00';	// 2006
-	
-		var vcfImage = 'MOD44B_C4_TREE_2000';
-		var bounds = [ -26, -89, 5, -32 ]
-		app.map.fitBounds.apply( app.map, bounds );
-		app.map.setZoom( 8 );
-		var ei = new EarthImage;
-		var radiance = ei.step( 'CLASLITE/Calibrate', rawImage );
-		var reflectance = ei.step( 'CLASLITE/Reflectance', radiance );
-		var autoMCU = ei.step( 'CLASLITE/AutoMCU', rawImage, reflectance );
-		var vcfAdjusted = ei.step( 'CLASLITE/VCFAdjustedImage', autoMCU, vcfImage );
-		var forest = ei.step('CLASLITE/ForestMask', vcfAdjusted);
-		
-		addEarthEngineLayer({
-			image: JSON.stringify( forest ),
-			bands: 'Forest_NonForest',
-			gain: 127
-		});
-	}
-
-	function addTestLayer3() {
-		rawImage = 'LANDSAT/L7_L1T/LE72300682010289EDC00';	// 2010
-
-		var vcfImage = 'MOD44B_C4_TREE_2000';
-		var bounds = [ -26, -89, 5, -32 ]
-		app.map.fitBounds.apply( app.map, bounds );
-		app.map.setZoom( 8 );
-		var ei = new EarthImage;
-		var radiance = ei.step( 'CLASLITE/Calibrate', rawImage );
-		var reflectance = ei.step( 'CLASLITE/Reflectance', radiance );
-		var autoMCU = ei.step( 'CLASLITE/AutoMCU', rawImage, reflectance );
-		var vcfAdjusted = ei.step( 'CLASLITE/VCFAdjustedImage', autoMCU, vcfImage );
-		var forest = ei.step('CLASLITE/ForestMask', vcfAdjusted);
-		
-		addEarthEngineLayer({
-			image: JSON.stringify( forest ),
-			bands: 'Forest_NonForest',
-			gain: 127
-		});
-	}
-	
-	function addTestLayer2old() {
-		var image = {
-			creator: 'LANDSAT/CalibratedSurfaceReflectance',
-			args: [ 'LANDSAT/L7_L1T/LE70050672005171EDC00' ]
-		};
-		
-		var request = {
-			image: JSON.stringify( image ),
-			bands: '30,20,10',
-			gain: 500,
-			gamma: 1.6
-		};
-		
-		addEarthEngineLayer( request );
-	}
-	
-	function addTestLayer3old() {
-		var dates = [ '2010_06_26', '2010_06_30' ];
-		var images = dates.map( function( date ) {
-			return {
-				creator: 'SAD/ModisCombiner',
-				args: [ 'MOD09GA_005_' + date, 'MOD09GA_005_' + date ]
+				var vcfImage = 'MOD44B_C4_TREE_2000';
+				var bounds = [ -26, -89, 5, -32 ]
+				app.map.fitBounds.apply( app.map, bounds );
+				app.map.setZoom( 8 );
+				var ei = new EarthImage;
+				var radiance = ei.step( 'CLASLITE/Calibrate', rawImage );
+				var reflectance = ei.step( 'CLASLITE/Reflectance', radiance );
+				var autoMCU = ei.step( 'CLASLITE/AutoMCU', rawImage, reflectance );
+				var vcfAdjusted = ei.step( 'CLASLITE/VCFAdjustedImage', autoMCU, vcfImage );
+				var forest = ei.step('CLASLITE/ForestMask', vcfAdjusted);
+				
+				addEarthEngineLayer({
+					image: JSON.stringify( forest ),
+					bands: 'Forest_NonForest',
+					gain: 127
+				});
+			},
+			
+			4: function() {
+				var image = {
+					creator: 'LANDSAT/CalibratedSurfaceReflectance',
+					args: [ 'LANDSAT/L7_L1T/LE70050672005171EDC00' ]
+				};
+				
+				var request = {
+					image: JSON.stringify( image ),
+					bands: '30,20,10',
+					gain: 500,
+					gamma: 1.6
+				};
+				
+				addEarthEngineLayer( request );
+			},
+			
+			5: function() {
+				var dates = [ '2010_06_26', '2010_06_30' ];
+				var images = dates.map( function( date ) {
+					return {
+						creator: 'SAD/ModisCombiner',
+						args: [ 'MOD09GA_005_' + date, 'MOD09GA_005_' + date ]
+					}
+				});
+				
+				var bands = [
+					'sur_refl_b01_250m', 'sur_refl_b02_250m', 'sur_refl_b03_500m',
+					'sur_refl_b04_500m', 'sur_refl_b06_500m', 'sur_refl_b07_500m'
+				];
+				
+				var image = {
+					creator: 'SAD/UnmixModis',
+					args: [{
+						creator: 'SAD/KrigingStub',
+						args: [{
+							creator: 'SAD/MakeMosaic',
+							args: [ images, bands ]
+						}]
+					}]
+				};
+				
+				var request = {
+					image: JSON.stringify( image ),
+					bands: 'soil,gv,npv',
+					//bias: ?,
+					//gamma: ?,
+					gain: 256
+				};
+				
+				addEarthEngineLayer( request );
 			}
-		});
-		
-		var bands = [
-			'sur_refl_b01_250m', 'sur_refl_b02_250m', 'sur_refl_b03_500m',
-			'sur_refl_b04_500m', 'sur_refl_b06_500m', 'sur_refl_b07_500m'
-		];
-		
-		var image = {
-			creator: 'SAD/UnmixModis',
-			args: [{
-				creator: 'SAD/KrigingStub',
-				args: [{
-					creator: 'SAD/MakeMosaic',
-					args: [ images, bands ]
-				}]
-			}]
 		};
 		
-		var request = {
-			image: JSON.stringify( image ),
-			bands: 'soil,gv,npv',
-			//bias: ?,
-			//gamma: ?,
-			gain: 256
-		};
-		
-		addEarthEngineLayer( request );
+		layers[id]();
 	}
 	
 	function addEarthEngineLayer( request ) {
@@ -460,23 +420,14 @@
 	}
 	
 	function addForestCoverLayer( id ) {
-		var value = app.$forestViewDateStart.val().split(':'),
-			fn = value[0], url = value[1];
-		// temp:
-		fn = ({
-			addLayer: addLayer,
-			testLayer: testLayer
-		})[fn];
-		fn && fn( id, url );
-	}
-	
-	function testLayer( id, url ) {
-		// TODO: temp hacky test code
-		({
-			1: addTestLayer1,
-			2: addTestLayer2,
-			3: addTestLayer3
-		})[url]();
+		var year = app.$forestViewDateStart.val();
+		// TEST:
+		if( year < 1000 ) {
+			addTestLayer( year );
+			return;
+		}
+		// END TEST
+		addLayer( year, S( 'forestcover/idesam/', year, '/' ) );
 	}
 	
 	function addForestChangeLayer( id ) {
