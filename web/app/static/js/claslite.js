@@ -47,6 +47,7 @@
 	function initUI() {
 		initVars();
 		initTabs();
+		initViewButtons();
 		initRangeInputs();
 		initDateSelects();
 		initUnitSelects();
@@ -155,15 +156,6 @@
 		};
 		app.tabs = S.Tabs( app.tabOpts );
 		
-		$('button.view-button').click( function() {
-			$button = $(this);
-			$button.blur().parent()
-				.find('button.submit').removeClass('submit')
-					.find('div.icon16').removeClass('icon16-tick icon16-arrow-circle');
-			$button.addClass( 'submit' )
-				.find('div.icon16').addClass('icon16-tick');
-		});
-		
 		$('form.input-form').submit( function( event ) {
 			event.preventDefault();
 			// TODO: this could be cleaner
@@ -172,6 +164,24 @@
 		
 		var tab = location.hash.replace( /^#/, '' );
 		app.tabs.select( app.tabOpts.tabs[tab] ? tab : 'location' );
+	}
+	
+	// TODO: refactor initViewButtons() and dirtyView() into a button manager
+	function initViewButtons() {
+		$('button.view-button').click( function() {
+			$button = $(this);
+			$button.blur().parent()
+				.find('button.submit').removeClass('submit')
+					.find('div.icon16').removeClass('icon16-tick icon16-arrow-circle');
+			$button.addClass( 'submit' )
+				.find('div.icon16').addClass('icon16-tick');
+		});
+	}
+	
+	function dirtyView() {
+		$('button.view-button.submit div.icon16')
+			.removeClass('icon16-tick')
+			.addClass('icon16-arrow-circle');
 	}
 	
 	function initRangeInputs() {
@@ -195,6 +205,7 @@
 				var $end = $(this).parent().find('.date-end');
 				if( +this.value >= +$end.val() )
 					$end.val( +this.value + 1 );
+				dirtyView();
 			});
 		
 		$('select.date-end')
@@ -202,6 +213,7 @@
 				var $start = $(this).parent().find('.date-start');
 				if( +this.value <= +$start.val() )
 					$start.val( +this.value - 1 );
+				dirtyView();
 			});
 	}
 	
