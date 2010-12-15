@@ -228,7 +228,7 @@ div.icon16-toggle-expand {
 #header-links {
 	position: absolute;
 	top: 9px;
-	right: 105px;
+	right: 10px;
 	text-align: right;
 }
 
@@ -613,7 +613,8 @@ table.stats-table  td {
 
 #earth-engine-logo {
 	position: absolute;
-	right: 4px;
+	/*right: 96px;*/
+	right: 9px;
 	top: 60px;
 	display: block;
 	text-decoration: none;
@@ -626,7 +627,7 @@ table.stats-table  td {
 }
 
 #earth-engine-logo:hover {
-	border-color: #84B0C7;
+	/*border-color: #84B0C7;*/
 }
 
 #earth-engine-logo-powered-by {
@@ -649,10 +650,11 @@ table.stats-table  td {
 #cis-logo {
 	display: block;
 	position: absolute;
-	right: 8px;
-	top: 8px;
-	width: 84px;
-	height: 39px;
+	/*right: 4px;*/
+	right: 250px;
+	top: 55px;
+	width: 82px;
+	height: 37px;
 	background: url(../images/cis-logo-header.gif) no-repeat;
 }
 
