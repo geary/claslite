@@ -521,6 +521,18 @@ var Scriptino, S;
 				return $target.is(selector) ? $target[0] : $target.parents(selector)[0];
 			},
 			
+			getCachedJSON: function( url, callback ) {
+				var cache = $.getCachedJSON.cache = $.getCachedJSON.cache || {};
+				if( cache[url] ) {
+					callback( cache[url], true );
+				}
+				else {
+					$.getJSON( url, function( data ) {
+						callback( cache[url] = data, false );
+					});
+				}
+			},
+			
 			// Load an image temporarily to get its dimensions,
 			// then call the callback function with those dimensions.
 			// Example:
