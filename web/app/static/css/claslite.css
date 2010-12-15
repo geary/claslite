@@ -64,13 +64,13 @@ html, body {
 	margin: 0px;
 	padding: 0px;
 	position: absolute;
-	font-family: Arial,sans-serif;
 	background: #FFF;
 	color: #000;
 	overflow: hidden;
 }
 
 html, body, button, input, select, td {
+	font-family: Arial,sans-serif;
 	font-size: 15px;
 }
 
