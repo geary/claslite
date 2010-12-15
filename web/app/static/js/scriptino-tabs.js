@@ -40,7 +40,7 @@
 			a.click && a.click( id );
 			$(a.panels).children().hide();
 			id = a.subst[id] || id;
-			$('#'+id+'-panel').show();
+			$(a.panels).find('> .'+id+'-panel').show();
 		}
 		return tabs;
 	};

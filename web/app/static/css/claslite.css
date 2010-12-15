@@ -94,6 +94,10 @@ html, body, button, input, select, td {
 	clear: both;
 }
 
+.center {
+	text-align: center;
+}
+
 a {
 	text-decoration: none;
 }
@@ -109,7 +113,6 @@ a:hover {
 
 form.input-form {
 	width: 330px;
-	margin-bottom: 10px;
 }
 
 div.button-row {
@@ -125,9 +128,8 @@ button.submit {
 	font-weight: bold;
 }
 
-button.view-button {
-	width: 6em;
-	text-align: left;
+.button-icon {
+	margin-right: 5px;
 }
 
 img.toggle-expand {
@@ -154,6 +156,10 @@ img.icon16 {
 
 .inline-block {
 	display: inline-block;
+}
+
+.hide {
+	display: none;
 }
 
 /* Sprites */
@@ -314,6 +320,13 @@ ul.tabs a.hover span {
 	width: 100%;
 	height: 12px;
 	background: #D5E1E8 url("../images/tabs-background.gif") repeat-x bottom;
+}
+
+.tab-base-extension {
+	background-color: #D5E1E8;
+	border-bottom: 1px solid #84B0C7;
+	margin-top: -2px;
+	padding: 0 8px 8px 8px;
 }
 
 /* Main */
@@ -522,7 +535,15 @@ div.slider-panel {
 	-webkit-border-radius:5px; 		
 }
 
-/* Forest change */
+/* Forest View */
+
+button.subtab-button-map {
+	width: 6em;
+}
+
+button.subtab-button-stats {
+	width: 8em;
+}
 
 .date-panel {
 	float: left;
