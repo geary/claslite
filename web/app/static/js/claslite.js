@@ -68,6 +68,8 @@
 			$main: $('#main'),
 			$tabs: $('#tabs'),
 			$sidebarOuter: $('#sidebar-outer'),
+			$tabPanels: $('#sidebar-top-panel, #sidebar-scrolling'),
+			$sidebarTopPanel: $('#sidebar-top-panel'),
 			$sidebarScrolling: $('#sidebar-scrolling'),
 			$forestViewDateStart: $('#forestview-date-start'),
 			$forestViewDateEnd: $('#forestview-date-end'),
@@ -125,11 +127,13 @@
 	function getSubTab( id ) {
 		var subst = app.tabOpts.subst[id] || id;
 		app.$outermost.removeClass().addClass( id ).addClass( subst );
+		var view = 'map';
 		switch( subst ) {
-			case 'location':
 			case 'forestview':
-				var view = $('#'+subst+'-panel button.submit')[0].id.split('-')[2];
+				view = $('#'+subst+'-input-form-top button.submit')[0].id.split('-')[2];
+			case 'location':
 				app.$outermost.addClass( id + '-' + view ).addClass( subst + '-' + view ).addClass( view );
+				break;
 		}
 		return id;
 	}
@@ -137,7 +141,7 @@
 	function initTabs() {
 		app.tabOpts = {
 			parent: '#tabs',
-			panels: '#sidebar-scrolling',
+			panels: app.$tabPanels,
 			tabs: {
 				location: 'Location',
 				forestcover: 'Forest Cover',
@@ -170,18 +174,26 @@
 	function initViewButtons() {
 		$('button.view-button').click( function() {
 			$button = $(this);
-			$button.blur().parent()
-				.find('button.submit').removeClass('submit')
-					.find('div.icon16').removeClass('icon16-tick icon16-arrow-circle');
-			$button.addClass( 'submit' )
-				.find('div.icon16').addClass('icon16-tick');
+			$button
+				.blur()
+				.parent()
+					.find('button.submit')
+						.removeClass('submit')
+					.find('div.icon16')
+						.removeClass('icon16-tick icon16-arrow-circle')
+						.addClass('hide');
+			$button
+				.addClass( 'submit' )
+				.find('div.icon16')
+					.addClass('icon16-tick')
+					.removeClass('hide');
 		});
 	}
 	
 	function dirtyView() {
-		$('button.view-button.submit div.icon16')
-			.removeClass('icon16-tick')
-			.addClass('icon16-arrow-circle');
+		//$('button.view-button.submit div.icon16')
+		//	.removeClass('icon16-tick')
+		//	.addClass('icon16-arrow-circle');
 	}
 	
 	function initRangeInputs() {

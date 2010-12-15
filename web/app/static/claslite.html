@@ -96,11 +96,25 @@
 			
 			<div id="sidebar-outer">
 				
+				<div id="sidebar-top-panel">
+					
+					<div class="forestview-panel">
+						<div class="tab-base-extension center">
+							<form class="input-form forestview" id="forestview-input-form-top">
+								<button class="subtab-button-map view-button submit" type="submit" id="view-forestview-map"><div class="inline-block sprite button-icon icon16 icon16-tick"></div>Map</button>
+								&nbsp;&nbsp;
+								<button class="subtab-button-stats view-button" id="view-forestview-stats"><div class="inline-block sprite button-icon icon16 hide"></div>Statistics</button>
+							</form>
+						</div>
+					</div>
+					
+				</div>
+				
 				<div id="sidebar-scrolling">
 					
 					<!-- Begin Location Panel -->
 					
-					<div class="tab-panel" id="location-panel">
+					<div class="tab-panel location-panel" id="location-panel">
 						
 						<form id="location-search-form">
 							
@@ -127,14 +141,13 @@
 					
 					<!-- Begin Forest View Panel -->
 					
-					<div class="tab-panel" id="forestview-panel">
+					<div class="tab-panel forestview-panel" id="forestview-panel">
 						
 						<form class="input-form" id="forestview-input-form">
 							
 							<div class="float-right">
-								<button class="view-button submit" type="submit" id="view-forestview-map"><div class="inline-block sprite icon16 icon16-tick"></div>&nbsp;Map</button>
-								<div style="margin-bottom: 4px;"></div>
-								<button class="view-button" id="view-forestview-stats"><div class="inline-block sprite icon16"></div>&nbsp;Stats</button>
+								<button class="submit map-only" type="submit" id="view-forestview-view"><div class="inline-block sprite icon16 icon16-arrow-circle"></div>&nbsp;View</button>
+								<button class="submit stats-only" type="submit" id="view-forestview-calc"><div class="inline-block sprite icon16 icon16-arrow-circle"></div>&nbsp;Calculate</button>
 							</div>
 							
 							<div style="margin-bottom:16px;">
@@ -237,7 +250,7 @@
 					
 					<!-- Begin Help Panel -->
 					
-					<div class="tab-panel" id="help-panel">
+					<div class="tab-panel help-panel" id="help-panel">
 						
 						<object width="330" height="280"><param name="movie" value="http://www.youtube.com/v/TU7JjJJZi1Q?fs=1&amp;hl=en_US&amp;rel=0&amp;autoplay=1"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/TU7JjJJZi1Q?fs=1&amp;hl=en_US&amp;rel=0&amp;autoplay=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="330" height="280"></embed></object>
 						
