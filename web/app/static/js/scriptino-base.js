@@ -436,6 +436,13 @@ var Scriptino, S;
 			return output;
 		},
 		
+		// Return an array with the elements of set sorted by property name
+		sortSet: function( set ) {
+			var output = [];
+			for( key in set ) output.push( key );
+			return output.sort();
+		},
+		
 		// Deprecated
 		str: function () {
 			return Array.prototype.join.call( arguments, '' );
