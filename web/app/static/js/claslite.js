@@ -630,7 +630,7 @@
 			function U( value ) { return value * factor; }
 			function num( value ) { return S.formatNumber( value, 2 ); }
 			
-			var height = 100;
+			var height = 150, width = 600;
 			
 			var charts = {
 				forestcover: function() {
@@ -686,8 +686,6 @@
 						'</table>'
 					);
 					
-					var width = 220;
-					
 					var url = S.ChartApi.barV({
 						width: width,
 						height: height,
@@ -696,12 +694,11 @@
 						data: [ [ forests.join(), nonforests.join(), unobserveds.join() ].join('|') ],
 						scale: [ 0, scaleMax ],
 						barWidth: [ 25, 20 ],
-						axis: '2,000000,15',
 						legend: 'Forest|Non-Forest|Unobserved',
 						legendPos: '|r',
 						axes: 'x,y',
 						axisRange: [ 1, 0, scaleMax ],
-						axisFormat: '1N*s*'
+						axisFormat: '0,222222,13|1N*s*,222222,13'
 					});
 					
 					setChart( selector, table, url, width, height, title );
@@ -733,8 +730,8 @@
 							'</tr>'
 						) );
 						// Chart
-						//labels.push( S( startdate.slice(-2), '-', enddate.slice(-2) ) );
-						labels.push( S( '-', enddate.slice(-2) ) );
+						labels.push( S( startdate.slice(-2), '-', enddate.slice(-2) ) );
+						//labels.push( S( '-', enddate.slice(-2) ) );
 						scaleMax = Math.max( scaleMax, deforestation, disturbance );
 						deforestations.push( deforestation );
 						disturbances.push( disturbance );
@@ -770,7 +767,6 @@
 							'</tbody>',
 						'</table>'
 					);
-					var width = 870;
 					
 					var url = S.ChartApi.barV({
 						width: width,
@@ -780,13 +776,12 @@
 						data: [ [ deforestations.join(), disturbances.join() ].join('|') ],
 						scale: [ 0, scaleMax ],
 						//barWidth: [ 22, 10 ],
-						barWidth: [ 10, 6 ],
-						axis: '2,000000,15',
+						barWidth: [ 25, 20 ],
 						legend: 'Deforestation|Disturbance',
 						legendPos: '|r',
 						axes: 'x,y',
 						axisRange: [ 1, 0, scaleMax ],
-						axisFormat: '1N*s*'
+						axisFormat: '0,222222,13|1N*s*,222222,13'
 					});
 					
 					setChart( '#forest-change-chart', table, url, width, height, title );
