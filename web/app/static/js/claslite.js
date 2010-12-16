@@ -583,19 +583,29 @@
 	}
 	
 	function setChart( sel, table, url, width, height, title ) {
+		setChartContent( sel, title, S(
+			'<div class="statistics-chart" style="width:', width, 'px; height:', height, 'px; background-image:url(', url, ')">',
+			'</div>',
+			'<div class="statistics-table-wrap">',
+				table,
+			'</div>'
+		) );
+	}
+	
+	function setEmptyChart( sel, table, url, width, height, title ) {
+		setChartContent( sel, title,
+			'Select years and use the <b>Calculate</b> button on the left to add statistics'
+		);
+	}
+	
+	function setChartContent( sel, title, content ) {
 		$(sel).html( S(
 			'<div>',
 				'<h2>',
 					title,
 				'</h2>',
 				'<div class="statistics-block">',
-					'<div class="xfloat-left statistics-chart" style="width:', width, 'px; height:', height, 'px; background-image:url(', url, ')">',
-					'</div>',
-					'<div class="xfloat-left statistics-table-wrap">',
-						table,
-					'</div>',
-					'<div class="xfloat-clear">',
-					'</div>',
+					content,
 				'</div>',
 			'</div>'
 		) );
@@ -650,6 +660,12 @@
 						unobserveds.push( unobserved );
 					});
 					
+					var selector = '#forest-cover-chart', title = 'Forest Cover';
+					if( ! rows.length ) {
+						setEmptyChart( selector, title );
+						return;
+					}
+					
 					var table = S(
 						'<table class="stats-table">',
 							'<thead>',
@@ -688,7 +704,7 @@
 						axisFormat: '1N*s*'
 					});
 					
-					setChart( '#forest-cover-chart', table, url, width, height, 'Forest Cover' );
+					setChart( selector, table, url, width, height, title );
 				},
 				
 				forestchange: function() {
@@ -723,6 +739,13 @@
 						deforestations.push( deforestation );
 						disturbances.push( disturbance );
 					});
+					
+					var selector = '#forest-change-chart',
+						title = S('Forest Change - Area (', unit.name, ')' );
+					if( ! rows.length ) {
+						setEmptyChart( selector, title );
+						return;
+					}
 					
 					var table = S(
 						'<table class="stats-table">',
@@ -766,9 +789,7 @@
 						axisFormat: '1N*s*'
 					});
 					
-					setChart( '#forest-change-chart', table, url, width, height,
-						S('Forest Change - Area (', unit.name, ')' )
-					);
+					setChart( '#forest-change-chart', table, url, width, height, title );
 				}
 			};
 			
