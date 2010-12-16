@@ -270,8 +270,10 @@
 	function addLegends() {
 		if( ! app.$outermost.is('.forestchange.map') )
 			return;
-		addForestChangeLegend( 'deforestation-legend' );
-		addForestChangeLegend( 'disturbance-legend' );
+		setTimeout( function() {
+			addForestChangeLegend( 'deforestation-legend' );
+			addForestChangeLegend( 'disturbance-legend' );
+		}, 1 );
 	}
 	
 	function makeColorPicker( id, name, value, label ) {
