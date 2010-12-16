@@ -363,13 +363,18 @@ ul.tabs a.hover span {
 	position: absolute;
 	left: 0;
 	top: 0;
-	width: 350px;
+	width: 0;
 	height: 100%;
 }
 
 #sidebar-scrolling {
-	margin: 12px 10px;
-	width: 100%;
+	width: 0;
+	overflow: scroll;
+	overflow-x: hidden;
+}
+
+#sidebar-padder {
+	padding: 8px;
 }
 
 /* Locations */
