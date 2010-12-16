@@ -424,6 +424,10 @@ div.color-picker-row {
 	margin-bottom: 6px;
 }
 
+div.color-picker-row img {
+	display: none;
+}
+
 input.color-picker {
 	font-size: 1px;
 	width:25px;
