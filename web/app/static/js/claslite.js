@@ -107,6 +107,7 @@
 			disableGeoclick();
 			removeLayers();
 			if( app.$outermost.is('.map') ) {
+				addLegends();
 				// TODO: there's probably a simpler way to do this:
 				var deforestation = app.$deforestationRadio.is(':checked');
 				var disturbance = app.$disturbanceRadio.is(':checked');
