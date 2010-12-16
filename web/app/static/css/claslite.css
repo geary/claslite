@@ -472,6 +472,14 @@ div.color-picker-box label {
 	margin-bottom: 0;
 }
 
+.legend-colors .color-picker-row.disabled input.color-picker {
+	visibility: hidden;
+}
+
+.legend-colors .color-picker-row.disabled label {
+	color: #AAA;
+}
+
 .legend-colors input.color-picker {
 	width: 18px;
 	height: 16px;
