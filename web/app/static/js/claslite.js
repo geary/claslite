@@ -277,9 +277,10 @@
 		}, 1 );
 	}
 	
-	function makeColorPicker( id, name, value, label ) {
+	function makeColorPicker( id, name, value, label, check ) {
 		return S(
 			'<div class="color-picker-row">',
+				check ? '<input type="checkbox" class="color-picker-check" checked="checked" />' : '',
 				'<input class="color-picker" data-hex="true" name="', name, '" id="', id, '" value="', value, '">',
 				'<label for="', id, '">', label, '</label>',
 			'</div>'
@@ -290,6 +291,10 @@
 		var $legend = $( '#' + id );
 		$legend.html( getForestChangeLegend(id) );
 		initColorPickers( $legend );
+		$legend.delegate( 'input[type="checkbox"]', 'click', function( event ) {
+			var $checkbox = $(this);
+			$checkbox.parent().toggleClass( 'disabled', ! $checkbox.is(':checked') );
+		});
 	}
 	
 	var temp = { oldest:'#FFFF00', newest:'#FF0000' };
@@ -304,7 +309,7 @@
 			'<div class="legend-colors">',
 				gradient.map( function( color, i ) {
 					var year = +start + i;
-					return makeColorPicker( id + '-' + year, id, color, year );
+					return makeColorPicker( id + '-' + year, id, color, year, true );
 				}).join(''),
 			'</div>'
 		);
