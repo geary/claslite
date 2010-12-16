@@ -857,7 +857,6 @@
 	}
 	
 	function resizeSidebarHeight() {
-		console.log( 'rsh', app.$sidebarScrolling.offset().top );
 		var sbh = app.$window.height() - app.$sidebarScrolling.offset().top;
 		app.$sidebarScrolling.css({ height: sbh });
 	}
