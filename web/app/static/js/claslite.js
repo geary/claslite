@@ -53,7 +53,6 @@
 		initDateSelects();
 		initUnitSelects();
 		initColorPickers();
-		initLegends();
 		initSizer();
 		resize();
 		initMap();
@@ -233,6 +232,7 @@
 				var $end = $(this).parent().find('.date-end');
 				if( +this.value >= +$end.val() )
 					$end.val( +this.value + 1 );
+				addLegends();
 				dirtyView();
 			});
 		
@@ -241,6 +241,7 @@
 				var $start = $(this).parent().find('.date-start');
 				if( +this.value <= +$start.val() )
 					$start.val( +this.value - 1 );
+				addLegends();
 				dirtyView();
 			});
 	}
@@ -255,35 +256,52 @@
 		return ( '' + ( value + 100000000 ) ).slice( -digits );
 	}
 	
-	function initColorPickers() {
-		$('input.color-picker').mColorPicker()
-		$('input.mColorPickerInput').click( function( event ) {
+	function initColorPickers( root ) {
+		var $root = $( root || 'body' );
+		$root.find('input.color-picker').mColorPicker()
+		$root.find('input.mColorPickerInput').click( function( event ) {
 			$(this).next().trigger( 'click', event );
 		});
 	}
 	
-	function initLegends() {
-		addLegend( '#deforestation-legend' );
-		addLegend( '#disturbance-legend' );
+	function addLegends() {
+		if( ! app.$outermost.is('.forestchange.map') )
+			return;
+		addForestChangeLegend( 'deforestation-legend' );
+		addForestChangeLegend( 'disturbance-legend' );
 	}
 	
-	function addLegend( legend ) {
-		var colors = [ '#FF0000', '#FF4400', '#FF8800', '#FFCC00', '#FFFF00' ];
-		$.S(
+	function makeColorPicker( id, name, value, label ) {
+		return S(
+			'<div class="color-picker-row">',
+				'<input class="color-picker" data-hex="true" name="', name, '" id="', id, '" value="', value, '">',
+				'<label for="', id, '">', label, '</label>',
+			'</div>'
+		);
+	}
+	
+	function addForestChangeLegend( id ) {
+		var $legend = $( '#' + id );
+		$legend.html( getForestChangeLegend(id) );
+		initColorPickers( $legend );
+	}
+	
+	var temp = { oldest:'#FFFF00', newest:'#FF0000' };
+	
+	function getForestChangeLegend( id ) {
+		var start = app.$forestViewDateStart.val(), end = app.$forestViewDateEnd.val(),
+			steps = end - start + 1;
+		if( steps < 2 ) return '';
+		
+		var gradient = S.Color.hexGradient( steps, [ temp.oldest, temp.newest ] );
+		return S(
 			'<div class="legend-colors">',
-				colors.map( function( color, i ) {
-					return S(
-						'<div class="legend-color" style="background-color:', color, '">',
-						'</div>',
-						'<div class="legend-label">',
-							i == 0 ? 'Recent' : i == colors.length - 1 ? 'Oldest' : '',
-						'</div>',
-						'<div class="clear-both">',
-						'</div>'
-					)
+				gradient.map( function( color, i ) {
+					var year = +start + i;
+					return makeColorPicker( id + '-' + year, id, color, year );
 				}).join(''),
 			'</div>'
-		).appendTo( legend );
+		);
 	}
 	
 	function enableGeoclick() {
