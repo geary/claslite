@@ -1,8 +1,9 @@
 /*
   mColorPicker
-  Version: 1.0 r24
+  Version: 1.0 r26
   
   Copyright (c) 2010 Meta100 LLC.
+  http://www.meta100.com/
   
   Permission is hereby granted, free of charge, to any person
   obtaining a copy of this software and associated documentation
@@ -62,7 +63,7 @@
     if ($o.swatches.length < 10) $o.swatches = $.fn.mColorPicker.defaults.swatches
     if ($("div#mColorPicker").length < 1) $.fn.mColorPicker.drawPicker();
 
-    if ($('#css_disabled_color_picker').length < 1) $('head').append('<style id="css_disabled_color_picker" type="text/css">.mColorPicker[disabled] + span, .mColorPicker[disabled="disabled"] + span, .mColorPicker[disabled="true"] + span {filter:alpha(opacity=50);-moz-opacity:0.5;-webkit-opacity:0.5;-khtml-opacity: 0.5;opacity: 0.5;}</style>');
+    if ($('#css_disabled_color_picker').length < 1) $('head').prepend('<style id="css_disabled_color_picker" type="text/css">.mColorPicker[disabled] + span, .mColorPicker[disabled="disabled"] + span, .mColorPicker[disabled="true"] + span {filter:alpha(opacity=50);-moz-opacity:0.5;-webkit-opacity:0.5;-khtml-opacity: 0.5;opacity: 0.5;}</style>');
 
     return this.each(function () {
 
@@ -146,7 +147,7 @@
         'background-color': color,
         'background-image': image,
         'display': 'inline-block'
-      });
+      }).attr('class', $('#' + id).attr('class'));
     } else {
 
       $('#' + id).css({
@@ -273,13 +274,11 @@
 
     $("#mColorPickerBg").click($.fn.mColorPicker.closePicker);
   
-    var swatch = ($.fn.mColorPicker.init.enhancedSwatches)? $.fn.mColorPicker.getCookie('swatches'): $o.swatches,
+    var swatch = $.fn.mColorPicker.getCookie('swatches'),
         i = 0;
 
-    if (swatch == null) swatch = $o.swatches;
-    else swatch = swatch.split('||');
-
-    if (swatch.length < 10) swatch = $o.swatches;
+    if (typeof swatch == 'string') swatch = swatch.split('||');
+    if (swatch == null || $.fn.mColorPicker.init.enhancedSwatches || swatch.length < 10) swatch = $o.swatches;
 
     $(".mPastColor").each(function() {
 
@@ -365,9 +364,7 @@
         $.fn.mColorPicker.color = $('#mColorPickerInput').val();
         $.fn.mColorPicker.setInputColor(id, $.fn.mColorPicker.color);
     
-        if (e.which == 13) {
-          $.fn.mColorPicker.colorPicked(id);
-        }
+        if (e.which == 13) $.fn.mColorPicker.colorPicked(id);
       } catch (r) {}
     }).bind('blur', function () {
   
