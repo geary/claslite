@@ -295,7 +295,33 @@
 			var $checkbox = $(this);
 			$checkbox.parent().toggleClass( 'disabled', ! $checkbox.is(':checked') );
 		});
+		$legend.setHider( '.legend-hider', '.legend-colors', function( expand ) {
+			if( expand ) {
+				var $content = $legend.find('.legend-colors');
+				if( $content.is(':empty') ) {
+					// TODO: populate legend here instead of at panel load time
+				}
+			}
+		});
 	}
+	
+	$.fn.setHider = function( hider, content, callback ) {
+		var $wrapper = $(this),
+			$hider = $wrapper.find(hider),
+			$icon = $hider.find('.icon16'),
+			$content = $wrapper.find(content);
+		function expanded() {
+			return $icon.is('.icon16-toggle');
+		}
+		$hider.click( function() {
+			var expand = ! expanded();
+			$icon
+				.removeClass( 'icon16-toggle icon16-toggle-expand' )
+				.addClass( expand ? 'icon16-toggle' : 'icon16-toggle-expand' );
+			$content.toggle( expand );
+			callback && callback( expand );
+		});
+	};
 	
 	var temp = { oldest:'#FFFF00', newest:'#FF0000' };
 	
@@ -306,11 +332,19 @@
 		
 		var gradient = S.Color.hexGradient( steps, [ temp.oldest, temp.newest ] );
 		return S(
-			'<div class="legend-colors">',
-				gradient.map( function( color, i ) {
-					var year = +start + i;
-					return makeColorPicker( id + '-' + year, id, color, year, true );
-				}).join(''),
+			'<div class="legend-wrapper">',
+				'<span class="legend-hider hider">',
+					'<div class="inline-block sprite icon16 icon16-toggle-expand">',
+					'</div>',
+					' ',
+					'<b>Set Colors</b>',
+				'</span>',
+				'<div class="legend-colors">',
+					gradient.map( function( color, i ) {
+						var year = +start + i;
+						return makeColorPicker( id + '-' + year, id, color, year, true );
+					}).join(''),
+				'</div>',
 			'</div>'
 		);
 	}
