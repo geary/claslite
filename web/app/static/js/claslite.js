@@ -70,7 +70,7 @@
 			$main: $('#main'),
 			$tabs: $('#tabs'),
 			$sidebarOuter: $('#sidebar-outer'),
-			$tabPanels: $('#sidebar-top-panel, #sidebar-scrolling'),
+			$tabPanels: $('#sidebar-top-panel, #sidebar-padder'),
 			$sidebarTopPanel: $('#sidebar-top-panel'),
 			$sidebarScrolling: $('#sidebar-scrolling'),
 			$forestViewDateStart: $('#forestview-date-start'),
@@ -156,6 +156,9 @@
 				id = getSubTab( id );
 				var activate = activateTab[id];
 				activate && activate( id );
+				// TODO: without the setTimeout, it doesn't get the correct height
+				// the first time, not sure why
+				setTimeout( resizeSidebarHeight, 1 );
 			}
 		};
 		app.tabs = S.Tabs( app.tabOpts );
@@ -837,9 +840,23 @@
 	
 	function resize() {
 		var ww = app.$window.width(), wh = app.$window.height();
-		app.$main.css({ height: wh - app.$main.offset().top });
-		app.$mapstatswrap.css({ width: ww - layout.sidebarWidth - 1 });
+		var mh = wh - app.$main.offset().top;
+		app.$main.css({ height: mh });
+		
+		var sbw = layout.sidebarWidth + $.scrollBarWidth();
+		app.$sidebarOuter.css({ width: sbw, height: mh });
+		
+		app.$sidebarScrolling.css({ width: sbw });
+		resizeSidebarHeight();
+		
+		app.$mapstatswrap.css({ left: sbw, width: ww - sbw - 1 });
 		app.map && app.map.resize();
+	}
+	
+	function resizeSidebarHeight() {
+		console.log( 'rsh', app.$sidebarScrolling.offset().top );
+		var sbh = app.$window.height() - app.$sidebarScrolling.offset().top;
+		app.$sidebarScrolling.css({ height: sbh });
 	}
 	
 })();
