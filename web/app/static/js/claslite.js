@@ -48,6 +48,7 @@
 		initVars();
 		initTabs();
 		initViewButtons();
+		initCalcButtons();
 		initRangeInputs();
 		initDateSelects();
 		initUnitSelects();
@@ -63,6 +64,8 @@
 	function initVars() {
 		app = {
 			layers: {},
+			forestCoverDates: {},
+			forestChangeDateRanges: {},
 			$window: $(window),
 			$outermost: $('#outermost'),
 			$main: $('#main'),
@@ -77,8 +80,6 @@
 			$disturbanceRadio: $('#disturbance-radio'),
 			$bothRadio: $('#both-radio'),
 			$units: $('#statistics-units-select'),
-			$statsStart: $('#statistics-date-start'),
-			$statsEnd: $('#statistics-date-end'),
 			$mapwrap: $('#mapwrap'),
 			$statswrap: $('#statswrap'),
 			$mapstatswrap: $('#mapwrap,#statswrap'),
@@ -196,6 +197,21 @@
 		//	.addClass('icon16-arrow-circle');
 	}
 	
+	function initCalcButtons() {
+		$('#view-forestview-add').click( function( event ) {
+			var index = app.$forestViewDateStart.val();
+			var set = app.forestCoverDates;
+			if( app.$outermost.is('.forestchange') ) {
+				index += '-' + app.$forestViewDateEnd.val();
+				set = app.forestChangeDateRanges;
+			}
+			if( set[index] ) {
+				//event.preventDefault();
+			}
+			set[index] = true;
+		});
+		
+	}
 	function initRangeInputs() {
 		$('input:range').rangeinput();
 	}
@@ -213,7 +229,7 @@
 			return a;
 		}
 		$('select.date-start')
-			.fillSelect( arr( 1985, 2008 ), 1985, function( event ) {
+			.fillSelect( arr( 1985, 2009 ), 1985, function( event ) {
 				var $end = $(this).parent().find('.date-end');
 				if( +this.value >= +$end.val() )
 					$end.val( +this.value + 1 );
@@ -586,7 +602,17 @@
 	}
 	
 	function addStatistics( id ) {
-		$.getJSON( 'js/statistics-test.json', function( json ) {
+		$.getCachedJSON( 'js/statistics-test.json', function( json, cached ) {
+			
+			var region = json.regions[0];
+			
+			if( ! cached ) {
+				region.forestChange.forEach( function( entry ) {
+					entry.daterange = [ entry.startdate, entry.enddate ].join('-');
+				});
+				S.indexArray( region.forestChange, 'daterange' );
+				S.indexArray( region.forestCover, 'date' );
+			}
 			
 			var units = app.$units.val().split('|'),
 				unit = { value:units[0], abbr:units[1], name:units[2] },
@@ -594,15 +620,16 @@
 			function U( value ) { return value * factor; }
 			function num( value ) { return S.formatNumber( value, 2 ); }
 			
-			var region = json.regions[0];
 			var height = 100;
 			
 			var charts = {
 				forestcover: function() {
 					var scaleMax = 0, labels = [], rows = [],
 						forests = [], nonforests = [], unobserveds = [];
-					region.forestCover.forEach( function( cover ) {
-						var date = cover.date,
+					S.sortSet(app.forestCoverDates).forEach( function( date ) {
+						var cover = region.forestCover.by_date[date];
+						if( ! cover ) return;
+						var
 							forest = U(cover.forest),
 							nonforest = U(cover.nonforest),
 							unobserved = U(cover.unobserved);
@@ -666,15 +693,14 @@
 				
 				forestchange: function() {
 					var totalpix = 2753565;  // temp for demo
-					var limit = { startdate: +app.$statsStart.val(), enddate: +app.$statsEnd.val() };
 					var scaleMax = 0, labels = [], rows = [],
 						deforestations = [], disturbances = [];
-					region.forestChange.forEach( function( change ) {
+					S.sortSet(app.forestChangeDateRanges).forEach( function( range ) {
+						var change = region.forestChange.by_daterange[range];
+						if( ! change ) return;
 						var startdate = change.startdate, enddate = change.enddate,
 							deforestation = U(change.deforestation),
 							disturbance = U(change.disturbance);
-						if( +startdate < limit.startdate  ||  +enddate > limit.enddate )
-							return;
 						// Table
 						var years = enddate - startdate;
 						function pct( value ) {
@@ -691,7 +717,6 @@
 							'</tr>'
 						) );
 						// Chart
-						if( years > 1 ) return;  // omit large ranges in demo
 						//labels.push( S( startdate.slice(-2), '-', enddate.slice(-2) ) );
 						labels.push( S( '-', enddate.slice(-2) ) );
 						scaleMax = Math.max( scaleMax, deforestation, disturbance );
