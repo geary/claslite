@@ -213,6 +213,14 @@ div.icon16-toggle-expand {
 	background-position: -128px 0;
 }
 
+div.icon16-open {
+	background-position: -144px 0;
+}
+
+div.icon16-save {
+	background-position: -160px 0;
+}
+
 /* Header */
 
 #header {
