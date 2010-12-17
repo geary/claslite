@@ -65,6 +65,7 @@
 			layers: {},
 			forestCoverDates: {},
 			forestChangeDateRanges: {},
+			viewed: {},
 			$window: $(window),
 			$outermost: $('#outermost'),
 			$main: $('#main'),
@@ -96,27 +97,29 @@
 		forestcover: function( id ) {
 			disableGeoclick();
 			removeLayers();
-			if( app.$outermost.is('.map') ) {
-				addForestCoverLayer( id );
-			}
-			else {
+			if( app.$outermost.is('.stats') ) {
 				addStatistics( id );
+			}
+			else if( app.viewed.forestcover ) {
+				addForestCoverLayer( id );
 			}
 		},
 		forestchange: function( id ) {
 			disableGeoclick();
 			removeLayers();
-			if( app.$outermost.is('.map') ) {
-				addLegends();
-				// TODO: there's probably a simpler way to do this:
-				var deforestation = app.$deforestationRadio.is(':checked');
-				var disturbance = app.$disturbanceRadio.is(':checked');
-				if( app.$bothRadio.is(':checked') ) deforestation = disturbance = true;
-				if( deforestation ) addForestChangeLayer( 'deforestation' );
-				if( disturbance ) addForestChangeLayer( 'disturbance' );
+			if( app.$outermost.is('.stats') ) {
+				addStatistics( id );
 			}
 			else {
-				addStatistics( id );
+				addLegends();
+				if( app.viewed.forestchange ) {
+					// TODO: there's probably a simpler way to do this:
+					var deforestation = app.$deforestationRadio.is(':checked');
+					var disturbance = app.$disturbanceRadio.is(':checked');
+					if( app.$bothRadio.is(':checked') ) deforestation = disturbance = true;
+					if( deforestation ) addForestChangeLayer( 'deforestation' );
+					if( disturbance ) addForestChangeLayer( 'disturbance' );
+				}
 			}
 		},
 		help: function() {
@@ -167,6 +170,8 @@
 		$('form.input-form').submit( function( event ) {
 			event.preventDefault();
 			// TODO: this could be cleaner
+			if( app.$outermost.is('.map') )
+				app.viewed[app.tabs.selected] = true;
 			app.tabOpts.click( app.tabs.selected );
 		});
 		
