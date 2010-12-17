@@ -47,6 +47,7 @@
 	function initUI() {
 		initVars();
 		initTabs();
+		initHider();
 		initProject();
 		initViewButtons();
 		initCalcButtons();
@@ -71,6 +72,7 @@
 			$outermost: $('#outermost'),
 			$main: $('#main'),
 			$tabs: $('#tabs'),
+			$sidebarHider: $('#sidebar-hider'),
 			$sidebarOuter: $('#sidebar-outer'),
 			$tabPanels: $('#sidebar-top-panel, #sidebar-padder'),
 			$sidebarTopPanel: $('#sidebar-top-panel'),
@@ -185,6 +187,15 @@
 		
 		var tab = location.hash.replace( /^#/, '' );
 		app.tabs.select( app.tabOpts.tabs[tab] ? tab : 'location' );
+	}
+	
+	function initHider() {
+		app.$sidebarHider.click( toggleSidebar );
+	}
+	
+	function toggleSidebar( show ) {
+		app.$main.toggleClass( 'show-sidebar', show );
+		resize();
 	}
 	
 	function initProject() {
@@ -945,11 +956,17 @@
 		var mh = wh - app.$main.offset().top;
 		app.$main.css({ height: mh });
 		
-		var sbw = layout.sidebarWidth + $.scrollBarWidth();
-		app.$sidebarOuter.css({ width: sbw, height: mh });
-		
-		app.$sidebarScrolling.css({ width: sbw });
-		resizeSidebarHeight();
+		if( app.$main.is('.show-sidebar') ) {
+			var sbw = layout.sidebarWidth + $.scrollBarWidth();
+			app.$sidebarHider.css({ left: sbw + 1 });
+			app.$sidebarOuter.css({ width: sbw, height: mh });
+			app.$sidebarScrolling.css({ width: sbw });
+			resizeSidebarHeight();
+		}
+		else {
+			sbw = 0;
+			app.$sidebarHider.css({ left: 0 });
+		}
 		
 		app.$mapstatswrap.css({ left: sbw, width: ww - sbw - 1 });
 		app.map && app.map.resize();
