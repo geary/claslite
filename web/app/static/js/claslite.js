@@ -94,6 +94,7 @@
 		project: function() {
 			disableGeoclick();
 			removeLayers();
+			autoSaveProject();
 		},
 		location: function() {
 			enableGeoclick();
@@ -203,6 +204,34 @@
 			}
 			return false;
 		});
+	}
+	
+	// Temp
+	
+	function twoDigits( n ) {
+		return ( n < 10 ? '0' : '' ) + n;
+	}
+	
+	function formatDateTime( date ) {
+		return S(
+			date.getFullYear(),
+			'-',
+			date.getMonth() + 1,
+			'-',
+			date.getDate(),
+			' ',
+			twoDigits( date.getHours() ),
+			':',
+			twoDigits( date.getMinutes() ),
+			':',
+			twoDigits( date.getSeconds() )
+		);
+	}
+	
+	function autoSaveProject() {
+		$('#project-input').val( S(
+			'My Project ', formatDateTime( new Date )
+		) );
 	}
 	
 	// TODO: refactor initViewButtons() and dirtyView() into a button manager
