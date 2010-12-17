@@ -47,6 +47,7 @@
 	function initUI() {
 		initVars();
 		initTabs();
+		initProject();
 		initViewButtons();
 		initCalcButtons();
 		initRangeInputs();
@@ -90,6 +91,10 @@
 	var tileBase = 'http://claslite.geary.joyeurs.com/tiles/';
 	// TODO: use tab hiders to simplify this code
 	var activateTab = {
+		project: function() {
+			disableGeoclick();
+			removeLayers();
+		},
 		location: function() {
 			enableGeoclick();
 			removeLayers();
@@ -135,6 +140,7 @@
 		switch( subst ) {
 			case 'forestview':
 				view = $('#'+subst+'-input-form-top button.submit')[0].id.split('-')[2];
+			case 'project':
 			case 'location':
 				app.$outermost.addClass( id + '-' + view ).addClass( subst + '-' + view ).addClass( view );
 				break;
@@ -147,6 +153,7 @@
 			parent: '#tabs',
 			panels: app.$tabPanels,
 			tabs: {
+				project: 'Project',
 				location: 'Location',
 				forestcover: 'Forest Cover',
 				forestchange: 'Forest Change',
@@ -177,6 +184,25 @@
 		
 		var tab = location.hash.replace( /^#/, '' );
 		app.tabs.select( app.tabOpts.tabs[tab] ? tab : 'location' );
+	}
+	
+	function initProject() {
+		var combo = S.Combo({
+			input: '#project-input',
+			list: '#project-list',
+			onchange: function( inlist ) {
+				$('#project-form').toggleClass( 'inlist', inlist );
+			}
+		});
+		app.project = { combo: combo }
+		
+		$('#project-form').submit( function() {
+			if( ! combo.inlist() ) {
+				$('<li>').text( combo.$input.val() ).appendTo( combo.$list );
+				// TODO: sort list
+			}
+			return false;
+		});
 	}
 	
 	// TODO: refactor initViewButtons() and dirtyView() into a button manager

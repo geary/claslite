@@ -165,6 +165,14 @@ img.icon16 {
 	display: none;
 }
 
+.absolute {
+	position: absolute;
+}
+
+.relative {
+	position: relative;
+}
+
 /* Sprites */
 
 div.sprite {
@@ -529,7 +537,7 @@ div.slider-panel {
 	margin-top:9px;
 	-moz-border-radius:4px; 
 	-webkit-border-radius:4px; 
-	-moz-box-shadow:inset 0 0 8px #84B0C7
+	-moz-box-shadow:inset 0 0 8px #84B0C7;
 }
 
 /* progress bar (enabled with progress: true) */
@@ -569,6 +577,66 @@ div.slider-panel {
 	width:38px;
 	-moz-border-radius:5px; 
 	-webkit-border-radius:5px; 		
+}
+
+/* Combo List */
+
+input.combo-input, ul.combo-list {
+	border: 1px solid #84B0C7;
+}
+
+input.combo-input {
+}
+
+ul.combo-list {
+	border-top: none;
+}
+
+ul.combo-list li {
+	cursor: default;
+	padding: 2px 1px;
+}
+
+ul.combo-list li.hover {
+	cursor: default;
+	padding: 2px 1px;
+	background-color: #DDD;
+}
+
+#project-open-button {
+	display: none;
+}
+
+#project-form.inlist #project-open-button {
+	display: inherit;
+}
+
+#project-save-button {
+	display: inherit;
+}
+
+#project-form.inlist #project-save-button {
+	display: none;
+}
+
+/* Project */
+
+label.project-label {
+	display: block;
+	font-weight: bold;
+	margin-bottom: 8px;
+}
+
+input.project-input, ul.project-list {
+	width: 242px;
+	margin-right: 4px;
+}
+
+button.project-button {
+	width: 84px;
+}
+
+#project-list {
 }
 
 /* Forest View */
