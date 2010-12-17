@@ -229,6 +229,23 @@ div.icon16-save {
 	background-position: -160px 0;
 }
 
+div.icon14x17 {
+	width: 14px;
+	height: 17px;
+	background-position: 14px -16px;  /* hide */
+}
+
+div.sidebar-hider {
+	background-position: -14px -16px;
+	position: absolute;
+	left: 0;
+	top: 2px;
+}
+
+#main.show-sidebar div.sidebar-hider  {
+	background-position: 0 -16px;
+}
+
 /* Header */
 
 #header {
@@ -378,11 +395,16 @@ ul.tabs a.hover span {
 /* Sidebar */
 
 #sidebar-outer {
+	visibility: hidden;
 	position: absolute;
 	left: 0;
 	top: 0;
 	width: 0;
 	height: 100%;
+}
+
+#main.show-sidebar #sidebar-outer {
+	visibility: visible;
 }
 
 #sidebar-scrolling {
