@@ -58,6 +58,7 @@
 		initSizer();
 		resize();
 		initMap();
+		activateDefaultTab();
 		app.$outermost.show();
 		resize();
 	}
@@ -184,7 +185,9 @@
 				app.viewed[app.tabs.selected] = true;
 			app.tabOpts.click( app.tabs.selected );
 		});
-		
+	}
+	
+	function activateDefaultTab() {
 		var tab = location.hash.replace( /^#/, '' );
 		app.tabs.select( app.tabOpts.tabs[tab] ? tab : 'location' );
 	}
@@ -240,9 +243,13 @@
 	}
 	
 	function autoSaveProject() {
-		$('#project-input').val( S(
+		var $input = $('#project-input');
+		$input.val( S(
 			'My Project ', formatDateTime( new Date )
 		) );
+		setTimeout( function() {
+			$input.focus().select();
+		}, 20 );
 	}
 	
 	// TODO: refactor initViewButtons() and dirtyView() into a button manager
