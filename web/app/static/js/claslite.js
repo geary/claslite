@@ -724,13 +724,16 @@
 	}
 	
 	function setChart( sel, table, url, width, height, title ) {
-		setChartContent( sel, title, S(
+		var chart = ! url ? '' : S(
 			'<div class="statistics-chart" style="width:', width, 'px; height:', height, 'px; background-image:url(', url, ')">',
-			'</div>',
+			'</div>'
+		);
+		table = ! table ? '' : S(
 			'<div class="statistics-table-wrap">',
 				table,
 			'</div>'
-		) );
+		);
+		setChartContent( sel, title, S( chart, table ) );
 	}
 	
 	function setEmptyChart( sel, table, url, width, height, title ) {
@@ -743,10 +746,10 @@
 		$(sel).html( S(
 			'<div>',
 				'<h2>',
-					title,
+					title || '',
 				'</h2>',
 				'<div class="statistics-block">',
-					content,
+					content || '',
 				'</div>',
 			'</div>'
 		) );
@@ -801,9 +804,9 @@
 						unobserveds.push( unobserved );
 					});
 					
-					var selector = '#forest-cover-chart', title = 'Forest Cover';
+					var container = '#forest-cover-chart', title = 'Forest Cover';
 					if( ! rows.length ) {
-						setEmptyChart( selector, title );
+						setEmptyChart( container, title );
 						return;
 					}
 					
@@ -842,14 +845,17 @@
 						axisFormat: '0,222222,13|1N*s*,222222,13'
 					});
 					
-					setChart( selector, table, url, width, height, title );
+					setChart( container, table, url, width, height, title );
 				},
 				
-				forestchange: function() {
+				forestchange: function( a ) {
+					a = a || { chart:true, table:true, details:true };
+					var container = a.container || '#forest-change-chart';
+					var ranges = a.ranges || app.forestChangeDateRanges;
 					var totalpix = 2753565;  // temp for demo
 					var scaleMax = 0, labels = [], rows = [],
 						deforestations = [], disturbances = [];
-					S.sortSet(app.forestChangeDateRanges).forEach( function( range ) {
+					S.sortSet(ranges).forEach( function( range ) {
 						var change = region.forestChange.by_daterange[range];
 						if( ! change ) return;
 						var startdate = change.startdate, enddate = change.enddate,
@@ -878,14 +884,13 @@
 						disturbances.push( disturbance );
 					});
 					
-					var selector = '#forest-change-chart',
-						title = S('Forest Change - Area (', unit.name, ')' );
+					var title = a.title != null ? a.title : S('Forest Change - Area (', unit.name, ')' );
 					if( ! rows.length ) {
-						setEmptyChart( selector, title );
+						setEmptyChart( container, title );
 						return;
 					}
 					
-					var table = S(
+					var table = ! a.table ? '' : S(
 						'<table class="stats-table">',
 							'<thead>',
 								'<tr>',
@@ -909,7 +914,7 @@
 						'</table>'
 					);
 					
-					var url = S.ChartApi.barV({
+					var url = ! a.chart ? '' : S.ChartApi.barV({
 						width: width,
 						height: height,
 						labels: labels,
@@ -925,11 +930,52 @@
 						axisFormat: '0,222222,13|1N*s*,222222,13'
 					});
 					
-					setChart( '#forest-change-chart', table, url, width, height, title );
+					setChart( container, table, url, width, height, title );
+					
+					if( a.details )
+						addForestChangeDetails( container );
 				}
 			};
 			
 			charts[id]();
+			
+			function addForestChangeDetails( container ) {
+				var $container = $(container);
+				var minYear = +Infinity, maxYear = -Infinity;
+				for( var range in app.forestChangeDateRanges ) {
+					var years = range.split('-');
+					minYear = Math.min( minYear, years[0] );
+					maxYear = Math.max( maxYear, years[1] );
+				}
+				if( minYear >= maxYear )
+					return;
+				var ranges = {};
+				for( var year = minYear;  year < maxYear;  ++year )
+					ranges[ S( year, '-', year+1 ) ] = true;
+				// TODO: refactor with similar hider code
+				$.S(
+					'<div class="details-wrapper">',
+						'<div class="details-hider hider">',
+							'<div class="inline-block sprite icon16 icon16-toggle-expand">',
+							'</div>',
+							' ',
+							'<b>Details</b>',
+						'</div>',
+						'<div class="details-content">',
+						'</div>',
+					'</div>'
+				).appendTo( $container );
+				$container.setHider( '.details-hider', '.details-content', function( expand ) {
+					if( expand ) {
+						charts.forestchange({
+							container: $container.find('.details-content'),
+							title: '',
+							table: true,
+							ranges: ranges
+						});
+					}
+				});
+			}
 			
 			// Old test code, save it for color bits
 			//S.chart({
