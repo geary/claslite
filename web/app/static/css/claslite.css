@@ -741,6 +741,10 @@ table.stats-table  td {
 	text-align: right;
 }
 
+div.details-wrapper {
+	margin-top: 16px;
+}
+
 /* Spinner */
 
 #spinner {
