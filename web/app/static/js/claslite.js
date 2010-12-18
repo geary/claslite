@@ -619,7 +619,7 @@
 			return;
 		}
 		// END TEST
-		addLayer( year, S( 'forestcover/idesam/', year, '/' ) );
+		addLayer( id, S( 'forestcover/idesam/', year, '/' ) );
 	}
 	
 	function addForestChangeLayer( id ) {
@@ -634,8 +634,6 @@
 	}
 	
 	function addLayer( id, path ) {
-		// TEMP HACK
-		var opid = id == 'forestcover' ? id : 'forestchange';
 		app.layers[id] = app.map.addLayer({
 			minZoom: 6,
 			maxZoom: 14,
@@ -702,16 +700,10 @@
 		});
 		
 		$('input.layer-slider').bind( 'onSlide change', function( event, value ) {
-			// TODO: clean this up
-			var id = this.id.split('-')[0];
 			value /= 100;
-			if( id == 'forestcover' ) {
-				set( id );
-			}
-			else {
-				set( 'deforestation' );
-				set( 'disturbance' );
-			}
+			set( 'forestcover' );
+			set( 'deforestation' );
+			set( 'disturbance' );
 			
 			function set( id ) { app.layers[id] && app.layers[id].setOpacity( value ); }
 		});
