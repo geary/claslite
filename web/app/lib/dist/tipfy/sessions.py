@@ -10,14 +10,13 @@
     :copyright: 2010 by tipfy.org.
     :license: Apache Sotware License, see LICENSE for details.
 """
-import base64
 import hashlib
 import hmac
 import logging
 import time
 
 from . import APPENGINE, DEFAULT_VALUE, REQUIRED_VALUE
-from .utils import json_encode, json_decode
+from .utils import json_b64encode, json_b64decode
 
 from werkzeug import cached_property
 from werkzeug.contrib.sessions import ModificationTrackingDict
@@ -176,7 +175,7 @@ class SecureCookieStore(object):
             return
 
         try:
-            return self._decode(parts[0])
+            return json_b64decode(parts[0])
         except:
             logging.warning('Cookie value failed to be decoded: %r', parts[0])
             return
@@ -208,22 +207,18 @@ class SecureCookieStore(object):
             An signed value using HMAC.
         """
         timestamp = str(int(time.time()))
-        value = self._encode(value)
+        value = json_b64encode(value)
         signature = self._get_signature(name, value, timestamp)
         return '|'.join([value, timestamp, signature])
 
-    def _encode(self, value):
-        return base64.b64encode(json_encode(value, separators=(',', ':')))
-
-    def _decode(self, value):
-        return json_decode(base64.b64decode(value))
-
     def _get_signature(self, *parts):
+        """Generated an HMAC signatures."""
         hash = hmac.new(self.secret_key, digestmod=hashlib.sha1)
         hash.update('|'.join(parts))
         return hash.hexdigest()
 
     def _check_signature(self, a, b):
+        """Checks if an HMAC signatures is valid."""
         if len(a) != len(b):
             return False
 
@@ -309,7 +304,28 @@ class SessionStore(object):
         sessions = self._sessions.setdefault(backend, {})
         session = self.backends[backend].get_session(self, **kwargs)
         session.update(value)
+        kwargs = self.get_cookie_args(**kwargs)
         sessions[key] = (session, kwargs)
+
+    def update_session_args(self, key, backend=None, **kwargs):
+        """Updates the cookie options for a session.
+
+        :param key:
+            Cookie name. See :meth:`get_session`.
+        :param backend:
+            Name of the session backend. See :meth:`get_session`.
+        :param kwargs:
+            Options to save the cookie. See :meth:`get_session`.
+        :returns:
+            True if the session was updated, False otherwise.
+        """
+        backend = backend or self.default_backend
+        sessions = self._sessions.setdefault(backend, {})
+        if key in sessions:
+            sessions[key][1].update(kwargs)
+            return True
+
+        return False
 
     def get_secure_cookie(self, name, max_age=DEFAULT_VALUE):
         """Returns a secure cookie from the request.
@@ -344,16 +360,22 @@ class SessionStore(object):
         kwargs = self.get_cookie_args(**kwargs)
         self.secure_cookie_store.set_cookie(response, name, value, **kwargs)
 
-    def set_cookie(self, key, value, **kwargs):
+    def set_cookie(self, key, value, format=None, **kwargs):
         """Registers a cookie or secure cookie to be saved or deleted.
 
         :param key:
             Cookie name.
         :param value:
             Cookie value.
+        :param format:
+            If set to 'json', the value is serialized to JSON and encoded
+            to base64.
         :param kwargs:
             Options to save the cookie. See :meth:`get_session`.
         """
+        if format == 'json':
+            value = json_b64encode(value)
+
         self._cookies[key] = (value, self.get_cookie_args(**kwargs))
 
     def unset_cookie(self, key):

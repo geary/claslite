@@ -14,6 +14,7 @@ from jinja2 import Environment, FileSystemLoader, ModuleLoader
 
 from werkzeug import cached_property, import_string
 
+from tipfy import current_handler
 from tipfy.utils import url_for
 
 #: Default configuration values for this module. Keys are:
@@ -53,22 +54,6 @@ default_config = {
 }
 
 
-class Jinja2Mixin(object):
-    """Mixin that adds ``render_template`` and ``render_response`` methods
-    to a :class:`tipfy.RequestHandler`. It will use the request context to
-    render templates.
-    """
-    @cached_property
-    def jinja2(self):
-        return Jinja2.factory(self.app, 'jinja2')
-
-    def render_template(self, _filename, **context):
-        return self.jinja2.render_template(self, _filename, **context)
-
-    def render_response(self, _filename, **context):
-        return self.jinja2.render_response(self, _filename, **context)
-
-
 class Jinja2(object):
     def __init__(self, app, _globals=None, filters=None):
         self.app = app
@@ -99,14 +84,19 @@ class Jinja2(object):
         if enable_i18n:
             # Install i18n.
             from tipfy import i18n
-            env.install_gettext_callables(i18n.gettext, i18n.ngettext,
+            env.install_gettext_callables(
+                lambda x: current_handler.i18n.translations.ugettext(x),
+                lambda s, p, n: current_handler.i18n.translations.ungettext(s,
+                    p, n),
                 newstyle=True)
-            env.filters.update({
+            format_functions = {
                 'format_date':      i18n.format_date,
                 'format_time':      i18n.format_time,
                 'format_datetime':  i18n.format_datetime,
                 'format_timedelta': i18n.format_timedelta,
-            })
+            }
+            env.globals.update(format_functions)
+            env.filters.update(format_functions)
 
         env.globals['url_for'] = url_for
 
@@ -189,3 +179,22 @@ class Jinja2(object):
             _app.registry[_name] = cls(_app, **kwargs)
 
         return _app.registry[_name]
+
+
+class Jinja2Mixin(object):
+    """Mixin that adds ``render_template`` and ``render_response`` methods
+    to a :class:`tipfy.RequestHandler`. It will use the request context to
+    render templates.
+    """
+    # The Jinja2 creator.
+    jinja2_class = Jinja2
+
+    @cached_property
+    def jinja2(self):
+        return self.jinja2_class.factory(self.app, 'jinja2')
+
+    def render_template(self, _filename, **context):
+        return self.jinja2.render_template(self, _filename, **context)
+
+    def render_response(self, _filename, **context):
+        return self.jinja2.render_response(self, _filename, **context)
