@@ -4,9 +4,6 @@
 import private
 
 config = {
-	
-	'private': private.private,
-	
 	#'proxy': {
 	#	'base': '/ee/'
 	#},
@@ -16,3 +13,5 @@ config = {
 	#},
 	
 }
+
+config.update( private.config )

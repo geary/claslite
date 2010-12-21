@@ -37,7 +37,7 @@ class ProxyHandler( RequestHandler ):
 			self.abort( 403 )
 		
 		api = cgi.escape( api )
-		url = self.get_config( 'private', 'earth-engine-api' ) + api
+		url = self.get_config( 'earth-engine', 'api' ) + api
 		
 		if test:
 			response = Response( url )
@@ -48,7 +48,7 @@ class ProxyHandler( RequestHandler ):
 			url = url,
 			headers = {
 				'Authorization': 'GoogleLogin auth=' +
-					self.get_config( 'private', 'earth-engine-auth' )
+					self.get_config( 'earth-engine', 'auth' )
 			},
 			data = data
 		)
