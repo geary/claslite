@@ -4,8 +4,7 @@
 from tipfy import Rule
 
 rules = [
-	Rule('/', name='hello-world', handler='hello_world.handlers.HelloWorldHandler'),
-	Rule('/pretty', name='hello-world-pretty', handler='hello_world.handlers.PrettyHelloWorldHandler'),
+	Rule( '/', name='claslite', handler='claslite.handlers.ClasliteHandler' ),
 	
 	Rule( '/ee/<path:path>', name='proxy', handler='proxy.handlers.ProxyHandler' ),
 ]
