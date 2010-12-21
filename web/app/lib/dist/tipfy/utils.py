@@ -15,11 +15,12 @@
 # under the License.
 
 """Escaping/unescaping methods for HTML, JSON, URLs, and others."""
-
+import base64
 import htmlentitydefs
 import re
-import xml.sax.saxutils
+import unicodedata
 import urllib
+import xml.sax.saxutils
 
 from .app import current_handler
 
@@ -41,34 +42,83 @@ except ImportError:
 
 
 def xhtml_escape(value):
-    """Escapes a string so it is valid within XML or XHTML."""
+    """Escapes a string so it is valid within XML or XHTML.
+
+    :param value:
+        The value to be escaped.
+    :returns:
+        The escaped value.
+    """
     return utf8(xml.sax.saxutils.escape(value, {'"': "&quot;"}))
 
 
 def xhtml_unescape(value):
-    """Un-escapes an XML-escaped string."""
+    """Un-escapes an XML-escaped string.
+
+    :param value:
+        The value to be un-escaped.
+    :returns:
+        The un-escaped value.
+    """
     return re.sub(r"&(#?)(\w+?);", _convert_entity, _unicode(value))
 
 
 def json_encode(value, *args, **kwargs):
-    """JSON-encodes the given Python object with forward slashes escaped."""
+    """Serializes a value to JSON.
+
+    :param value:
+        A value to be serialized.
+    :param args:
+        Extra arguments to be passed to `simplejson.dumps()`.
+    :param kwargs:
+        Extra keyword arguments to be passed to `simplejson.dumps()`.
+    :returns:
+        The serialized value.
+    """
     # JSON permits but does not require forward slashes to be escaped.
     # This is useful when json data is emitted in a <script> tag
     # in HTML, as it prevents </script> tags from prematurely terminating
     # the javscript.  Some json libraries do this escaping by default,
     # although python's standard library does not, so we do it here.
     # http://stackoverflow.com/questions/1580647/json-why-are-forward-slashes-escaped
-    return json_encode_plain(value, *args, **kwargs).replace("</", "<\\/")
-
-
-def json_encode_plain(value, *args, **kwargs):
-    """JSON-encodes the given Python object."""
-    return simplejson.dumps(value, *args, **kwargs)
+    return simplejson.dumps(value, *args, **kwargs).replace("</", "<\\/")
 
 
 def json_decode(value, *args, **kwargs):
-    """Returns Python objects for the given JSON string."""
+    """Deserializes a value from JSON.
+
+    :param value:
+        A value to be deserialized.
+    :param args:
+        Extra arguments to be passed to `simplejson.loads()`.
+    :param kwargs:
+        Extra keyword arguments to be passed to `simplejson.loads()`.
+    :returns:
+        The deserialized value.
+    """
     return simplejson.loads(_unicode(value), *args, **kwargs)
+
+
+def json_b64encode(value):
+    """Serializes a value to JSON and encodes it to base64.
+
+    :param value:
+        A value to be encoded.
+    :returns:
+        The encoded value.
+    """
+    return base64.b64encode(json_encode(value, separators=(',', ':')))
+
+
+def json_b64decode(value):
+    """Decodes a value from base64 and deserializes it from JSON.
+
+    :param value:
+        A value to be decoded.
+    :returns:
+        The decoded value.
+    """
+    return json_decode(base64.b64decode(value))
 
 
 def render_json_response(*args, **kwargs):
@@ -102,15 +152,31 @@ def url_unescape(value):
 
 
 def utf8(value):
+    """Encodes a unicode value to UTF-8 if not yet encoded.
+
+    :param value:
+        Value to be encoded.
+    :returns:
+        An encoded string.
+    """
     if isinstance(value, unicode):
         return value.encode("utf-8")
+
     assert isinstance(value, str)
     return value
 
 
 def _unicode(value):
+    """Encodes a string value to unicode if not yet decoded.
+
+    :param value:
+        Value to be decoded.
+    :returns:
+        A decoded string.
+    """
     if isinstance(value, str):
         return value.decode("utf-8")
+
     assert isinstance(value, unicode)
     return value
 
@@ -138,6 +204,37 @@ def url_for(_name, **kwargs):
     .. seealso:: :meth:`Router.build`.
     """
     return current_handler.url_for(_name, **kwargs)
+
+
+def slugify(value, max_length=None, default=None):
+    """Converts a string to slug format (all lowercase, words separated by
+    dashes).
+
+    :param value:
+        The string to be slugified.
+    :param max_length:
+        An integer to restrict the resulting string to a maximum length.
+        Words are not broken when restricting length.
+    :param default:
+        A default value in case the resulting string is empty.
+    :returns:
+        A slugified string.
+    """
+    value = _unicode(value)
+    s = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').lower()
+    s = re.sub('-+', '-', re.sub('[^a-zA-Z0-9-]+', '-', s)).strip('-')
+    if not s:
+        return default
+
+    if max_length:
+        # Restrict length without breaking words.
+        while len(s) > max_length:
+            if s.find('-') == -1:
+                s = s[:max_length]
+            else:
+                s = s.rsplit('-', 1)[0]
+
+    return s
 
 
 _HTML_UNICODE_MAP = _build_unicode_map()

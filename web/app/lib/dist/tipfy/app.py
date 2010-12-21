@@ -32,6 +32,8 @@ local = Local()
 #: context or other objects shared between requests, we use `current_handler`
 #: there to dynamically get the currently active handler.
 current_handler = local('current_handler')
+#: Same as current_handler, only for the active WSGI app.
+current_app = local('current_app')
 
 from . import default_config
 from .config import Config, REQUIRED_VALUE
@@ -236,7 +238,7 @@ class RequestHandler(object):
         """
         return self.app.make_response(self.request, *rv)
 
-    def redirect(self, location, code=302):
+    def redirect(self, location, code=302, empty=False):
         """Returns a response object with headers set for redirection to the
         given URI. This won't stop code execution, so you must return when
         calling this method::
@@ -248,6 +250,9 @@ class RequestHandler(object):
             will be joined to the current request URL.
         :param code:
             The HTTP status code for the redirect.
+        :param empty:
+            If True, returns a response without body. By default Werkzeug sets
+            a standard message in the body.
         :returns:
             A :class:`Response` object with headers set for redirection.
         """
@@ -255,9 +260,14 @@ class RequestHandler(object):
             # Make it absolute.
             location = urlparse.urljoin(self.request.url, location)
 
-        return base_redirect(location, code)
+        response = base_redirect(location, code)
 
-    def redirect_to(self, _name, _code=302, **kwargs):
+        if empty:
+            response.data = ''
+
+        return response
+
+    def redirect_to(self, _name, _code=302, _empty=False, **kwargs):
         """Convenience method mixing ``werkzeug.redirect`` and :func:`url_for`:
         returns a response object with headers set for redirection to a URL
         built using a named :class:`Rule`.
@@ -266,13 +276,16 @@ class RequestHandler(object):
             The rule name.
         :param _code:
             The HTTP status code for the redirect.
+        :param _empty:
+            If True, returns a response without body. By default Werkzeug sets
+            a standard message in the body.
         :param kwargs:
             Keyword arguments to build the URL.
         :returns:
             A :class:`Response` object with headers set for redirection.
         """
         return self.redirect(self.url_for(_name, _full=kwargs.pop('_full',
-            True), **kwargs), code=_code)
+            True), **kwargs), code=_code, empty=_empty)
 
     def url_for(self, _name, **kwargs):
         """Returns a URL for a named :class:`Rule`.
@@ -336,6 +349,7 @@ class Tipfy(object):
         :param debug:
             True if this is debug mode, False otherwise.
         """
+        local.current_app = self
         self.debug = debug
         self.registry = {}
         self.error_handlers = {}
@@ -347,6 +361,7 @@ class Tipfy(object):
 
     def __call__(self, environ, start_response):
         """Shortcut for :meth:`Tipfy.wsgi_app`."""
+        local.current_app = self
         if self.debug and self.config['tipfy']['enable_debugger']:
             return self._debugged_wsgi_app(environ, start_response)
 
@@ -541,11 +556,6 @@ class Tipfy(object):
                 main()
 
         """
-        if DEV_APPSERVER and APPENGINE:
-            # Fix issue #772.
-            from .dev import fix_sys_path
-            fix_sys_path()
-
         CGIHandler().run(self)
 
     @cached_property
@@ -565,10 +575,10 @@ class Tipfy(object):
 
     @cached_property
     def i18n_store_class(self):
-        """Returns the configured auth store class.
+        """Returns the configured i18n store class.
 
         :returns:
-            An auth store class.
+            An i18n store class.
         """
         return import_string(self.config['tipfy']['i18n_store_class'])
 

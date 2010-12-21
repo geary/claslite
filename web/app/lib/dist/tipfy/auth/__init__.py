@@ -154,7 +154,7 @@ class SessionAuthStore(BaseAuthStore):
         self.loaded = False
         self._session = self._user = None
 
-    @cached_property
+    @property
     def session(self):
         """Returns the currently logged in user session."""
         if self.loaded is False:
@@ -162,7 +162,7 @@ class SessionAuthStore(BaseAuthStore):
 
         return self._session
 
-    @cached_property
+    @property
     def user(self):
         """Returns the currently logged in user entity or None.
 
@@ -190,7 +190,6 @@ class SessionAuthStore(BaseAuthStore):
         self.loaded = True
         self._session_base.pop('_auth', None)
         self._session = self._user = None
-        self._save_session_base()
 
     def _load_session_and_user(self):
         raise NotImplementedError()
@@ -207,20 +206,12 @@ class SessionAuthStore(BaseAuthStore):
             kwargs['max_age'] = None
 
         self._session_base['_auth'] = self._session = session
-        self._save_session_base(**kwargs)
-
-    def _save_session_base(self, **kwargs):
-        _kwargs = self.app.config['tipfy.sessions']['cookie_args'].copy()
-        _kwargs.update(kwargs)
-        self.handler.session_store.set_session(self.config['cookie_name'],
-            self._session_base, **_kwargs)
+        self.handler.session_store.update_session_args(
+            self.config['cookie_name'], **kwargs)
 
 
 class MultiAuthStore(SessionAuthStore):
-    """This RequestHandler mixin is used for custom or third party
-    authentication. It requires a `SessionMixin` to be used with the handler
-    as it depends on sessions to be set.
-    """
+    """Store used for custom or third party authentication."""
     def login_with_form(self, username, password, remember=False):
         """Authenticates the current user using data from a form.
 
