@@ -10,6 +10,7 @@ config = {
 	
 	#'tipfy': {
 	#	'auth_store_class': 'tipfy.appengine.auth.AuthStore',
+	#	'session_store_class': 'tipfy.sessions.SessionStore',
 	#},
 	
 }
