@@ -64,14 +64,6 @@ class LogoutHandler( BaseHandler ):
 class SignupHandler( BaseHandler ):
 	@login_required
 	def get( self, **kwargs ):
-		if not self.auth.user:
-			user_id = 'gae|' + self.auth.session.user_id()
-			email = self.auth.session.email()
-			user = self.auth.create_user( user_id, user_id, email=email )
-		return self.redirect()
-	
-	@login_required
-	def get( self, **kwargs ):
 		if self.auth.user:
 			return self.redirect()
 		context = {
