@@ -65,13 +65,19 @@
 				</div>
 				
 				<div id="user-links">
+<!--
+					<b>{{ user_id }}</b>
+					<span class="pipe">|</span>
+					<b>{{ count }}</b>
+					<span class="pipe">|</span>
+-->
 					<b>{{ email | e }}</b>
 					<span class="pipe">|</span>
 					<a href="#">My account</a>
 					<span class="pipe">|</span>
 					<a href="#">Help</a>
 					<span class="pipe">|</span>
-					<a href="#">Sign out</a>
+					<a href="{{ logout_url }}">Sign out</a>
 				</div>
 				
 			</div>
