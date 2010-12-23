@@ -3,10 +3,8 @@
 	Earth Engine precalculator for CLASlite
 	Requires Python 2.6+
 	
-	Public Domain where allowed, otherwise:
-	Copyright 2010 Michael Geary - http://mg.to/
-	Use under MIT, GPL, or any Open Source license:
-	http://www.opensource.org/licenses/
+	By Michael Geary - http://mg.to/
+	See UNLICENSE or http://unlicense.org/ for public domain notice.
 '''
 
 import cgi, json, os, sys, time, urllib2

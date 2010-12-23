@@ -5,9 +5,8 @@
 
 	CLASlite handler
 
-	:Copyright 2010 Carnegie Institution for Science and Michael Geary
-	:Use under any Open Source license:
-	:http://www.opensource.org/licenses/
+	:By Michael Geary - http://mg.to/
+	:See UNLICENSE or http://unlicense.org/ for public domain notice.
 """
 
 from tipfy import RequestHandler, Response
