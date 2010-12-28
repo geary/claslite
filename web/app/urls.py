@@ -11,4 +11,6 @@ rules = [
 	Rule( '/auth/login', name='auth/login', handler='claslite.handlers.LoginHandler'),
 	Rule( '/auth/logout', name='auth/logout', handler='claslite.handlers.LogoutHandler'),
 	Rule( '/auth/signup', name='auth/signup', handler='claslite.handlers.SignupHandler'),
+	
+	Rule( '/rpc', name='rpc', handler='rpc.handlers.JsonHandler'),
 ]

@@ -9,6 +9,20 @@
 		sidebarWidth: 350
 	};
 	
+	$.jsonRPC.setup({
+		endPoint: '/rpc'
+	});
+	
+	$.jsonRPC.request( 'test', [ 'One', 'Two', { anda:'Three' } ], {
+		success: function( result ) {
+			window.console && console.dir( result );
+		},
+		error: function(result) {
+			window.console && console.log( 'JSON-RPC error' );
+			window.console && console.dir( result );
+		}
+	});
+	
 	S.extend( $.fn.mColorPicker.defaults, {
 		imageFolder: 'images/mColorPicker/'
 	});
