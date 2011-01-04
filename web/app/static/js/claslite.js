@@ -241,7 +241,7 @@
 					var list = rpc.result.projects.map( function( project ) {
 						return S(
 							'<li value="', project.key, '">',
-								'<div class="project-name">',
+								'<div class="text project-name">',
 									project.name,
 								'</div>',
 								'<div class="delete inline-block sprite icon16 icon16-cross">',
