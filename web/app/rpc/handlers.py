@@ -10,6 +10,7 @@
 """
 
 from google.appengine.api import users
+from google.appengine.ext import db
 
 from tipfy import RequestHandler
 from tipfy.ext.jsonrpc import JSONRPCMixin
@@ -20,16 +21,28 @@ from models import Project
 class JsonService( object ):
 	
 	def project_delete( self, keytext ):
-		owner = users.get_current_user()
-		key = Key( keytext )
+		key = db.Key( keytext )
 		project = db.get( key )
-		if owner != project.owner:
+		if project.owner != users.get_current_user():
 			return {
 				'error': 'Wrong owner'
 			}
 		db.delete( project )
 		return {
 			'deleted': keytext
+		}
+	
+	def project_get( self, keytext ):
+		key = db.Key( keytext )
+		project = db.get( key )
+		if project.owner != users.get_current_user():
+			return {
+				'error': 'Wrong owner'
+			}
+		return {
+			'key': keytext,
+			'name': project.name,
+			'settings': project.settings
 		}
 	
 	def project_list( self ):
@@ -48,9 +61,9 @@ class JsonService( object ):
 			'projects': list
 		}
 	
-	def project_new( self, name ):
+	def project_new( self, name, settings ):
 		owner = users.get_current_user()
-		project = Project( name=name, owner=owner )
+		project = Project( name=name, owner=owner, settings=settings )
 		project.put()
 		return {
 			'key': str( project.key() )

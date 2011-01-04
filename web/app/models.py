@@ -18,4 +18,5 @@ class Project( db.Model ):
 	updated = db.DateTimeProperty( auto_now=True )
 	name = db.StringProperty()
 	description = db.TextProperty()
+	settings = db.TextProperty()
 
