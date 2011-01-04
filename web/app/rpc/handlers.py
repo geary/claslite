@@ -35,7 +35,7 @@ class JsonService( object ):
 	def project_list( self ):
 		owner = users.get_current_user()
 		projects = Project.gql(
-			'WHERE owner = :1 ORDER BY name DESC',
+			'WHERE owner = :1 ORDER BY name',
 			owner
 		)
 		list = []
