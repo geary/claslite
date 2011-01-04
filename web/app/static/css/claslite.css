@@ -615,14 +615,57 @@ ul.combo-list {
 }
 
 ul.combo-list li {
+	position: relative;
 	cursor: default;
 	padding: 2px 1px;
+	width: 100%;
 }
 
 ul.combo-list li.hover {
 	cursor: default;
 	padding: 2px 1px;
-	background-color: #DDD;
+	background-color: #EEE;
+}
+
+ul.combo-list li.deleted {
+	background-color: #FFD6D6;
+}
+
+ul.combo-list li.deleted div.project-name {
+	color: #A20F0F;
+	font-style: italic;
+	text-decoration: line-through;
+}
+
+ul.combo-list div.delete, ul.combo-list div.undelete {
+	position: absolute;
+	right: 4px;
+	top: 2px;
+	visibility: hidden;
+}
+
+ul.combo-list div.undelete {
+	font-size: 80%;
+	font-weight: bold;
+	color: #119B22;
+	background-color: #CCFFD1;
+	border: 1px solid #119B22;
+	padding: 0 2px;
+}
+
+ul.combo-list div.undelete {
+}
+
+ul.combo-list li.hover div.delete {
+	visibility: visible;
+}
+
+ul.combo-list li.deleted div.delete {
+	visibility: hidden;
+}
+
+ul.combo-list li.deleted div.undelete {
+	visibility: visible;
 }
 
 #project-open-button {

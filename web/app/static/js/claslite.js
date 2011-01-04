@@ -13,16 +13,6 @@
 		endPoint: '/rpc'
 	});
 	
-	$.jsonRPC.request( 'test', [ 'One', 'Two', { anda:'Three' } ], {
-		success: function( result ) {
-			window.console && console.dir( result );
-		},
-		error: function(result) {
-			window.console && console.log( 'JSON-RPC error' );
-			window.console && console.dir( result );
-		}
-	});
-	
 	S.extend( $.fn.mColorPicker.defaults, {
 		imageFolder: 'images/mColorPicker/'
 	});
@@ -219,18 +209,56 @@
 			input: '#project-input',
 			list: '#project-list',
 			onchange: function( inlist ) {
-				$('#project-form').toggleClass( 'inlist', inlist );
+				$('#project-form').toggleClass( 'inlist', !! inlist );
 			}
 		});
 		app.project = { combo: combo }
 		
 		$('#project-form').submit( function() {
-			if( ! combo.inlist() ) {
-				$('<li>').text( combo.$input.val() ).appendTo( combo.$list );
-				// TODO: sort list
+			var name = combo.$input.val();
+			var $match = combo.inlist();
+			if( $match ) {
+			}
+			else {
+				$.jsonRPC.request( 'project_new', [ name ], {
+					success: function( rpc ) {
+						load();  // TODO: optimize
+						//$('<li>').text( combo.$input.val() ).appendTo( combo.$list );
+					},
+					error: function(result) {
+						alert( 'Error creating project' );  // TODO: better errors
+					}
+				});
 			}
 			return false;
 		});
+		
+		load();
+		
+		function load() {
+			$.jsonRPC.request( 'project_list', [], {
+				success: function( rpc ) {
+					var list = rpc.result.projects.map( function( project ) {
+						return S(
+							'<li value="', project.key, '">',
+								'<div class="project-name">',
+									project.name,
+								'</div>',
+								'<div class="delete inline-block sprite icon16 icon16-cross">',
+								'</div>',
+								'<div class="undelete inline-block">',
+									'Undo',
+								'</div>',
+							'</li>'
+						);
+					});
+					combo.$list.html( list.join('') );
+				},
+				error: function(result) {
+					combo.$list.html( '<li><i>Error loading project list</i></li>' );
+				}
+			});
+		}
 	}
 	
 	// Temp
