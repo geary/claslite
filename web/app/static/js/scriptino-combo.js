@@ -16,7 +16,7 @@
 				match = $items[ ++i ];
 			) {
 				var $match = $(match);
-				if( text == $match.text() )
+				if( text == $match.find('.text').text() )
 					return $match;
 			}
 			return null;
@@ -41,18 +41,18 @@
 				$(this).removeClass('hover');
 			})
 			.delegate( 'li', 'click', function( event ) {
-				$input.val( $(this).text() );
+				$input.val( $(this).find('.text').text() );
 				onchange();
 			})
 			.delegate( 'div.delete', 'click', function( event ) {
 				var $li = $(this).parent();
 				$li.addClass('deleted');
-				a.ondelete && a.ondelete( $li.val(), $li.text() );
+				a.ondelete && a.ondelete( $li );
 			})
 			.delegate( 'div.undelete', 'click', function( event ) {
 				var $li = $(this).parent();
 				$li.removeClass('deleted');
-				a.onundelete && a.onundelete( $li.val(), $li.text() );
+				a.onundelete && a.onundelete( $li );
 			});
 		onchange();
 		return combo;
