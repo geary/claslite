@@ -216,14 +216,26 @@
 			var name = combo.$input.val();
 			var $match = combo.inlist();
 			if( $match ) {
+				$.jsonRPC.request(
+					'project_get',
+					[ $match[0].getAttribute('value') ], {
+					success: function( rpc ) {
+						applySettings( rpc.result.settings );
+					},
+					error: function( result ) {
+						alert( 'Error loading project' );  // TODO: better errors
+					}
+				});
 			}
 			else {
-				$.jsonRPC.request( 'project_new', [ name ], {
+				$.jsonRPC.request(
+					'project_new',
+					[ name, getSettingsJSON() ], {
 					success: function( rpc ) {
 						load();  // TODO: optimize
 						//$('<li>').text( combo.$input.val() ).appendTo( combo.$list );
 					},
-					error: function(result) {
+					error: function( result ) {
 						alert( 'Error creating project' );  // TODO: better errors
 					}
 				});
@@ -1063,6 +1075,30 @@
 	function resizeSidebarHeight() {
 		var sbh = app.$window.height() - app.$sidebarScrolling.offset().top;
 		app.$sidebarScrolling.css({ height: sbh });
+	}
+	
+	function getSettings() {
+		var s = {
+			map: {
+				type: app.map.getType(),
+				center: app.map.getCenter(),
+				zoom: app.map.getZoom()
+			}
+		};
+		return s;
+	}
+	
+	function getSettingsJSON() {
+		return JSON.stringify( getSettings() );
+	}
+	
+	function applySettings( s ) {
+		if( typeof s == 'string' )  s = JSON.parse( s );
+		
+		app.map.setType( s.map.type );
+		app.map.setCenter( s.map.center );
+		app.map.setZoom( s.map.zoom );
+		
 	}
 	
 })();

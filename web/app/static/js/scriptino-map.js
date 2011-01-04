@@ -66,9 +66,30 @@
 				}
 				return poly;
 			},
-
-			setZoom: function ( zoom ) {
-				map.setZoom(zoom);
+			
+			getCenter: function() {
+				var center = map.getCenter();
+				return { lat:center.lat(), lng:center.lng() };
+			},	
+			
+			setCenter: function( ll ) {
+				map.setCenter( new gm.LatLng( ll.lat, ll.lng ) );
+			},	
+			
+			getType: function() {
+				return map.getMapTypeId();
+			},	
+			
+			setType: function( type ) {
+				map.setMapTypeId( type );
+			},	
+			
+			getZoom: function() {
+				return map.getZoom();
+			},	
+			
+			setZoom: function( zoom ) {
+				map.setZoom( zoom );
 			},	
 			
 			addLayer: function( opt ) {
