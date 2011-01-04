@@ -208,9 +208,7 @@
 		var combo = S.Combo({
 			input: '#project-input',
 			list: '#project-list',
-			onchange: function( inlist ) {
-				$('#project-form').toggleClass( 'inlist', !! inlist );
-			}
+			onchange: onchange
 		});
 		app.project = { combo: combo }
 		
@@ -253,11 +251,15 @@
 						);
 					});
 					combo.$list.html( list.join('') );
+					onchange();
 				},
 				error: function(result) {
 					combo.$list.html( '<li><i>Error loading project list</i></li>' );
 				}
 			});
+		}
+		function onchange() {
+			$('#project-form').toggleClass( 'inlist', !! combo.inlist() );
 		}
 	}
 	
