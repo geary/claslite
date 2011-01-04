@@ -6,7 +6,7 @@
 	
 	S.Combo = function( a ) {
 		function onchange() {
-			a.onchange && a.onchange( inlist() );
+			a.onchange && a.onchange();
 		}
 		
 		function inlist() {
@@ -54,7 +54,6 @@
 				$li.removeClass('deleted');
 				a.onundelete && a.onundelete( $li );
 			});
-		onchange();
 		return combo;
 	};
 	
