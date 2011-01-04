@@ -1,4 +1,4 @@
-// Scriptino Tabs
+// Scriptino Combo
 // By Michael Geary - http://mg.to/
 // See UNLICENSE or http://unlicense.org/ for public domain notice.
 
@@ -10,16 +10,16 @@
 		}
 		
 		function inlist() {
-			var val = $input.val();
-			var match = false;
-			$list.find('li').each( function() {
-				if( val == $(this).text() ) {
-					match = true;
-					return false;
-				}
-				return true;
-			});
-			return match;
+			var text = $input.val();
+			for(
+				var match,  i = -1,  $items = $list.find('li');
+				match = $items[ ++i ];
+			) {
+				var $match = $(match);
+				if( text == $match.text() )
+					return $match;
+			}
+			return null;
 		}
 		
 		var $input = $(a.input), $list = $(a.list);
@@ -43,6 +43,16 @@
 			.delegate( 'li', 'click', function( event ) {
 				$input.val( $(this).text() );
 				onchange();
+			})
+			.delegate( 'div.delete', 'click', function( event ) {
+				var $li = $(this).parent();
+				$li.addClass('deleted');
+				a.ondelete && a.ondelete( $li.val(), $li.text() );
+			})
+			.delegate( 'div.undelete', 'click', function( event ) {
+				var $li = $(this).parent();
+				$li.removeClass('deleted');
+				a.onundelete && a.onundelete( $li.val(), $li.text() );
 			});
 		onchange();
 		return combo;
