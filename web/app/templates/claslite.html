@@ -204,18 +204,26 @@
 							
 							<div style="margin-bottom:16px;">
 								
-								<label class="year-label" for="forestview-date-start">
-									<b class="date-single forestview-forestcover">Year:</b>
-									<b class="date-range forestview-forestchange">Years:</b>
-								</label>
-								<select class="date-select date-start" id="forestview-date-start">
-								</select>
+								<div class="forestview-forestcover">
+									<label class="year-label" for="forestcover-date">
+										<b class="date-single">Year:</b>
+									</label>
+									<select class="date-select date-start" id="forestcover-date">
+									</select>
+								</div>
 								
-								<label class="date-range forestview-forestchange" for="forestview-date-end" style="xmargin-left:4px;">
-									<b>&ndash;</b>
-								</label>
-								<select class="date-range date-select date-end forestview-forestchange" id="forestview-date-end">
-								</select>
+								<div class="forestview-forestchange">
+									<label class="year-label" for="forestchange-date-start">
+										<b class="date-range">Years:</b>
+									</label>
+									<select class="date-select date-start" id="forestchange-date-start">
+									</select>
+									<label class="date-range" for="forestchange-date-end">
+										<b>&ndash;</b>
+									</label>
+									<select class="date-range date-select date-end" id="forestchange-date-end">
+									</select>
+								</div>
 								
 							</div>
 							
