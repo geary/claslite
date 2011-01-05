@@ -15,4 +15,11 @@ config = {
 	
 }
 
+try:
+	import dbgp.client
+	config['tipfy']['enable_debugger'] = False
+except:
+	pass
+
 config.update( private.config )
+
