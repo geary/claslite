@@ -69,8 +69,23 @@
 	function initVars() {
 		app = {
 			layers: {},
-			forestCoverDates: {},
-			forestChangeDateRanges: {},
+			units: {
+				//area:
+			},
+			forestcover: {
+				map: {
+				},
+				stats: {
+					dates: {}
+				}
+			},
+			forestchange: {
+				map: {
+				},
+				stats: {
+					ranges: {}
+				}
+			},
 			viewed: {},
 			$window: $(window),
 			$outermost: $('#outermost'),
@@ -81,8 +96,9 @@
 			$tabPanels: $('#sidebar-top-panel, #sidebar-padder'),
 			$sidebarTopPanel: $('#sidebar-top-panel'),
 			$sidebarScrolling: $('#sidebar-scrolling'),
-			$forestViewDateStart: $('#forestview-date-start'),
-			$forestViewDateEnd: $('#forestview-date-end'),
+			$forestCoverDate: $('#forestcover-date'),
+			$forestChangeDateStart: $('#forestchange-date-start'),
+			$forestChangeDateEnd: $('#forestchange-date-end'),
 			$deforestationRadio: $('#deforestation-radio'),
 			$disturbanceRadio: $('#disturbance-radio'),
 			$bothRadio: $('#both-radio'),
@@ -335,11 +351,14 @@
 	
 	function initCalcButtons() {
 		$('#view-forestview-add').click( function( event ) {
-			var index = app.$forestViewDateStart.val();
-			var set = app.forestCoverDates;
-			if( app.$outermost.is('.forestchange') ) {
-				index += '-' + app.$forestViewDateEnd.val();
-				set = app.forestChangeDateRanges;
+			if( app.$outermost.is('.forestcover') ) {
+				var index = app.$forestCoverDate.val();
+				var set = app.forestcover.stats.dates;
+			}
+			else {
+				index = app.$forestChangeDateStart.val() + '-' +
+					app.$forestChangeDateEnd.val();
+				set = app.forestchange.stats.ranges;
 			}
 			if( set[index] ) {
 				//event.preventDefault();
@@ -459,7 +478,7 @@
 	var temp = { oldest:'#FFFF00', newest:'#FF0000' };
 	
 	function getForestChangeLegend( id ) {
-		var start = app.$forestViewDateStart.val(), end = app.$forestViewDateEnd.val(),
+		var start = app.$forestChangeDateStart.val(), end = app.$forestChangeDateEnd.val(),
 			steps = end - start + 1;
 		if( steps < 2 ) return '';
 		
@@ -667,7 +686,7 @@
 	}
 	
 	function addForestCoverLayer( id ) {
-		var year = app.$forestViewDateStart.val();
+		var year = app.$forestCoverDate.val();
 		// TEST:
 		if( year < 1000 ) {
 			addTestLayer( year );
@@ -681,9 +700,9 @@
 		var type = id == 'deforestation' ? 'deforestation' : 'pertubacao_compiled';
 		addLayer( id, S(
 			'forestchange/idesam/', type, '_',
-			app.$forestViewDateStart.val().slice(-2),
+			app.$forestChangeDateStart.val().slice(-2),
 			'_',
-			app.$forestViewDateEnd.val().slice(-2),
+			app.$forestChangeDateEnd.val().slice(-2),
 			'_masked_rgb/'
 		) );
 	}
@@ -827,7 +846,7 @@
 				forestcover: function() {
 					var scaleMax = 0, labels = [], rows = [],
 						forests = [], nonforests = [], unobserveds = [];
-					S.sortSet(app.forestCoverDates).forEach( function( date ) {
+					S.sortSet(app.forestcover.stats.dates).forEach( function( date ) {
 						var cover = region.forestCover.by_date[date];
 						if( ! cover ) return;
 						var
@@ -898,7 +917,7 @@
 				forestchange: function( a ) {
 					a = a || { chart:true, table:true, details:true };
 					var container = a.container || '#forest-change-chart';
-					var ranges = a.ranges || app.forestChangeDateRanges;
+					var ranges = a.ranges || app.forestchange.stats.ranges;
 					var totalpix = 2753565;  // temp for demo
 					var scaleMax = 0, labels = [], rows = [],
 						deforestations = [], disturbances = [];
@@ -989,7 +1008,7 @@
 			function addForestChangeDetails( container ) {
 				var $container = $(container);
 				var minYear = +Infinity, maxYear = -Infinity;
-				for( var range in app.forestChangeDateRanges ) {
+				for( var range in app.forestchange.stats.ranges ) {
 					var years = range.split('-');
 					minYear = Math.min( minYear, years[0] );
 					maxYear = Math.max( maxYear, years[1] );
@@ -1083,6 +1102,25 @@
 				type: app.map.getType(),
 				center: app.map.getCenter(),
 				zoom: app.map.getZoom()
+			},
+			forestcover: {
+				map: {
+					date: app.$forestCoverDate.val()
+				},
+				stats: {
+					dates: app.forestcover.stats.dates
+				}
+			},
+			forestchange: {
+				map: {
+					range: [
+						app.$forestChangeDateStart.val(),
+						app.$forestChangeDateEnd.val()
+					]
+				},
+				stats: {
+					ranges: app.forestchange.stats.ranges
+				}
 			}
 		};
 		return s;
@@ -1094,11 +1132,26 @@
 	
 	function applySettings( s ) {
 		if( typeof s == 'string' )  s = JSON.parse( s );
+		if( typeof s != 'object' ) return;
 		
-		app.map.setType( s.map.type );
-		app.map.setCenter( s.map.center );
-		app.map.setZoom( s.map.zoom );
+		if( s.map ) {
+			app.map.setType( s.map.type );
+			app.map.setCenter( s.map.center );
+			app.map.setZoom( s.map.zoom );
+		}
 		
+		if( s.forestcover ) {
+			var map = s.forestcover.map, stats = s.forestcover.stats;
+			app.$forestCoverDate.val( map.date );
+			if( stats.dates ) app.forestcover.stats.dates = stats.dates;
+		}
+		
+		if( s.forestchange ) {
+			var map = s.forestchange.map, stats = s.forestchange.stats;
+			app.$forestChangeDateStart.val( map.range[0] );
+			app.$forestChangeDateEnd.val( map.range[1] );
+			if( stats.ranges ) app.forestchange.stats.ranges = stats.ranges;
+		}
 	}
 	
 })();
