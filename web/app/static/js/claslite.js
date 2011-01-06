@@ -2,7 +2,7 @@
 // By Michael Geary - http://mg.to/
 // See UNLICENSE or http://unlicense.org/ for public domain notice.
 
-(function() {
+//(function() {
 	
 	var app;
 	var layout = {
@@ -1154,4 +1154,4 @@
 		}
 	}
 	
-})();
+//})();
