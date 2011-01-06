@@ -245,6 +245,12 @@
 									<label for="unobserved-color">Unobserved</label>
 								</div>
 								<!-- End TODO -->
+								
+								<div class="slider-panel map-only">
+									<script type="text/javascript">
+										document.write( opacitySlider('forestcover') );
+									</script>
+								</div>
 							</div>
 							
 							<div class="forestview-forestchange map-only">
@@ -252,30 +258,21 @@
 									Layers:
 								</div>
 								
-								<div id="deforestation-layer">
-									<input type="radio" name="forestchange-layer-radio" id="deforestation-radio" checked="checked" />
-									<label for="deforestation-radio">Deforestation</label>
-									<div id="deforestation-legend"></div>
-								</div>
-								
-								<div id="disturbance-layer">
-									<input type="radio" name="forestchange-layer-radio" id="disturbance-radio" />
-									<label for="disturbance-radio">Forest Disturbance</label>
-									<div id="disturbance-legend"></div>
-								</div>
+								<script type="text/javascript">
+									document.write(
+										getForestChangeStaticPanel(
+											'deforestation', 'Deforestation'
+										),
+										getForestChangeStaticPanel(
+											'disturbance', 'Forest Disturbance'
+										)
+									);
+								</script>
 								
 								<div id="both-layer">
 									<input type="radio" name="forestchange-layer-radio" id="both-radio" />
 									<label for="both-radio">Both</label>
 								</div>
-							</div>
-							
-							<div class="slider-panel map-only">
-								<label for="forestview-opacity" class="slider-label">Opacity</label>
-								<input type="range" class="range layer-slider" min="0" max="100" value="50" id="forestview-opacity" />
-							</div>
-							
-							<div class="clear-both">
 							</div>
 							
 							<div class="units stats-only" id="statistics-units">

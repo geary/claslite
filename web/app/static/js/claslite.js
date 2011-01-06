@@ -58,6 +58,7 @@
 		initDateSelects();
 		initUnitSelects();
 		initColorPickers();
+		initForestChangeColorPanels();
 		initSizer();
 		resize();
 		initMap();
@@ -139,7 +140,6 @@
 				addStatistics( id );
 			}
 			else {
-				addLegends();
 				if( app.viewed.forestchange ) {
 					// TODO: there's probably a simpler way to do this:
 					var deforestation = app.$deforestationRadio.is(':checked');
@@ -388,7 +388,7 @@
 				var $end = $(this).parent().find('.date-end');
 				if( +this.value >= +$end.val() )
 					$end.val( +this.value + 1 );
-				addLegends();
+				updateForestChangeColorPanels();
 				dirtyView();
 			});
 		
@@ -397,7 +397,7 @@
 				var $start = $(this).parent().find('.date-start');
 				if( +this.value <= +$start.val() )
 					$start.val( +this.value - 1 );
-				addLegends();
+				updateForestChangeColorPanels();
 				dirtyView();
 			});
 	}
@@ -420,13 +420,11 @@
 		});
 	}
 	
-	function addLegends() {
-		if( ! app.$outermost.is('.forestchange.map') )
-			return;
-		setTimeout( function() {
-			addForestChangeLegend( 'deforestation-legend' );
-			addForestChangeLegend( 'disturbance-legend' );
-		}, 1 );
+	function updateForestChangeColorPanels() {
+		if( app.$outermost.is('.forestchange.map') ) {
+			updateForestChangeColorPanel( 'deforestation', true );
+			updateForestChangeColorPanel( 'disturbance', true );
+		}
 	}
 	
 	function makeColorPicker( id, name, value, label, check ) {
@@ -439,22 +437,49 @@
 		);
 	}
 	
-	function addForestChangeLegend( id ) {
-		var $legend = $( '#' + id );
-		$legend.html( getForestChangeLegend(id) );
-		initColorPickers( $legend );
+	function initForestChangeColorPanels() {
+		initForestChangeColorPanel( 'deforestation' );
+		initForestChangeColorPanel( 'disturbance' );
+	}
+	
+	function initForestChangeColorPanel( id ) {
+		var $legend = $( '#' + id + '-legend' );
 		$legend.delegate( 'input[type="checkbox"]', 'click', function( event ) {
 			var $checkbox = $(this);
 			$checkbox.parent().toggleClass( 'disabled', ! $checkbox.is(':checked') );
 		});
 		$legend.setHider( '.legend-hider', '.legend-colors', function( expand ) {
 			if( expand ) {
-				var $content = $legend.find('.legend-colors');
-				if( $content.is(':empty') ) {
-					// TODO: populate legend here instead of at panel load time
-				}
+				updateForestChangeColorPanel( id );
 			}
 		});
+	}
+	
+	function updateForestChangeColorPanel( id, reset ) {
+		var $colors = $('#'+id+'-legend-colors');
+		if( reset ) $colors.empty();
+		else if( ! $colors.is(':empty') ) return;
+		$colors.html( getForestChangeColorPanel(id) );
+		initColorPickers( $colors );
+	}
+	
+	function opacitySlider( id ) {
+		return S(
+			'<div class="opacity-slider">',
+				'<label for="', id, '-opacity" class="slider-label">Opacity</label>',
+				'<input type="range" class="range layer-slider" min="0" max="100" value="50" id="', id, '-opacity" />',
+				'<div class="clear-both">',
+				'</div>',
+			'</div>'
+		);
+	}
+	
+	function getOpacity( id ) {
+		return $('#'+id+'-opacity').data('rangeinput').getValue() / 100;
+	}
+	
+	function setOpacity( id, value ) {
+		$('#'+id+'-opacity').data('rangeinput').setValue( value * 100 );
 	}
 	
 	$.fn.setHider = function( hider, content, callback ) {
@@ -477,25 +502,41 @@
 	
 	var temp = { oldest:'#FFFF00', newest:'#FF0000' };
 	
-	function getForestChangeLegend( id ) {
+	function getForestChangeColorPanel( id ) {
 		var start = app.$forestChangeDateStart.val(), end = app.$forestChangeDateEnd.val(),
 			steps = end - start + 1;
 		if( steps < 2 ) return '';
 		
 		var gradient = S.Color.hexGradient( steps, [ temp.oldest, temp.newest ] );
 		return S(
-			'<div class="legend-wrapper">',
-				'<span class="legend-hider hider">',
-					'<div class="inline-block sprite icon16 icon16-toggle-expand">',
+			'<div>',
+				gradient.map( function( color, i ) {
+					var year = +start + i;
+					return makeColorPicker( id + '-' + year, id, color, year, true );
+				}).join(''),
+			'</div>'
+		);
+	}
+	
+	function getForestChangeStaticPanel( id, label ) {
+		return S(
+			'<div id="', id, '-layer">',
+				'<input type="radio" name="forestchange-layer-radio" id="', id, '-radio" checked="checked" />',
+				'<label for="', id, '-radio">', label, '</label>',
+				'<div id="', id, '-legend">',
+					'<div class="legend-wrapper">',
+						opacitySlider( id ),
+						'<div>',
+							'<span class="legend-hider hider">',
+								'<div class="inline-block sprite icon16 icon16-toggle-expand">',
+								'</div>',
+								' ',
+								'Set Colors',
+							'</span>',
+							'<div id="', id, '-legend-colors" class="legend-colors">',
+							'</div>',
+						'</div>',
 					'</div>',
-					' ',
-					'<b>Set Colors</b>',
-				'</span>',
-				'<div class="legend-colors">',
-					gradient.map( function( color, i ) {
-						var year = +start + i;
-						return makeColorPicker( id + '-' + year, id, color, year, true );
-					}).join(''),
 				'</div>',
 			'</div>'
 		);
@@ -645,11 +686,11 @@
 	function addEarthEngineLayer( request ) {
 		var ee = new S.EarthEngine;
 		ee.getTiles( request, function( tiles ) {
-			var opid = 'forestcover';
-			app.layers[opid] = app.map.addLayer({
+			var id = 'forestcover';
+			app.layers[id] = app.map.addLayer({
 				minZoom: 3,
 				maxZoom: 14,
-				opacity: $('#forestview-opacity').data('rangeinput').getValue() / 100,
+				opacity: getOpacity( id ),
 				tiles: S(
 					'https://earthengine.googleapis.com/map/', tiles.mapid,
 					'/{Z}/{X}/{Y}?token=', tiles.token
@@ -711,7 +752,7 @@
 		app.layers[id] = app.map.addLayer({
 			minZoom: 6,
 			maxZoom: 14,
-			opacity: $('#forestview-opacity').data('rangeinput').getValue() / 100,
+			opacity: getOpacity( id ),
 			tiles: function( coord, zoom ) {
 				return S(
 					tileBase, path,
@@ -773,14 +814,14 @@
 			}
 		});
 		
-		$('input.layer-slider').bind( 'onSlide change', function( event, value ) {
-			value /= 100;
-			set( 'forestcover' );
-			set( 'deforestation' );
-			set( 'disturbance' );
-			
-			function set( id ) { app.layers[id] && app.layers[id].setOpacity( value ); }
-		});
+		opacity( 'forestcover' );
+		opacity( 'deforestation' );
+		opacity( 'disturbance' );
+		function opacity( id ) {
+			$('#'+id+'-opacity').bind( 'onSlide change', function( event, value ) {
+				app.layers[id] && app.layers[id].setOpacity( value / 100 );
+			});
+		}
 	}
 	
 	function addSolidMapType( id, color, name, alt ) {
@@ -1105,7 +1146,8 @@
 			},
 			forestcover: {
 				map: {
-					date: app.$forestCoverDate.val()
+					date: app.$forestCoverDate.val(),
+					opacity: getOpacity( 'forestcover' )
 				},
 				stats: {
 					dates: app.forestcover.stats.dates
@@ -1116,7 +1158,13 @@
 					range: [
 						app.$forestChangeDateStart.val(),
 						app.$forestChangeDateEnd.val()
-					]
+					],
+					deforestation: {
+						opacity: getOpacity( 'deforestation' )
+					},
+					disturbance: {
+						opacity: getOpacity( 'disturbance' )
+					}
 				},
 				stats: {
 					ranges: app.forestchange.stats.ranges
@@ -1134,24 +1182,21 @@
 		if( typeof s == 'string' )  s = JSON.parse( s );
 		if( typeof s != 'object' ) return;
 		
-		if( s.map ) {
-			app.map.setType( s.map.type );
-			app.map.setCenter( s.map.center );
-			app.map.setZoom( s.map.zoom );
-		}
+		app.map.setType( s.map.type );
+		app.map.setCenter( s.map.center );
+		app.map.setZoom( s.map.zoom );
 		
-		if( s.forestcover ) {
-			var map = s.forestcover.map, stats = s.forestcover.stats;
-			app.$forestCoverDate.val( map.date );
-			if( stats.dates ) app.forestcover.stats.dates = stats.dates;
-		}
+		var map = s.forestcover.map, stats = s.forestcover.stats;
+		app.$forestCoverDate.val( map.date );
+		if( stats.dates ) app.forestcover.stats.dates = stats.dates;
+		setOpacity( 'forestcover', map.opacity );
 		
-		if( s.forestchange ) {
-			var map = s.forestchange.map, stats = s.forestchange.stats;
-			app.$forestChangeDateStart.val( map.range[0] );
-			app.$forestChangeDateEnd.val( map.range[1] );
-			if( stats.ranges ) app.forestchange.stats.ranges = stats.ranges;
-		}
+		var map = s.forestchange.map, stats = s.forestchange.stats;
+		app.$forestChangeDateStart.val( map.range[0] );
+		app.$forestChangeDateEnd.val( map.range[1] );
+		if( stats.ranges ) app.forestchange.stats.ranges = stats.ranges;
+		setOpacity( 'deforestation', map.deforestation.opacity );
+		setOpacity( 'disturbance', map.disturbance.opacity );
 	}
 	
 //})();
