@@ -12,12 +12,9 @@
 from tipfy import RequestHandler, Response
 from tipfy.auth import login_required, user_required
 from tipfy.sessions import SessionMiddleware
+from tipfy.auth.google import GoogleMixin
 from tipfyext.jinja2 import Jinja2Mixin
 
-from google.appengine.api.users import(
-	create_login_url, create_logout_url,
-	get_current_user, is_current_user_admin
-)
 
 class BaseHandler( RequestHandler, Jinja2Mixin ):
 	middleware = [ SessionMiddleware() ]
@@ -43,28 +40,41 @@ class ClasliteHandler( BaseHandler ):
 		
 		context = {
 			'count': count,
-			'email': self.auth.session.email(),
+			'email': str(self.auth.user.email),
 			'logout_url': self.auth.logout_url(),
-			'user_id': 'gae|' + self.auth.session.user_id(),
+			'user_id': self.auth.user.auth_id,
 		}
 		return self.render_response( 'claslite.html', **context )
 
 
-class LoginHandler( BaseHandler ):
+class LoginHandler( BaseHandler, GoogleMixin ):
 	def get( self, **kwargs ):
-		return self.redirect( create_login_url( self.redirect_path() ) )
+		if self.request.args.get( 'openid.mode', None ):
+			return self.get_authenticated_user( self._on_auth )
+		return self.authenticate_redirect()
+	
+	def _on_auth( self, user ):
+		if not user:
+			self.abort( 403 )
+		auth_id = user['claimed_id']
+		email = user['email']
+		self.auth.login_with_auth_id( auth_id, True )
+		if not self.auth.user:
+			user = self.auth.create_user( auth_id, auth_id, email=email )
+		return self.redirect()
 
 
-class LogoutHandler( BaseHandler ):
+class LogoutHandler( BaseHandler, GoogleMixin ):
 	def get( self, **kwargs ):
-		return self.redirect( create_logout_url( self.redirect_path() ) )
+		self.auth.logout()
+		return self.redirect( 'https://www.google.com/accounts/Logout' )
 
 
 class SignupHandler( BaseHandler ):
 	@login_required
 	def get( self, **kwargs ):
-		if self.auth.user:
-			return self.redirect()
+		if not self.auth.user:
+			return self.redirect( '/auth/logout' )  # avoid redirect loop
 		context = {
 			'redirect_url': self.redirect_path(),
 		}
@@ -72,11 +82,4 @@ class SignupHandler( BaseHandler ):
 	
 	@login_required
 	def post( self, **kwargs ):
-		if self.auth.user:
-			return self.redirect()
-		auth_id = 'gae|%s' % self.auth.session.user_id()
-		email = self.auth.session.email()
-		user = self.auth.create_user( auth_id, auth_id, email=email )
-		if user:
-			return self.redirect()
-		return self.get( **kwargs )
+		return self.redirect()

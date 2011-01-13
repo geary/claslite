@@ -8,10 +8,10 @@ config = {
 	#	'base': '/ee/'
 	#},
 	
-	#'tipfy': {
-	#	'auth_store_class': 'tipfy.appengine.auth.AuthStore',
-	#	'session_store_class': 'tipfy.sessions.SessionStore',
-	#},
+	'tipfy': {
+		'auth_store_class': 'tipfy.auth.MultiAuthStore',
+		#'session_store_class': 'tipfy.sessions.SessionStore',
+	},
 	
 }
 
