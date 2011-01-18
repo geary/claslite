@@ -51,16 +51,19 @@ class LoginHandler( BaseHandler, GoogleMixin ):
 	def get( self, **kwargs ):
 		if self.request.args.get( 'openid.mode', None ):
 			return self.get_authenticated_user( self._on_auth )
-		return self.authenticate_redirect()
+		return self.authorize_redirect( 'http://www.google.com/fusiontables/api/query' )
+
 	
 	def _on_auth( self, user ):
 		if not user:
 			self.abort( 403 )
 		auth_id = user['claimed_id']
 		email = user['email']
+		access_token = user['access_token']
 		self.auth.login_with_auth_id( auth_id, True )
 		if not self.auth.user:
 			user = self.auth.create_user( auth_id, auth_id, email=email )
+		self.session['google_access_token'] = access_token
 		return self.redirect()
 
 

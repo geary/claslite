@@ -12,10 +12,12 @@
 from google.appengine.api import users
 from google.appengine.ext import db
 
-from tipfy import RequestHandler
+from tipfy import RequestHandler, current_handler
 from tipfy.ext.jsonrpc import JSONRPCMixin
 
 from models import Project
+
+from ftclient.ftclient import OAuthFTClient
 
 
 class JsonService( object ):
@@ -58,7 +60,7 @@ class JsonService( object ):
 				'name': project.name
 			})
 		return {
-			'projects': list
+			'projects': list,
 		}
 	
 	def project_new( self, name, settings ):
@@ -67,6 +69,21 @@ class JsonService( object ):
 		project.put()
 		return {
 			'key': str( project.key() )
+		}
+	
+	def test( self ):
+		conf = current_handler.app.config['tipfy.auth.google']
+		token = current_handler.session['google_access_token']
+		
+		client = OAuthFTClient(
+			conf['google_consumer_key'], conf['google_consumer_secret'],
+			token['key'], token['secret']
+		)
+		
+		tables = client.query( 'SHOW TABLES' )
+		
+		return {
+			'tables': tables
 		}
 
 
