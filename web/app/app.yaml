@@ -9,7 +9,7 @@ builtins:
 - remote_api: on
 
 handlers:
-- url: /(robots\.txt|favicon\.ico|claslite\.html|css/.*|images/.*|js/.*)
+- url: /(robots\.txt|favicon\.ico|.*\.html|css/.*|images/.*|js/.*)
   static_files: static/\1
   upload: static/(.*)
 
