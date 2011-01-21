@@ -3,10 +3,13 @@
 import os
 import sys
 
-if 'lib' not in sys.path:
-    # Add lib as primary libraries directory, with fallback to lib/dist
-    # and optionally to lib/dist.zip, loaded using zipimport.
-    sys.path[0:0] = ['lib', 'lib/dist', 'lib/dist.zip']
+def fix_sys_path():
+    if 'lib' not in sys.path:
+        # Add lib as primary libraries directory, with fallback to lib/dist
+        # and optionally to lib/dist.zip, loaded using zipimport.
+        sys.path[0:0] = ['lib', 'lib/dist', 'lib/dist.zip']
+
+fix_sys_path()
 
 from tipfy import Tipfy
 from config import config
