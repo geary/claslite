@@ -6,6 +6,8 @@
 	See UNLICENSE or http://unlicense.org/ for public domain notice.
 '''
 
+from main import fix_sys_path;  fix_sys_path()
+
 from tipfy import RequestHandler, Response
 
 from tipfy.utils import json_decode, json_encode
