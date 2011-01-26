@@ -21,6 +21,46 @@ from models import Project
 
 from ftclient.ftclient import OAuthFTClient
 
+import csv
+def csvToList( csvText ):
+	list = []
+	reader = csv.reader( csvText.strip().split('\n') )
+	head = map(
+		lambda t: t.replace( ' ', '_' ),
+		reader.next()
+	)
+	# TODO: is there a more Pythonic way to do this?
+	for row in reader:
+		r = {}
+		for j in range( len(head) ):
+			r[ head[j] ] = row[j]
+		list.append( r )
+	return list
+
+
+def fixId( id ):
+	return str( int( id ) )
+
+def hasCol( cols, name ):
+	# There must be a better way to do this
+	for col in cols:
+		if col['name'] == name:
+			return True
+	return False
+
+class FTClient( object ):
+	
+	def __init__( self ):
+		conf = current_handler.app.config['tipfy.auth.google']
+		token = current_handler.session['google_access_token']
+		self.client = OAuthFTClient(
+			conf['google_consumer_key'], conf['google_consumer_secret'],
+			token['key'], token['secret']
+		)
+	
+	def query( self, query, request_type=None ):
+		result = self.client.query( query, request_type )
+		return csvToList( result )
 
 class JsonService( object ):
 	
@@ -73,21 +113,32 @@ class JsonService( object ):
 			'key': str( project.key() )
 		}
 	
-	def test( self ):
-		conf = current_handler.app.config['tipfy.auth.google']
-		token = current_handler.session['google_access_token']
-		
-		client = OAuthFTClient(
-			conf['google_consumer_key'], conf['google_consumer_secret'],
-			token['key'], token['secret']
+	def shape_list_tables( self ):
+		client = FTClient()
+		tables = filter(
+			lambda row: row['name'].endswith(('.kml','.shp')),
+			client.query( 'SHOW TABLES' )
 		)
-		
-		tables = client.query( 'SHOW TABLES' )
-		
 		return {
 			'tables': tables
 		}
-
+	
+	def shape_describe( self, idTable ):
+		client = FTClient()
+		cols = client.query( 'DESCRIBE ' + fixId(idTable) )
+		return {
+			'cols': cols
+		}
+	
+	def shape_list_rows( self, idTable ):
+		client = FTClient()
+		cols = client.query( 'DESCRIBE ' + fixId(idTable) )
+		if not hasCol( cols, 'geometry' ):
+			return { 'error': 'No geometry column' }
+		rows = client.query( 'SELECT rowid FROM ' + fixId(idTable) )
+		return {
+			'rows': rows
+		}
 
 class JsonHandler( RequestHandler, JSONRPCMixin ):
 	jsonrpc_service = JsonService()

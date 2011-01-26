@@ -801,6 +801,10 @@
 			}, 100 );
 			// END HACK
 		}
+		else {
+			var ftl = new google.maps.FusionTablesLayer( 400828 );
+			ftl.setMap( app.map.map );
+		}
 		
 		app.geoclick = new app.map.Geoclick({
 			form: '#location-search-form',
