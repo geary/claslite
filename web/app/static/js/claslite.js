@@ -368,19 +368,19 @@
 		
 	}
 	function initRangeInputs() {
-		$('input:range').rangeinput();
+		$('input:range').rangeinput({ precision: 0 });
 	}
 	
 	function initDateSelects() {
 		function arr( first, last ) {
 			var a = [];
+			// TEST: uncomment this to add test layers to date selectors
+			var nTests = 5;
+			for( var i = 1;  i <= nTests;  i++ )
+				a.push({ text:'Test '+i, value:i });
+			// END TEST
 			for( var i = first;  i <= last;  ++i )
 				a.push({ text:i, value:i });
-			// TEST: uncomment this to add test layers to date selectors
-			//var nTests = 5;
-			//for( var i = 1;  i <= nTests;  i++ )
-			//	a.push({ text:'Test '+i, value:i });
-			// END TEST
 			return a;
 		}
 		$('select.date-start')
