@@ -724,6 +724,13 @@ button.subtab-button-stats {
 	margin-top: 8px;
 }
 
+.year-source-label {
+	width: 4em;
+	display: block;
+	float: left;
+	font-weight: bold;
+}
+
 /* Map */
 
 #mapwrap, #statswrap {
