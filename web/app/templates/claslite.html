@@ -205,17 +205,13 @@
 							<div style="margin-bottom:16px;">
 								
 								<div class="forestview-forestcover">
-									<label class="year-label" for="forestcover-date">
-										<b class="date-single">Year:</b>
-									</label>
+									<label class="year-source-label" for="forestcover-date">Year:</label>
 									<select class="date-select date-start" id="forestcover-date">
 									</select>
 								</div>
 								
 								<div class="forestview-forestchange">
-									<label class="year-label" for="forestchange-date-start">
-										<b class="date-range">Years:</b>
-									</label>
+									<label class="year-source-label" for="forestchange-date-start">Years:</label>
 									<select class="date-select date-start" id="forestchange-date-start">
 									</select>
 									<label class="date-range" for="forestchange-date-end">
@@ -228,6 +224,20 @@
 							</div>
 							
 							<div class="clear-right">
+							</div>
+							
+							<div style="margin-bottom:16px;">
+								<label class="year-source-label" for="sat-select">Source:</label>
+								<select id="sat-select">
+									<option value="LANDSAT/L5_L1T">Landsat 5 TM</option>
+									<option value="LANDSAT/L7_L1T" selected="selected">Landsat 7 ETM SLC-off (2003+)</option>
+									<option value="">Landsat 7 ETM SLC-on (1999-2003)</option>
+									<option value="">Landsat 5-7 combined</option>
+									<option value="">MODIS</option>
+								</select>
+							</div>
+							
+							<div class="clear-left">
 							</div>
 							
 							<div class="forestview-forestcover map-only">
