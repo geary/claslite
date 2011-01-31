@@ -10,9 +10,11 @@ from main import fix_sys_path;  fix_sys_path()
 
 from tipfy import RequestHandler, Response
 
-from tipfy.utils import json_decode, json_encode
+from tipfy.utils import json_encode
 
 import cgi, re, urllib, urllib2
+
+from earthengine import EarthEngine
 
 class ProxyHandler( RequestHandler ):
 	'''
@@ -36,31 +38,17 @@ class ProxyHandler( RequestHandler ):
 		if not re.match( allow, api ):
 			self.abort( 403 )
 		
-		api = cgi.escape( api )
-		url = self.get_config( 'earth-engine', 'api' ) + api
-		
 		if test:
-			response = Response( url )
+			response = Response( api )
 			response.headers['Content-Type'] = 'text/plain'
 			return response
 		
-		req = urllib2.Request(
-			url = url,
-			headers = {
-				'Authorization': 'GoogleLogin auth=' +
-					self.get_config( 'earth-engine', 'auth' )
-			},
-			data = data
-		)
-		
-		f = urllib2.urlopen( req )
-		json = f.read()
-		f.close()
+		result = EarthEngine( self ).post( api, data )
 		
 		if debug:
-			jd = json_decode( json )
-			#jd['eeurl'] = url
-			json = json_encode( jd, indent=4 )
+			json = json_encode( result, indent=4 )
+		else:
+			json = json_encode( result )
 			
 		response = Response( json )
 		if debug:
