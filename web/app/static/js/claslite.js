@@ -706,7 +706,15 @@
 			'earthengine_map_' + type, [ opt ],
 			{
 				success: function( rpc ) {
-					//applySettings( rpc.result.settings );
+					var error = rpc.result.error;
+					if( error ) {
+						// TODO: better error reporting
+						if( error.type == 'no_images' )
+							alert( 'No images available for the selected year.' );
+						else
+							alert( 'Error' );
+						return;
+					}
 					var tiles = rpc.result.tiles;
 					app.layers[type] = app.map.addLayer({
 						minZoom: 3,
