@@ -578,7 +578,7 @@
 				var vcfAdjusted = ei.step( 'CLASLITE/VCFAdjustedImage', autoMCU, vcfImage );
 				var forest = ei.step('CLASLITE/ForestMask', vcfAdjusted);
 				
-				addEarthEngineLayer({
+				addEarthEngineTestLayer({
 					image: JSON.stringify( forest ),
 					bands: 'Forest_NonForest',
 					gain: 127
@@ -599,7 +599,7 @@
 				var vcfAdjusted = ei.step( 'CLASLITE/VCFAdjustedImage', autoMCU, vcfImage );
 				var forest = ei.step('CLASLITE/ForestMask', vcfAdjusted);
 				
-				addEarthEngineLayer({
+				addEarthEngineTestLayer({
 					image: JSON.stringify( forest ),
 					bands: 'Forest_NonForest',
 					gain: 127
@@ -620,7 +620,7 @@
 				var vcfAdjusted = ei.step( 'CLASLITE/VCFAdjustedImage', autoMCU, vcfImage );
 				var forest = ei.step('CLASLITE/ForestMask', vcfAdjusted);
 				
-				addEarthEngineLayer({
+				addEarthEngineTestLayer({
 					image: JSON.stringify( forest ),
 					bands: 'Forest_NonForest',
 					gain: 127
@@ -640,7 +640,7 @@
 					gamma: 1.6
 				};
 				
-				addEarthEngineLayer( request );
+				addEarthEngineTestLayer( request );
 			},
 			
 			5: function() {
@@ -676,14 +676,14 @@
 					gain: 256
 				};
 				
-				addEarthEngineLayer( request );
+				addEarthEngineTestLayer( request );
 			}
 		};
 		
 		layers[id]();
 	}
 	
-	function addEarthEngineLayer( request ) {
+	function addEarthEngineTestLayer( request ) {
 		var ee = new S.EarthEngine;
 		ee.getTiles( request, function( tiles ) {
 			var id = 'forestcover';
@@ -699,42 +699,73 @@
 		});
 	}
 	
-	// TODO: turn these into an object
-	function listEarthEngineAssets( bounds ) {
-		var ne = bounds.getNorthEast(), sw = bounds.getSouthWest(),
-			n = ne.lat(), e = ne.lng(), s = sw.lat(), w = sw.lng();
-		//console.log( S( 'bbox=', w.toFixed(2), ',', s.toFixed(2), ',', e.toFixed(2), ',', n.toFixed(2) ) );
-		var ee = new S.EarthEngine;
-		var request = {
-			id: 'MOD09GA',
-			region: [ e, s, w, n ].join(),
-			fields: 'ACQUISITION_DATE'
-		};
-		ee.list( request, function( assets ) {
-			//console.dir( assets );
-			//$('#assets-list').html( S(
-			//	'<div class="assets">',
-			//		assets.map( function( asset ) {
-			//			return S(
-			//				'<div class="asset">',
-			//					asset
-			//				'</div>'
-			//			);
-			//		}).join(''),
-			//	'</div>'
-			//) );
-		});
+	function addEarthEngineLayer( opt ) {
+		// Call earthengine_map_forestcover or earthengine_map_forestchange
+		var type = opt.type;
+		$.jsonRPC.request(
+			'earthengine_map_' + type, [ opt ],
+			{
+				success: function( rpc ) {
+					//applySettings( rpc.result.settings );
+					var tiles = rpc.result.tiles;
+					app.layers[type] = app.map.addLayer({
+						minZoom: 3,
+						maxZoom: 14,
+						opacity: getOpacity( type ),
+						tiles: S(
+							'https://earthengine.googleapis.com/map/', tiles.mapid,
+							'/{Z}/{X}/{Y}?token=', tiles.token
+						)
+					});
+				},
+				error: function( result ) {
+					alert( 'Error loading Earth Engine layer' );  // TODO: better errors
+				}
+			}
+		);
 	}
 	
-	function addForestCoverLayer( id ) {
-		var year = app.$forestCoverDate.val();
+	//function listEarthEngineAssets( year, bounds, callback ) {
+	//	var ne = bounds.getNorthEast(), sw = bounds.getSouthWest(),
+	//		n = ne.lat(), e = ne.lng(), s = sw.lat(), w = sw.lng();
+	//	//console.log( S( 'bbox=', w.toFixed(2), ',', s.toFixed(2), ',', e.toFixed(2), ',', n.toFixed(2) ) );
+	//	var ee = new S.EarthEngine;
+	//	var request = {
+	//		id: $('#sat-select').val(),
+	//		region: [ e, s, w, n ].join(),
+	//		fields: 'ACQUISITION_DATE'
+	//	};
+	//	ee.list( request, function( assets ) {
+	//		//console.dir( assets );
+	//		//$('#assets-list').html( S(
+	//		//	'<div class="assets">',
+	//		//		assets.map( function( asset ) {
+	//		//			return S(
+	//		//				'<div class="asset">',
+	//		//					asset
+	//		//				'</div>'
+	//		//			);
+	//		//		}).join(''),
+	//		//	'</div>'
+	//		//) );
+	//	});
+	//}
+	
+	function addForestCoverLayer( type ) {
+		var year = +app.$forestCoverDate.val();
 		// TEST:
 		if( year < 1000 ) {
 			addTestLayer( year );
 			return;
 		}
 		// END TEST
-		addLayer( id, S( 'forestcover/idesam/', year, '/' ) );
+		addEarthEngineLayer({
+			type: type,
+			id: $('#sat-select').val(),
+			starttime: Date.UTC( year, 0, 1 ),
+			endtime: Date.UTC( year+1, 0, 1 ),
+			bbox: S.Map.boundsToBbox( app.location.bounds ).join(',')
+		});
 	}
 	
 	function addForestChangeLayer( id ) {
@@ -813,8 +844,8 @@
 			onclick: function() {
 				app.tabs.select( 'location' );
 			},
-			onselect: function( bounds ) {
-				listEarthEngineAssets( bounds );
+			onselect: function( name, bounds ) {
+				app.location = { name:name, bounds:bounds };
 			}
 		});
 		
