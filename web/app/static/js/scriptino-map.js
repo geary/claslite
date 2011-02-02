@@ -76,6 +76,10 @@
 				map.setCenter( new gm.LatLng( ll.lat, ll.lng ) );
 			},	
 			
+			getEdges: function() {
+				return S.Map.boundsToEdges( map.getBounds() );
+			},
+			
 			getType: function() {
 				return map.getMapTypeId();
 			},	
@@ -98,12 +102,14 @@
 				};
 				
 				function getTileUrl( coord, zoom ) {
-					return typeof opt.tiles == 'function' ?
+					var url = typeof opt.tiles == 'function' ?
 						opt.tiles( coord, zoom ) :
 						opt.tiles
 							.replace( '{X}', coord.x )
 							.replace( '{Y}', coord.y )
 							.replace( '{Z}', zoom );
+					//console.log( 'getTileUrl', coord.x, coord.y, zoom, url );
+					return url;
 				}
 				
 				if( v2 ) {
@@ -268,7 +274,7 @@
 											strokeWeight: 2
 										});
 										sm.fitBounds( bounds );
-										opt.onselect && opt.onselect( bounds )
+										opt.onselect && opt.onselect( result.formatted_address, bounds )
 									});
 								if( i == 0 ) hilite( $li, bounds );
 							});
@@ -326,7 +332,18 @@
 		});
 	};
 	
-	S.extend( S.Map, v2 ? {
+	S.extend( S.Map, {
+		boundsToBbox: function( bounds ) {
+			var c = S.Map.boundsToEdges( bounds );
+			return [ c.w, c.s, c.e, c.n ];
+		},
+		
+		boundsToEdges: function( bounds ) {
+			var ne = bounds.getNorthEast(), sw = bounds.getSouthWest();
+			return { n: ne.lat(), e: ne.lng(), s: sw.lat(), w: sw.lng() }
+		}
+	},
+	v2 ? {
 		v2: {
 		}
 	} : {

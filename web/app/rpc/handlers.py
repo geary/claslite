@@ -16,12 +16,56 @@ from google.appengine.ext import db
 
 from tipfy import RequestHandler, current_handler
 from tipfy.ext.jsonrpc import JSONRPCMixin
+from tipfy.utils import json_decode, json_encode
 
 from models import Project
 
+from earthengine import EarthEngine, EarthImage
+
 import fusion
 
+
 class JsonService( object ):
+	
+	# earthengine_...
+	
+	def earthengine_map_forestcover( self, opt ):
+		ee = EarthEngine( current_handler )
+		
+		params = 'id=%s&fields=ACQUISITION_DATE&starttime=%d&endtime=%d&bbox=%s' %(
+			opt['id'], opt['starttime'], opt['endtime'], opt['bbox']
+		)
+		
+		list = ee.get( 'list', params )
+		if 'error' in list:
+			return list
+		
+		images = list['data']
+		
+		if len(images) == 0:
+			return { 'error': { 'type': 'no_images' } }
+		
+		# Just use the first for now
+		image = images[0]
+		rawImage = image['id']
+		
+		modImage = 'MOD44B_C4_TREE_2000'
+		ei =  EarthImage()
+		radiance = ei.step( 'CLASLITE/Calibrate', rawImage )
+		reflectance = ei.step( 'CLASLITE/Reflectance', radiance )
+		autoMCU = ei.step( 'CLASLITE/AutoMCU', rawImage, reflectance )
+		vcfAdjusted = ei.step( 'CLASLITE/VCFAdjustedImage', autoMCU, modImage )
+		forest = ei.step( 'CLASLITE/ForestMask', vcfAdjusted )
+		
+		params = 'image=%s&bands=%s&gain=%d' %(
+			json_encode(forest), 'Forest_NonForest', 127
+		)
+		
+		tiles = ee.post( 'mapid', params )
+		
+		return { 'tiles': tiles['data'] }
+	
+	# project_...
 	
 	def project_delete( self, keytext ):
 		key = db.Key( keytext )
@@ -71,6 +115,8 @@ class JsonService( object ):
 		return {
 			'key': str( project.key() )
 		}
+	
+	# shape_...
 	
 	def shape_list_tables( self ):
 		client = fusion.Client( current_handler )
