@@ -759,6 +759,12 @@
 	//	});
 	//}
 	
+	function makePalette( ids ) {
+		return ids.map( function( id ) {
+			return $('#'+id).val().slice(1);
+		}).join(',');
+	}
+	
 	function addForestCoverLayer( type ) {
 		var year = +app.$forestCoverDate.val();
 		// TEST:
@@ -775,6 +781,7 @@
 			id: $('#sat-select').val(),
 			starttime: Date.UTC( year, 0, 1 ),
 			endtime: Date.UTC( year+1, 0, 1 ),
+			palette: makePalette([ 'unobserved-color', 'nonforest-color', 'forest-color' ]),
 			bbox: bbox.join(',')
 		});
 	}
