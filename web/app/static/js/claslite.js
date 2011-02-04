@@ -393,6 +393,12 @@
 			});
 		
 		clearDateSelects();
+		
+		$('#sat-select').bind( 'change keyup', function() {
+			// TODO: don't do this if the selection hasn't really changed
+			clearDateSelects();
+			loadDateSelects();
+		});
 	}
 	
 	function initUnitSelects() {
