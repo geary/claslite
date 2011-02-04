@@ -57,8 +57,8 @@ class JsonService( object ):
 		vcfAdjusted = ei.step( 'CLASLITE/VCFAdjustedImage', autoMCU, modImage )
 		forest = ei.step( 'CLASLITE/ForestMask', vcfAdjusted )
 		
-		params = 'image=%s&bands=%s&gain=%d' %(
-			json_encode(forest), 'Forest_NonForest', 127
+		params = 'image=%s&bands=%s&min=0&max=2&palette=%s' %(
+			json_encode(forest), 'Forest_NonForest', opt['palette']
 		)
 		
 		tiles = ee.post( 'mapid', params )
