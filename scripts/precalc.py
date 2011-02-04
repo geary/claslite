@@ -7,7 +7,12 @@
 	See UNLICENSE or http://unlicense.org/ for public domain notice.
 '''
 
-import cgi, json, os, sys, time, urllib2
+try:
+	import json
+except:
+	import simplejson as json
+
+import cgi, os, sys, time, urllib2
 
 sys.path.append( os.path.abspath('../web/app') )
 import private
@@ -24,7 +29,7 @@ def fetch( api ):
 		headers = { 'Authorization': 'GoogleLogin auth=' + auth }
 	)
 	try:
-		f = urllib2.urlopen( req, None, 600 )
+		f = urllib2.urlopen( req, None )
 		data = f.read()
 		f.close()
 		return json.loads( data )
