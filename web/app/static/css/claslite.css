@@ -714,14 +714,8 @@ button.subtab-button-stats {
 	width: 8em;
 }
 
-.date-panel {
-	float: left;
-	width: 150px;
-	text-align: center;
-}
-
-.date-panel select {
-	margin-top: 8px;
+select.date-select {
+	width: 4.5em;
 }
 
 .year-source-label {

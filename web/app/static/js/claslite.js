@@ -42,7 +42,7 @@
 				changed && changed.apply( this, arguments );
 			});
 		if( initial != null )
-			this	.val( initial );
+			this.val( initial );
 	}
 	
 	$().ready( initUI );
@@ -126,6 +126,7 @@
 		forestcover: function( id ) {
 			disableGeoclick();
 			removeLayers();
+			loadDateSelects();
 			if( app.$outermost.is('.stats') ) {
 				addStatistics( id );
 			}
@@ -136,6 +137,7 @@
 		forestchange: function( id ) {
 			disableGeoclick();
 			removeLayers();
+			loadDateSelects();
 			if( app.$outermost.is('.stats') ) {
 				addStatistics( id );
 			}
@@ -372,19 +374,8 @@
 	}
 	
 	function initDateSelects() {
-		function arr( first, last ) {
-			var a = [];
-			// TEST: uncomment this to add test layers to date selectors
-			var nTests = 5;
-			for( var i = 1;  i <= nTests;  i++ )
-				a.push({ text:'Test '+i, value:i });
-			// END TEST
-			for( var i = first;  i <= last;  ++i )
-				a.push({ text:i, value:i });
-			return a;
-		}
 		$('select.date-start')
-			.fillSelect( arr( 1985, 2009 ), 1985, function( event ) {
+			.fillSelect( [], null, function( event ) {
 				var $end = $(this).parent().find('.date-end');
 				if( +this.value >= +$end.val() )
 					$end.val( +this.value + 1 );
@@ -393,13 +384,15 @@
 			});
 		
 		$('select.date-end')
-			.fillSelect( arr( 1986, 2009 ), 2009, function( event ) {
+			.fillSelect( [], null, function( event ) {
 				var $start = $(this).parent().find('.date-start');
 				if( +this.value <= +$start.val() )
 					$start.val( +this.value - 1 );
 				updateForestChangeColorPanels();
 				dirtyView();
 			});
+		
+		clearDateSelects();
 	}
 	
 	function initUnitSelects() {
@@ -765,6 +758,68 @@
 		}).join(',');
 	}
 	
+	function getMapCenterTinyBbox() {
+		var c = app.map.getCenter(), d = .00001;
+		return [ c.lng - d, c.lat - d, c.lng + d, c.lat + d ];
+	}
+	
+	function fillDateSelectsDisabled( text ) {
+		$('select.date-select').html( S(
+			'<option style="color:white;" class="select-disabled" selected="selected" disabled="disabled">',
+				text,
+			'</option>'
+		) );
+	}
+	function clearDateSelects() {
+		fillDateSelectsDisabled( '&nbsp;' );
+	}
+	
+	function fillDateSelectsNone() {
+		fillDateSelectsDisabled( 'None' );
+	}
+	
+	function loadDateSelects() {
+		
+		function fill( select, years ) {
+			$(select).html(
+				S.mapJoin( years, function( year ) {
+					return S(
+						'<option value="', year, '">',
+							year,
+						'</option>'
+					);
+				})
+			);
+		}
+		
+		$.jsonRPC.request(
+			'earthengine_getyears', [{
+				id: $('#sat-select').val(),
+				//bbox: S.Map.boundsToBbox( app.location.bounds ).join(),
+				bbox: getMapCenterTinyBbox().join()
+			}],
+			{
+				success: function( rpc ) {
+					clearDateSelects();
+					if( rpc.result.error )
+						return;
+					var years = rpc.result.years;
+					fill( '#forestcover-date', years );
+					if( years.length > 1 ) {
+						fill( '#forestchange-date-start',
+							years.slice( 0, years.length - 1 ) );
+						fill( '#forestchange-date-end',
+							years.slice( 1 ) );
+					}
+				},
+				error: function( result ) {
+					fillDateSelectsNone();
+				}
+			}
+		);
+
+	}
+	
 	function addForestCoverLayer( type ) {
 		var year = +app.$forestCoverDate.val();
 		// TEST:
@@ -773,16 +828,14 @@
 			return;
 		}
 		// END TEST
-		//var bbox = S.Map.boundsToBbox( app.location.bounds );
-		var c = app.map.getCenter(), d = .00001;
-		var bbox = [ c.lng - d, c.lat - d, c.lng + d, c.lat + d ];
 		addEarthEngineLayer({
 			type: type,
 			id: $('#sat-select').val(),
 			starttime: Date.UTC( year, 0, 1 ),
 			endtime: Date.UTC( year+1, 0, 1 ),
 			palette: makePalette([ 'unobserved-color', 'nonforest-color', 'forest-color' ]),
-			bbox: bbox.join(',')
+			//bbox: S.Map.boundsToBbox( app.location.bounds ).join(),
+			bbox: getMapCenterTinyBbox().join()
 		});
 	}
 	
