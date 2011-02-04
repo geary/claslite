@@ -11,8 +11,8 @@ import cgi, json, os, sys, time, urllib2
 
 sys.path.append( os.path.abspath('../web/app') )
 import private
-base = private.private['earth-engine-api']
-auth = private.private['earth-engine-auth']
+base = private.config['earth-engine']['api']
+auth = private.config['earth-engine']['auth']
 
 sat = 'LANDSAT/L7_L1T'
 #bbox = '-61.6,-11.4,-60.8,-10.6'
@@ -54,9 +54,9 @@ def main():
 		report( vcf, t )
 
 def report( vcf, t ):
-	adjustment = vcf['data']['properties']['vcf_adjustment']
-	forest = adjustment['forest_pixel_count']
-	valid = adjustment['valid_pixel_count']
+	values = vcf['data']['properties']['vcf_adjustment']['values']
+	forest = values['forest_pixel_count']
+	valid = values['valid_pixel_count']
 	if valid > 0:
 		percent = forest * 100 / valid
 	else:
