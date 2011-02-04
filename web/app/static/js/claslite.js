@@ -376,18 +376,18 @@
 	function initDateSelects() {
 		$('select.date-start')
 			.fillSelect( [], null, function( event ) {
-				var $end = $(this).parent().find('.date-end');
-				if( +this.value >= +$end.val() )
-					$end.val( +this.value + 1 );
+				var end = $(this).parent().find('.date-end')[0];
+				if( end  &&  this.selectedIndex > end.selectedIndex )
+					end.selectedIndex = this.selectedIndex;
 				updateForestChangeColorPanels();
 				dirtyView();
 			});
 		
 		$('select.date-end')
 			.fillSelect( [], null, function( event ) {
-				var $start = $(this).parent().find('.date-start');
-				if( +this.value <= +$start.val() )
-					$start.val( +this.value - 1 );
+				var start = $(this).parent().find('.date-start')[0];
+				if( this.selectedIndex < start.selectedIndex )
+					start.selectedIndex = this.selectedIndex;
 				updateForestChangeColorPanels();
 				dirtyView();
 			});
