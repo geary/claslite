@@ -29,6 +29,35 @@ class JsonService( object ):
 	
 	# earthengine_...
 	
+	def earthengine_getyears( self, opt ):
+		ee = EarthEngine( current_handler )
+		
+		params = 'id=%s&fields=ACQUISITION_DATE&bbox=%s' %(
+			opt['id'], opt['bbox']
+		)
+		
+		response = ee.get( 'list', params )
+		if 'error' in response:
+			return response
+		
+		years = {}
+		ymd = {}
+		for image in response['data']:
+			date = image['properties']['ACQUISITION_DATE']
+			year = int( date.split('-')[0] )
+			years[year] = True
+			ymd[date] = True
+		
+		ymd = list(ymd)
+		ymd.sort()
+		
+		years = list(years)
+		years.sort()
+		return {
+			'years': years,
+			'ymd': ymd
+		}
+	
 	def earthengine_map_forestcover( self, opt ):
 		ee = EarthEngine( current_handler )
 		
@@ -36,11 +65,11 @@ class JsonService( object ):
 			opt['id'], opt['starttime'], opt['endtime'], opt['bbox']
 		)
 		
-		list = ee.get( 'list', params )
-		if 'error' in list:
-			return list
+		response = ee.get( 'list', params )
+		if 'error' in response:
+			return response
 		
-		images = list['data']
+		images = response['data']
 		
 		if len(images) == 0:
 			return { 'error': { 'type': 'no_images' } }
@@ -98,14 +127,14 @@ class JsonService( object ):
 			'WHERE owner = :1 ORDER BY name',
 			owner
 		)
-		list = []
+		result = []
 		for project in projects:
-			list.append({
+			result.append({
 				'key': str( project.key() ),
 				'name': project.name
 			})
 		return {
-			'projects': list,
+			'projects': result,
 		}
 	
 	def project_new( self, name, settings ):
