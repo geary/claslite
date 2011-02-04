@@ -767,12 +767,15 @@
 			return;
 		}
 		// END TEST
+		//var bbox = S.Map.boundsToBbox( app.location.bounds );
+		var c = app.map.getCenter(), d = .00001;
+		var bbox = [ c.lng - d, c.lat - d, c.lng + d, c.lat + d ];
 		addEarthEngineLayer({
 			type: type,
 			id: $('#sat-select').val(),
 			starttime: Date.UTC( year, 0, 1 ),
 			endtime: Date.UTC( year+1, 0, 1 ),
-			bbox: S.Map.boundsToBbox( app.location.bounds ).join(',')
+			bbox: bbox.join(',')
 		});
 	}
 	
