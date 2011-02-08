@@ -784,13 +784,18 @@
 		fillDateSelectsDisabled( 'None' );
 	}
 	
+	//var satboxLatest;
+	//var satboxesDateSelects = {};
 	function loadDateSelects() {
 		
-		function fill( select, years ) {
-			$(select).html(
+		function fill( $select, years ) {
+			var save = $select.val();
+			$select.html(
 				S.mapJoin( years, function( year ) {
 					return S(
-						'<option value="', year, '">',
+						'<option value="', year, '" ',
+							year == save ? 'selected="selected"' : '',
+						'>',
 							year,
 						'</option>'
 					);
@@ -798,32 +803,49 @@
 			);
 		}
 		
-		$.jsonRPC.request(
-			'earthengine_getyears', [{
-				id: $('#sat-select').val(),
-				//bbox: S.Map.boundsToBbox( app.location.bounds ).join(),
-				bbox: getMapCenterTinyBbox().join()
-			}],
-			{
-				success: function( rpc ) {
-					clearDateSelects();
-					if( rpc.result.error )
-						return;
-					var years = rpc.result.years;
-					fill( '#forestcover-date', years );
-					if( years.length > 1 ) {
-						fill( '#forestchange-date-start',
-							years.slice( 0, years.length - 1 ) );
-						fill( '#forestchange-date-end',
-							years.slice( 1 ) );
-					}
-				},
-				error: function( result ) {
-					fillDateSelectsNone();
-				}
+		function fillSelects( years ) {
+			fill( app.$forestCoverDate, years );
+			if( years.length > 1 ) {
+				fill( app.$forestChangeDateStart,
+					years.slice( 0, years.length - 1 ) );
+				fill( app.$forestChangeDateEnd,
+					years.slice( 1 ) );
 			}
-		);
-
+		}
+		
+		var sat =  $('#sat-select').val();
+		
+		//var bbox = S.Map.boundsToBbox( app.location.bounds ).join();
+		var bbox = getMapCenterTinyBbox().join();
+		
+		var satbox = sat + bbox;
+		
+		//if( satbox == satboxLatest ) return;
+		//satboxLatest = satbox;
+		
+		//if( satboxesDateSelects[satbox] ) {
+		//	fillSelects( satboxesDateSelects[satbox] );
+		//}
+		//else {
+			$.jsonRPC.request(
+				'earthengine_getyears', [{ id:sat, bbox:bbox }],
+				{
+					success: function( rpc ) {
+						if( rpc.result.error ) {
+							fillDateSelectsNone();
+						}
+						else {
+							var years = rpc.result.years;
+							//satboxesDateSelects[satbox] = years;
+							fillSelects( years );
+						}
+					},
+					error: function( result ) {
+						fillDateSelectsNone();
+					}
+				}
+			);
+		//}
 	}
 	
 	function addForestCoverLayer( type ) {
