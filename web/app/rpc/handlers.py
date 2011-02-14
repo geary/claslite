@@ -87,12 +87,65 @@ class JsonService( object ):
 		forest = ei.step( 'CLASLITE/ForestMask', vcfAdjusted )
 		
 		params = 'image=%s&bands=%s&min=0&max=2&palette=%s' %(
-			json_encode(forest), 'Forest_NonForest', opt['palette']
+			json_encode(forest), 'Forest_NonForest',
+			','.join(opt['palette'])
 		)
 		
 		tiles = ee.post( 'mapid', params )
 		
-		return { 'tiles': tiles['data'] }
+		if 'error' in tiles:
+			return tiles
+		else:
+			return { 'tiles': tiles['data'] }
+	
+	def earthengine_map_forestchange( self, opt ):
+		ee = EarthEngine( current_handler )
+		ei =  EarthImage()
+		modImage = 'MOD44B_C4_TREE_2000'
+		
+		vcfImages = []
+		for time in opt['times']:
+			params = 'id=%s&fields=ACQUISITION_DATE&starttime=%d&endtime=%d&bbox=%s' %(
+				opt['id'], time['starttime'], time['endtime'], opt['bbox']
+			)
+			
+			response = ee.get( 'list', params )
+			if 'error' in response:
+				return response
+			
+			images = response['data']
+			
+			if len(images) == 0:
+				continue  # TODO: ???
+			
+			# Just use the first for now
+			image = images[0]
+			rawImage = image['id']
+			
+			radiance = ei.step( 'CLASLITE/Calibrate', rawImage )
+			reflectance = ei.step( 'CLASLITE/Reflectance', radiance )
+			autoMCU = ei.step( 'CLASLITE/AutoMCU', rawImage, reflectance )
+			vcfAdjusted = ei.step( 'CLASLITE/VCFAdjustedImage', autoMCU, modImage )
+			
+			vcfImages.append( vcfAdjusted )
+		
+		forest = ei.step( 'CLASLITE/ForestCoverChange', vcfImages )
+		
+		if opt['type'] == 'deforestation':
+			band = 'deforest'
+		else:
+			band = 'disturb'
+		params = 'image=%s&bands=%s&min=0&max=%d&palette=%s' %(
+			json_encode(forest), band,
+			len(opt['palette'])-1, ','.join(opt['palette'])
+		)
+		
+		tiles = ee.post( 'mapid', params )
+		
+		if 'error' in tiles:
+			return tiles
+		else:
+			return { 'tiles': tiles['data'] }
 	
 	# project_...
 	

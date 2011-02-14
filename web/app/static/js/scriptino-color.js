@@ -7,7 +7,7 @@
 	S.Color = {
 		
 		hexToHsv: function( hex ) {
-			var m = hex.match( /^#(\w\w)(\w\w)(\w\w)$/ );
+			var m = hex.match( /^(\w\w)(\w\w)(\w\w)$/ );
 			return S.Color.rgbToHsv(
 				parseInt( m[1], 16 ),
 				parseInt( m[2], 16 ),
@@ -21,7 +21,7 @@
 				return ( n < 16 ? '0' : '' ) + n.toString( 16 );
 			}
 			var rgb = S.Color.hsvToRgb( hsv.h, hsv.s, hsv.v );
-			return '#' + hex(rgb.r) + hex(rgb.g) + hex(rgb.b);
+			return hex(rgb.r) + hex(rgb.g) + hex(rgb.b);
 		},
 		
 		// Color conversion code from:
