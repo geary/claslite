@@ -55,6 +55,7 @@ class EarthImage( object ):
 	
 	def step( self, creator, *args ):
 		return {
+			'type': 'Image',
 			'creator': creator,
 			'args': args,
 		}

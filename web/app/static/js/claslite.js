@@ -430,7 +430,7 @@
 		return S(
 			'<div class="color-picker-row">',
 				check ? '<input type="checkbox" class="color-picker-check" checked="checked" />' : '',
-				'<input class="color-picker" data-hex="true" name="', name, '" id="', id, '" value="', value, '">',
+				'<input class="color-picker" data-hex="true" name="', name, '" id="', id, '" value="#', value, '">',
 				'<label for="', id, '">', label, '</label>',
 			'</div>'
 		);
@@ -499,18 +499,27 @@
 		});
 	};
 	
-	var temp = { oldest:'#FFFF00', newest:'#FF0000' };
+	function getForestChangeYears( withStart ) {
+		var iStart = app.$forestChangeDateStart[0].selectedIndex +
+			( withStart ? 0 : 1 );
+		var iEnd = app.$forestChangeDateEnd[0].selectedIndex + 1;
+		var years = [];
+		for( var i = iStart;  i <= iEnd;  ++i )
+			years.push( app.years[i] );
+		return years;
+	}
+	
+	var tempForestChangeColorLimits = { oldest:'FFFF00', newest:'FF0000' };
 	
 	function getForestChangeColorPanel( id ) {
-		var start = app.$forestChangeDateStart.val(), end = app.$forestChangeDateEnd.val(),
-			steps = end - start + 1;
-		if( steps < 2 ) return '';
+		var years = getForestChangeYears();
+		if( years.length < 1 ) return '';
 		
-		var gradient = S.Color.hexGradient( steps, [ temp.oldest, temp.newest ] );
+		var gradient = S.Color.hexGradient( years.length, [ tempForestChangeColorLimits.oldest, tempForestChangeColorLimits.newest ] );
 		return S(
 			'<div>',
 				gradient.map( function( color, i ) {
-					var year = +start + i;
+					var year = years[i];
 					return makeColorPicker( id + '-' + year, id, color, year, true );
 				}).join(''),
 			'</div>'
@@ -700,9 +709,8 @@
 	
 	function addEarthEngineLayer( opt ) {
 		// Call earthengine_map_forestcover or earthengine_map_forestchange
-		var type = opt.type;
 		$.jsonRPC.request(
-			'earthengine_map_' + type, [ opt ],
+			'earthengine_map_' + opt.proc, [ opt ],
 			{
 				success: function( rpc ) {
 					var error = rpc.result.error;
@@ -715,10 +723,10 @@
 						return;
 					}
 					var tiles = rpc.result.tiles;
-					app.layers[type] = app.map.addLayer({
+					app.layers[opt.type] = app.map.addLayer({
 						minZoom: 3,
 						maxZoom: 14,
-						opacity: getOpacity( type ),
+						opacity: getOpacity( opt.type ),
 						tiles: S(
 							'https://earthengine.googleapis.com/map/', tiles.mapid,
 							'/{Z}/{X}/{Y}?token=', tiles.token
@@ -758,10 +766,31 @@
 	//	});
 	//}
 	
-	function makePalette( ids ) {
-		return ids.map( function( id ) {
-			return $('#'+id).val().slice(1);
-		}).join(',');
+	function makeForestCoverPalette() {
+		return makePalette(
+			$('#unobserved-color')
+			.add('#nonforest-color')
+			.add('#forest-color')
+		);
+	}
+	
+	function makeForestChangePalette( type ) {
+		var $pickers = $('#'+type+'-legend-colors input.color-picker');
+		if( $pickers.length )
+			return makePalette( $pickers );
+		// Kind of a hack for when palette is not expanded
+		var years = getForestChangeYears();
+		if( years.length < 1 ) return '';
+		return S.Color.hexGradient( years.length, [ tempForestChangeColorLimits.oldest, tempForestChangeColorLimits.newest ] );
+		
+	}
+	
+	function makePalette( $pickers ) {
+		var pal = [];
+		$pickers.each( function( i, input ) {
+			pal.push( input.value.slice(1) );
+		});
+		return pal;
 	}
 	
 	function getMapCenterTinyBbox() {
@@ -835,7 +864,7 @@
 							fillDateSelectsNone();
 						}
 						else {
-							var years = rpc.result.years;
+							var years = app.years = rpc.result.years;
 							//satboxesDateSelects[satbox] = years;
 							fillSelects( years );
 						}
@@ -857,25 +886,34 @@
 		}
 		// END TEST
 		addEarthEngineLayer({
+			proc: type,
 			type: type,
 			id: $('#sat-select').val(),
 			starttime: Date.UTC( year, 0, 1 ),
 			endtime: Date.UTC( year+1, 0, 1 ),
-			palette: makePalette([ 'unobserved-color', 'nonforest-color', 'forest-color' ]),
+			palette: makeForestCoverPalette(),
 			//bbox: S.Map.boundsToBbox( app.location.bounds ).join(),
 			bbox: getMapCenterTinyBbox().join()
 		});
 	}
 	
-	function addForestChangeLayer( id ) {
-		var type = id == 'deforestation' ? 'deforestation' : 'pertubacao_compiled';
-		addLayer( id, S(
-			'forestchange/idesam/', type, '_',
-			app.$forestChangeDateStart.val().slice(-2),
-			'_',
-			app.$forestChangeDateEnd.val().slice(-2),
-			'_masked_rgb/'
-		) );
+	function addForestChangeLayer( type ) {
+		var years = getForestChangeYears(true).map( function( year ) {
+			return {
+				starttime: Date.UTC( year, 0, 1 ),
+				endtime: Date.UTC( year+1, 0, 1 )
+			}
+		});
+		
+		addEarthEngineLayer({
+			proc: 'forestchange',
+			type: type,
+			id: $('#sat-select').val(),
+			times: years,
+			palette: makeForestChangePalette( type ),
+			//bbox: S.Map.boundsToBbox( app.location.bounds ).join(),
+			bbox: getMapCenterTinyBbox().join()
+		});
 	}
 	
 	function addLayer( id, path ) {
