@@ -135,9 +135,9 @@ class JsonService( object ):
 			band = 'deforest'
 		else:
 			band = 'disturb'
-		params = 'image=%s&bands=%s&min=0&max=%d&palette=%s' %(
-			json_encode(forest), band,
-			len(opt['palette'])-1, ','.join(opt['palette'])
+		palette = opt['palette']
+		params = 'image=%s&bands=%s&min=1&max=%d&palette=%s' %(
+			json_encode(forest), band, len(palette), ','.join(palette)
 		)
 		
 		tiles = ee.post( 'mapid', params )
