@@ -767,17 +767,17 @@
 	//}
 	
 	function makeForestCoverPalette() {
-		return makePalette(
-			$('#unobserved-color')
-			.add('#nonforest-color')
-			.add('#forest-color')
-		);
+		return makePalette([
+			$('#unobserved-color')[0],
+			$('#nonforest-color')[0],
+			$('#forest-color')[0]
+		]);
 	}
 	
 	function makeForestChangePalette( type ) {
 		var $pickers = $('#'+type+'-legend-colors input.color-picker');
 		if( $pickers.length )
-			return makePalette( $pickers );
+			return makePalette( $pickers.toArray() );
 		// Kind of a hack for when palette is not expanded
 		var years = getForestChangeYears();
 		if( years.length < 1 ) return '';
@@ -785,12 +785,10 @@
 		
 	}
 	
-	function makePalette( $pickers ) {
-		var pal = [];
-		$pickers.each( function( i, input ) {
-			pal.push( input.value.slice(1) );
+	function makePalette( pickers ) {
+		return pickers.map( function( input ) {
+			return input.value.slice(1);
 		});
-		return pal;
 	}
 	
 	function getMapCenterTinyBbox() {
