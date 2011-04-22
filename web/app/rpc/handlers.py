@@ -14,6 +14,8 @@ from main import fix_sys_path;  fix_sys_path()
 from google.appengine.api import users
 from google.appengine.ext import db
 
+import logging
+
 from tipfy import RequestHandler, current_handler
 from tipfy.ext.jsonrpc import JSONRPCMixin
 from tipfy.utils import json_decode, json_encode
@@ -77,22 +79,27 @@ class JsonService( object ):
 		if len(images) == 0:
 			return { 'error': { 'type': 'no_images' } }
 		
-		# Just use the first for now
-		image = images[0]
-		rawImage = image['id']
-		
-		modImage = 'MOD44B_C4_TREE_2000'
-		ei =  EarthImage()
-		radiance = ei.step( CLASLITE+'Calibrate', rawImage )
-		reflectance = ei.step( CLASLITE+'Reflectance', radiance )
-		autoMCU = ei.step( CLASLITE+'AutoMCU', rawImage, reflectance, opt['sat'][0] )
-		vcfAdjusted = ei.step( CLASLITE+'VCFAdjustedImage', autoMCU, modImage )
-		forest = ei.step( CLASLITE+'ForestMask', vcfAdjusted )
+		scenes = []
+		for image in images:
+			rawImage = image['id']
+			modImage = 'MOD44B_C4_TREE_2000'
+			ei =  EarthImage()
+			radiance = ei.step( CLASLITE+'Calibrate', rawImage )
+			reflectance = ei.step( CLASLITE+'Reflectance', radiance )
+			autoMCU = ei.step( CLASLITE+'AutoMCU', rawImage, reflectance, opt['sat'][0] )
+			vcfAdjusted = ei.step( CLASLITE+'VCFAdjustedImage', autoMCU, modImage )
+			scenes.append( vcfAdjusted )
+			
+		mosaic = ei.step( CLASLITE+'MosaicScene', scenes )
+		forest = ei.step( CLASLITE+'ForestMask', mosaic )
 		
 		params = 'image=%s&bands=%s&min=0&max=2&palette=%s' %(
 			json_encode(forest), 'Forest_NonForest',
 			str( ','.join(opt['palette']) )
 		)
+		logging.info( 'Forest_NonForest %d images, %d bytes' %(
+			len(images), len(params)
+		) )
 		
 		tiles = ee.post( 'mapid', params )
 		
