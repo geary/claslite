@@ -846,9 +846,7 @@
 		
 		var sat =  $('#sat-select').val().split('|');
 		
-		//var bbox = S.Map.boundsToBbox( app.location.bounds ).join();
-		var bbox = getMapCenterTinyBbox().join();
-		
+		var bbox = getMapBbox();
 		var satbox = sat[1] + bbox;
 		
 		//if( satbox == satboxLatest ) return;
@@ -894,8 +892,7 @@
 			starttime: Date.UTC( year, 0, 1 ),
 			endtime: Date.UTC( year+1, 0, 1 ),
 			palette: makeForestCoverPalette(),
-			//bbox: S.Map.boundsToBbox( app.location.bounds ).join(),
-			bbox: getMapCenterTinyBbox().join()
+			bbox: getMapBbox()
 		});
 	}
 	
@@ -913,8 +910,7 @@
 			sat: $('#sat-select').val().split('|'),
 			times: years,
 			palette: makeForestChangePalette( type ),
-			//bbox: S.Map.boundsToBbox( app.location.bounds ).join(),
-			bbox: getMapCenterTinyBbox().join()
+			bbox: getMapBbox()
 		});
 	}
 	
@@ -1371,6 +1367,13 @@
 		if( stats.ranges ) app.forestchange.stats.ranges = stats.ranges;
 		setOpacity( 'deforestation', map.deforestation.opacity );
 		setOpacity( 'disturbance', map.disturbance.opacity );
+	}
+	
+	function getMapBbox() {
+		//var bounds = app.location.bounds;
+		var bounds = app.map.map.getBounds();
+		return S.Map.boundsToBbox( bounds ).join();
+		//return getMapCenterTinyBbox().join();
 	}
 	
 //})();
