@@ -746,7 +746,7 @@
 	//	//console.log( S( 'bbox=', w.toFixed(2), ',', s.toFixed(2), ',', e.toFixed(2), ',', n.toFixed(2) ) );
 	//	var ee = new S.EarthEngine;
 	//	var request = {
-	//		id: $('#sat-select').val(),
+	//		sat: $('#sat-select').val(),
 	//		region: [ e, s, w, n ].join(),
 	//		fields: 'ACQUISITION_DATE'
 	//	};
@@ -840,12 +840,12 @@
 			}
 		}
 		
-		var sat =  $('#sat-select').val();
+		var sat =  $('#sat-select').val().split('|');
 		
 		//var bbox = S.Map.boundsToBbox( app.location.bounds ).join();
 		var bbox = getMapCenterTinyBbox().join();
 		
-		var satbox = sat + bbox;
+		var satbox = sat[1] + bbox;
 		
 		//if( satbox == satboxLatest ) return;
 		//satboxLatest = satbox;
@@ -855,7 +855,7 @@
 		//}
 		//else {
 			$.jsonRPC.request(
-				'earthengine_getyears', [{ id:sat, bbox:bbox }],
+				'earthengine_getyears', [{ sat:sat, bbox:bbox }],
 				{
 					success: function( rpc ) {
 						if( rpc.result.error ) {
@@ -886,7 +886,7 @@
 		addEarthEngineLayer({
 			proc: type,
 			type: type,
-			id: $('#sat-select').val(),
+			sat: $('#sat-select').val().split('|'),
 			starttime: Date.UTC( year, 0, 1 ),
 			endtime: Date.UTC( year+1, 0, 1 ),
 			palette: makeForestCoverPalette(),
@@ -906,7 +906,7 @@
 		addEarthEngineLayer({
 			proc: 'forestchange',
 			type: type,
-			id: $('#sat-select').val(),
+			sat: $('#sat-select').val().split('|'),
 			times: years,
 			palette: makeForestChangePalette( type ),
 			//bbox: S.Map.boundsToBbox( app.location.bounds ).join(),

@@ -19,9 +19,11 @@ import private
 base = private.config['earth-engine']['api']
 auth = private.config['earth-engine']['auth']
 
-sat = 'LANDSAT/L7_L1T'
+sat = ( 'LANDSAT/L7_L1T', 'L7' )
 #bbox = '-61.6,-11.4,-60.8,-10.6'
 bbox = '-64.0,-13.0,-60.0,-9.0'
+#bbox = '-61.795884,-11.619288,-61.000521,-10.987566' # cacoal
+#bbox = '-72.399051,-13.354849,-68.677986,-9.863813' # madre
 
 def fetch( api ):
 	req = urllib2.Request(
@@ -37,13 +39,13 @@ def fetch( api ):
 		return error.read()
 
 def listImages( sat, bbox ):
-	return fetch( 'list?id=%s&bbox=%s' %( sat, bbox ) )['data']
+	return fetch( 'list?id=%s&bbox=%s' %( sat[0], bbox ) )['data']
 
 def calcVCF( id ):
 	return fetch( vcfAPI(id) )
 
 def vcfAPI( id ):
-	return 'value?image={"creator":"CLASLITE/VCFAdjustedImage","args":[{"creator":"CLASLITE/AutoMCU","args":["%s",{"creator":"CLASLITE/Reflectance","args":[{"creator":"CLASLITE/Calibrate","args":["%s"]}]}]},"MOD44B_C4_TREE_2000"]}&fields=vcf_adjustment' %( id, id )
+	return 'value?image={"creator":"CLASLITE/com.google.earthengine.third_party.claslite.VCFAdjustedImage","args":[{"creator":"CLASLITE/com.google.earthengine.third_party.claslite.AutoMCU","args":["%s",{"creator":"CLASLITE/com.google.earthengine.third_party.claslite.Reflectance","args":[{"creator":"CLASLITE/com.google.earthengine.third_party.claslite.Calibrate","args":["%s"]}]},"%s"]},"MOD44B_C4_TREE_2000"]}&fields=vcf_adjustment' %( id, id, sat[1] )
 
 def main():
 	images = listImages( sat, bbox )
@@ -59,6 +61,9 @@ def main():
 		report( vcf, t )
 
 def report( vcf, t ):
+	if 'data' not in vcf:
+		print '%d seconds, ERROR:\n%s' %( t, vcf )
+		return
 	values = vcf['data']['properties']['vcf_adjustment']['values']
 	forest = values['forest_pixel_count']
 	valid = values['valid_pixel_count']
