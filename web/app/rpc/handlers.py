@@ -25,6 +25,9 @@ from earthengine import EarthEngine, EarthImage
 import fusion
 
 
+CLASLITE = 'CLASLITE/com.google.earthengine.third_party.claslite.'
+
+
 class JsonService( object ):
 	
 	# earthengine_...
@@ -33,7 +36,7 @@ class JsonService( object ):
 		ee = EarthEngine( current_handler )
 		
 		params = 'id=%s&fields=ACQUISITION_DATE&bbox=%s' %(
-			opt['id'], opt['bbox']
+			opt['sat'][1], opt['bbox']
 		)
 		
 		response = ee.get( 'list', params )
@@ -62,7 +65,7 @@ class JsonService( object ):
 		ee = EarthEngine( current_handler )
 		
 		params = 'id=%s&fields=ACQUISITION_DATE&starttime=%d&endtime=%d&bbox=%s' %(
-			opt['id'], opt['starttime'], opt['endtime'], opt['bbox']
+			opt['sat'][1], opt['starttime'], opt['endtime'], opt['bbox']
 		)
 		
 		response = ee.get( 'list', params )
@@ -80,15 +83,15 @@ class JsonService( object ):
 		
 		modImage = 'MOD44B_C4_TREE_2000'
 		ei =  EarthImage()
-		radiance = ei.step( 'CLASLITE/Calibrate', rawImage )
-		reflectance = ei.step( 'CLASLITE/Reflectance', radiance )
-		autoMCU = ei.step( 'CLASLITE/AutoMCU', rawImage, reflectance )
-		vcfAdjusted = ei.step( 'CLASLITE/VCFAdjustedImage', autoMCU, modImage )
-		forest = ei.step( 'CLASLITE/ForestMask', vcfAdjusted )
+		radiance = ei.step( CLASLITE+'Calibrate', rawImage )
+		reflectance = ei.step( CLASLITE+'Reflectance', radiance )
+		autoMCU = ei.step( CLASLITE+'AutoMCU', rawImage, reflectance, opt['sat'][0] )
+		vcfAdjusted = ei.step( CLASLITE+'VCFAdjustedImage', autoMCU, modImage )
+		forest = ei.step( CLASLITE+'ForestMask', vcfAdjusted )
 		
 		params = 'image=%s&bands=%s&min=0&max=2&palette=%s' %(
 			json_encode(forest), 'Forest_NonForest',
-			','.join(opt['palette'])
+			str( ','.join(opt['palette']) )
 		)
 		
 		tiles = ee.post( 'mapid', params )
@@ -106,7 +109,7 @@ class JsonService( object ):
 		vcfImages = []
 		for time in opt['times']:
 			params = 'id=%s&fields=ACQUISITION_DATE&starttime=%d&endtime=%d&bbox=%s' %(
-				opt['id'], time['starttime'], time['endtime'], opt['bbox']
+				opt['sat'][1], time['starttime'], time['endtime'], opt['bbox']
 			)
 			
 			response = ee.get( 'list', params )
@@ -120,16 +123,16 @@ class JsonService( object ):
 			
 			# Just use the first for now
 			image = images[0]
-			rawImage = image['id']
+			rawImage = image['id'][1]
 			
-			radiance = ei.step( 'CLASLITE/Calibrate', rawImage )
-			reflectance = ei.step( 'CLASLITE/Reflectance', radiance )
-			autoMCU = ei.step( 'CLASLITE/AutoMCU', rawImage, reflectance )
-			vcfAdjusted = ei.step( 'CLASLITE/VCFAdjustedImage', autoMCU, modImage )
+			radiance = ei.step( CLASLITE+'Calibrate', rawImage )
+			reflectance = ei.step( CLASLITE+'Reflectance', radiance )
+			autoMCU = ei.step( CLASLITE+'AutoMCU', rawImage, reflectance, opt['sat'][0] )
+			vcfAdjusted = ei.step( CLASLITE+'VCFAdjustedImage', autoMCU, modImage )
 			
 			vcfImages.append( vcfAdjusted )
 		
-		forest = ei.step( 'CLASLITE/ForestCoverChange', vcfImages )
+		forest = ei.step( CLASLITE+'ForestCoverChange', vcfImages )
 		
 		if opt['type'] == 'deforestation':
 			band = 'deforest'
@@ -137,7 +140,7 @@ class JsonService( object ):
 			band = 'disturb'
 		palette = opt['palette']
 		params = 'image=%s&bands=%s&min=1&max=%d&palette=%s' %(
-			json_encode(forest), band, len(palette), ','.join(palette)
+			json_encode(forest), band, len(palette), str( ','.join(palette) )
 		)
 		
 		tiles = ee.post( 'mapid', params )
