@@ -6,7 +6,7 @@
 	:See UNLICENSE or http://unlicense.org/ for public domain notice.
 """
 
-import cgi
+import cgi, sys
 
 from google.appengine.api import urlfetch
 
@@ -33,9 +33,11 @@ class EarthEngine( object ):
 			else:
 				json = { 'error': { 'type':'http', 'code': response.status_code } }
 		except urlfetch.DownloadError:
-			json = { 'error': { 'type':'DownloadError' } }
+			json = { 'error': { 'type':'DownloadError', 'info':sys.exc_info() } }
 		except urlfetch.ResponseTooLargeError:
-			json = { 'error': { 'type':'ResponseTooLargeError' } }
+			json = { 'error': { 'type':'ResponseTooLargeError', 'info':sys.exc_info() } }
+		except:
+			json = { 'error': { 'type':'Other', 'info':sys.exc_info() } }
 		finally:
 			return json
 	

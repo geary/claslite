@@ -716,10 +716,14 @@
 					var error = rpc.result.error;
 					if( error ) {
 						// TODO: better error reporting
-						if( error.type == 'no_images' )
-							alert( 'No images available for the selected year.' );
-						else
-							alert( 'Error' );
+						alert(
+							error.type == 'no_images' ?
+								'No images available for the selected year.' :
+							error.code && error.message ?
+								'Error ' + error.code + ':\n' + error.message :
+							// else
+								'Error'
+						);
 						return;
 					}
 					var tiles = rpc.result.tiles;
