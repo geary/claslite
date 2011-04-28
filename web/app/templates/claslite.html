@@ -56,34 +56,41 @@
 				Forest<br />Monitoring
 			</div>
 			
-			<div id="header-links">
+			<div id="header-link-block">
 				
-				<div id="site-links">
-					<b>CLASlite</b>
-					<span class="pipe">|</span>
-					<a href="http://claslite.ciw.edu/en/">Website</a>
-					<span class="pipe">|</span>
-					<a href="http://code.google.com/p/claslite/source/browse/web/client/claslite.html">Code</a>
-					<span class="pipe">|</span>
-					<a href="#">About</a>
-					<span class="pipe">|</span>
-					<a href="#">More</a>
+				<div id="header-links">
+					
+					<div id="site-links">
+						<b>CLASlite</b>
+						<span class="pipe">|</span>
+						<a href="http://claslite.ciw.edu/en/">Website</a>
+						<span class="pipe">|</span>
+						<a href="http://code.google.com/p/claslite/source/browse/web/client/claslite.html">Code</a>
+						<span class="pipe">|</span>
+						<a href="#">About</a>
+						<span class="pipe">|</span>
+						<a href="#">More</a>
+					</div>
+					
+					<div id="user-links">
+	<!--
+						<b>{{ user_id }}</b>
+						<span class="pipe">|</span>
+						<b>{{ count }}</b>
+						<span class="pipe">|</span>
+	-->
+						<b>{{ email | e }}</b>
+						<span class="pipe">|</span>
+						<a href="#">My account</a>
+						<span class="pipe">|</span>
+						<a href="#">Help</a>
+						<span class="pipe">|</span>
+						<a href="{{ logout_url }}">Sign out</a>
+					</div>
+					
 				</div>
 				
-				<div id="user-links">
-<!--
-					<b>{{ user_id }}</b>
-					<span class="pipe">|</span>
-					<b>{{ count }}</b>
-					<span class="pipe">|</span>
--->
-					<b>{{ email | e }}</b>
-					<span class="pipe">|</span>
-					<a href="#">My account</a>
-					<span class="pipe">|</span>
-					<a href="#">Help</a>
-					<span class="pipe">|</span>
-					<a href="{{ logout_url }}">Sign out</a>
+				<div id="google-translator">
 				</div>
 				
 			</div>
