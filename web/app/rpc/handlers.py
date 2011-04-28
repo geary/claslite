@@ -80,7 +80,10 @@ class JsonService( object ):
 			return { 'error': { 'type': 'no_images' } }
 		
 		scenes = []
+		limit = 18  # temp
 		for image in images:
+			limit -= 1  #temp
+			if limit <= 0: break  #temp
 			rawImage = image['id']
 			modImage = 'MOD44B_C4_TREE_2000'
 			ei =  EarthImage()
