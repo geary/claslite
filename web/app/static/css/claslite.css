@@ -394,7 +394,11 @@ ul.tabs a.hover span {
 #outermost.stats .map-only {
 }
 
+#outermost.fractcover .forestview-forestcover,
+#outermost.fractcover .forestview-forestchange,
+#outermost.forestcover .forestview-fractcover,
 #outermost.forestcover .forestview-forestchange,
+#outermost.forestchange .forestview-fractcover,
 #outermost.forestchange .forestview-forestcover,
 #outermost.map .stats-only,
 #outermost.stats .map-only {

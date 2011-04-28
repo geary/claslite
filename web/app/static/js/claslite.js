@@ -74,6 +74,13 @@
 			units: {
 				//area:
 			},
+			fractcover: {
+				map: {
+				},
+				stats: {
+					dates: {}
+				}
+			},
 			forestcover: {
 				map: {
 				},
@@ -98,6 +105,7 @@
 			$tabPanels: $('#sidebar-top-panel, #sidebar-padder'),
 			$sidebarTopPanel: $('#sidebar-top-panel'),
 			$sidebarScrolling: $('#sidebar-scrolling'),
+			$fractCoverDate: $('#fractcover-date'),
 			$forestCoverDate: $('#forestcover-date'),
 			$forestChangeDateStart: $('#forestchange-date-start'),
 			$forestChangeDateEnd: $('#forestchange-date-end'),
@@ -123,6 +131,18 @@
 		location: function() {
 			enableGeoclick();
 			removeLayers();
+		},
+		// TODO: refactor!
+		fractcover: function( id ) {
+			disableGeoclick();
+			removeLayers();
+			loadDateSelects();
+			if( app.$outermost.is('.stats') ) {
+				addStatistics( id );
+			}
+			else if( app.viewed.fractcover ) {
+				addFractCoverLayer( id );
+			}
 		},
 		forestcover: function( id ) {
 			disableGeoclick();
@@ -183,9 +203,11 @@
 				location: 'Location',
 				forestcover: 'Forest Cover',
 				forestchange: 'Forest Change',
+				fractcover: 'Fractional Cover',
 				help: 'Help'
 			},
 			subst: {
+				fractcover: 'forestview',
 				forestcover: 'forestview',
 				forestchange: 'forestview'
 			},
@@ -354,7 +376,12 @@
 	
 	function initCalcButtons() {
 		$('#view-forestview-add').click( function( event ) {
-			if( app.$outermost.is('.forestcover') ) {
+			// TODO: refactor
+			if( app.$outermost.is('.fractcover') ) {
+				var index = app.$fractCoverDate.val();
+				var set = app.fractcover.stats.dates;
+			}
+			else if( app.$outermost.is('.forestcover') ) {
 				var index = app.$forestCoverDate.val();
 				var set = app.forestcover.stats.dates;
 			}
@@ -771,6 +798,15 @@
 	//	});
 	//}
 	
+	function makeFractCoverPalette() {
+		return makePalette([
+			/* TODO */
+			'#000000',
+			'#888888',
+			'#FFFFFF'
+		]);
+	}
+	
 	function makeForestCoverPalette() {
 		return makePalette([
 			$('#unobserved-color')[0],
@@ -876,6 +912,20 @@
 				}
 			);
 		//}
+	}
+	
+	// TODO: refactor
+	function addFractCoverLayer( type ) {
+		var year = +app.$fractCoverDate.val();
+		addEarthEngineLayer({
+			proc: 'forestcover',
+			type: type,
+			sat: $('#sat-select').val().split('|'),
+			starttime: Date.UTC( year, 0, 1 ),
+			endtime: Date.UTC( year+1, 0, 1 ),
+			palette: makeFractCoverPalette(),
+			bbox: getMapBbox()
+		});
 	}
 	
 	function addForestCoverLayer( type ) {
@@ -985,6 +1035,7 @@
 			}
 		});
 		
+		opacity( 'fractcover' );
 		opacity( 'forestcover' );
 		opacity( 'deforestation' );
 		opacity( 'disturbance' );
@@ -1055,6 +1106,9 @@
 			var height = 150, width = 600;
 			
 			var charts = {
+				fractcover: function() {
+				},
+				
 				forestcover: function() {
 					var scaleMax = 0, labels = [], rows = [],
 						forests = [], nonforests = [], unobserveds = [];
@@ -1315,6 +1369,16 @@
 				center: app.map.getCenter(),
 				zoom: app.map.getZoom()
 			},
+			// TODO: refactor
+			fractcover: {
+				map: {
+					date: app.$fractCoverDate.val(),
+					opacity: getOpacity( 'fractcover' )
+				},
+				stats: {
+					dates: app.fractcover.stats.dates
+				}
+			},
 			forestcover: {
 				map: {
 					date: app.$forestCoverDate.val(),
@@ -1356,6 +1420,12 @@
 		app.map.setType( s.map.type );
 		app.map.setCenter( s.map.center );
 		app.map.setZoom( s.map.zoom );
+		
+		// TODO: refactor
+		var map = s.fractcover.map, stats = s.fractcover.stats;
+		app.$fractCoverDate.val( map.date );
+		if( stats.dates ) app.fractcover.stats.dates = stats.dates;
+		setOpacity( 'fractcover', map.opacity );
 		
 		var map = s.forestcover.map, stats = s.forestcover.stats;
 		app.$forestCoverDate.val( map.date );
