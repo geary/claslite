@@ -48,6 +48,7 @@
 	$().ready( initUI );
 	
 	function initUI() {
+		initGoogleTranslate();
 		initVars();
 		initTabs();
 		initHider();
@@ -1374,6 +1375,16 @@
 		var bounds = app.map.map.getBounds();
 		return S.Map.boundsToBbox( bounds ).join();
 		//return getMapCenterTinyBbox().join();
+	}
+	
+	function initGoogleTranslate() {
+		googleTranslateInit = function() {
+			new google.translate.TranslateElement({
+				pageLanguage: 'en',
+				layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+			}, 'google-translator' );
+		};
+		$.getScript( '//translate.google.com/translate_a/element.js?cb=googleTranslateInit' );
 	}
 	
 //})();

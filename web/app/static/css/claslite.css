@@ -266,10 +266,14 @@ div.sidebar-hider {
 	top: 6px;
 }
 
-#header-links {
+#header-link-block {
 	position: absolute;
 	top: 9px;
 	right: 10px;
+}
+
+#header-links {
+	float: right;
 	text-align: right;
 }
 
@@ -284,6 +288,11 @@ div.sidebar-hider {
 span.pipe {
 	padding: 0 6px;
 	color: #9EB08E;
+}
+
+#google-translator {
+	float: right;
+	margin-right: 10px;
 }
 
 /* Tabs */
