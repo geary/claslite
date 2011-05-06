@@ -65,43 +65,24 @@ class JsonService( object ):
 	
 	def earthengine_map_forestcover( self, opt ):
 		ee = EarthEngine( current_handler )
+		ei =  EarthImage()
+		modImage = ei.obj( 'Image', 'MOD44B_C4_TREE_2000' )
+		collection = ei.obj( 'ImageCollection', opt['sat'][1] )
+		sensor = opt['sat'][0]
 		
-		params = 'id=%s&fields=ACQUISITION_DATE&starttime=%d&endtime=%d&bbox=%s' %(
-			opt['sat'][1], opt['starttime'], opt['endtime'], opt['bbox']
+		mosaic = ei.step(
+			CLASLITE+'MosaicScene',
+			collection, modImage, sensor,
+			opt['starttime'], opt['endtime']
 		)
-		
-		response = ee.get( 'list', params )
-		if 'error' in response:
-			return response
-		
-		images = response['data']
-		
-		if len(images) == 0:
-			return { 'error': { 'type': 'no_images' } }
-		
-		scenes = []
-		limit = 18  # temp
-		for image in images:
-			limit -= 1  #temp
-			if limit <= 0: break  #temp
-			rawImage = image['id']
-			modImage = 'MOD44B_C4_TREE_2000'
-			ei =  EarthImage()
-			radiance = ei.step( CLASLITE+'Calibrate', rawImage )
-			reflectance = ei.step( CLASLITE+'Reflectance', radiance )
-			autoMCU = ei.step( CLASLITE+'AutoMCU', rawImage, reflectance, opt['sat'][0] )
-			vcfAdjusted = ei.step( CLASLITE+'VCFAdjustedImage', autoMCU, modImage )
-			scenes.append( vcfAdjusted )
-			
-		mosaic = ei.step( CLASLITE+'MosaicScene', scenes )
 		forest = ei.step( CLASLITE+'ForestMask', mosaic )
 		
-		params = 'image=%s&bands=%s&min=0&max=2&palette=%s' %(
+		params = 'image=%s&bands=%s&min=0&max=2&palette=%s&bbox=%s' %(
 			json_encode(forest), 'Forest_NonForest',
-			str( ','.join(opt['palette']) )
+			str( ','.join(opt['palette']) ), str(opt['bbox'])
 		)
-		logging.info( 'Forest_NonForest %d images, %d bytes' %(
-			len(images), len(params)
+		logging.info( 'Forest_NonForest %d bytes' %(
+			len(params)
 		) )
 		
 		tiles = ee.post( 'mapid', params )
@@ -114,43 +95,27 @@ class JsonService( object ):
 	def earthengine_map_forestchange( self, opt ):
 		ee = EarthEngine( current_handler )
 		ei =  EarthImage()
-		modImage = 'MOD44B_C4_TREE_2000'
+		modImage = ei.obj( 'Image', 'MOD44B_C4_TREE_2000' )
+		collection = ei.obj( 'ImageCollection', opt['sat'][1] )
+		sensor = opt['sat'][0]
 		
-		vcfImages = []
+		mosaics = []
 		for time in opt['times']:
-			params = 'id=%s&fields=ACQUISITION_DATE&starttime=%d&endtime=%d&bbox=%s' %(
-				opt['sat'][1], time['starttime'], time['endtime'], opt['bbox']
-			)
-			
-			response = ee.get( 'list', params )
-			if 'error' in response:
-				return response
-			
-			images = response['data']
-			
-			if len(images) == 0:
-				continue  # TODO: ???
-			
-			# Just use the first for now
-			image = images[0]
-			rawImage = image['id'][1]
-			
-			radiance = ei.step( CLASLITE+'Calibrate', rawImage )
-			reflectance = ei.step( CLASLITE+'Reflectance', radiance )
-			autoMCU = ei.step( CLASLITE+'AutoMCU', rawImage, reflectance, opt['sat'][0] )
-			vcfAdjusted = ei.step( CLASLITE+'VCFAdjustedImage', autoMCU, modImage )
-			
-			vcfImages.append( vcfAdjusted )
+			mosaics.append( ei.step(
+				CLASLITE+'MosaicScene',
+				collection, modImage, sensor,
+				time['starttime'], time['endtime']
+			) )
 		
-		forest = ei.step( CLASLITE+'ForestCoverChange', vcfImages )
+		forest = ei.step( CLASLITE+'ForestCoverChange', mosaics )
 		
 		if opt['type'] == 'deforestation':
 			band = 'deforest'
 		else:
 			band = 'disturb'
 		palette = opt['palette']
-		params = 'image=%s&bands=%s&min=1&max=%d&palette=%s' %(
-			json_encode(forest), band, len(palette), str( ','.join(palette) )
+		params = 'image=%s&bands=%s&min=1&max=%d&palette=%s&bbox=%s' %(
+			json_encode(forest), band, len(palette), str( ','.join(palette) ), str(opt['bbox'])
 		)
 		
 		tiles = ee.post( 'mapid', params )
