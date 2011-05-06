@@ -55,10 +55,15 @@ class EarthImage( object ):
 	def __init__( self ):
 		pass
 	
+	def obj( self, type, id ):
+		return {
+			'type': type,
+			'id': id,
+		}
+	
 	def step( self, creator, *args ):
 		return {
 			'type': 'Image',
 			'creator': creator,
 			'args': args,
 		}
-		
