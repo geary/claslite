@@ -5,7 +5,7 @@
 
     Configuration object.
 
-    :copyright: 2010 by tipfy.org.
+    :copyright: 2011 by tipfy.org.
     :license: BSD, see LICENSE.txt for more details.
 """
 from werkzeug import import_string
@@ -27,7 +27,8 @@ class Config(dict):
     of the first level one.
 
     The configuration object is available as a ``config`` attribute of
-    :class:`Tipfy`. If is instantiated and populated when the app is built::
+    :class:`tipfy.app.App`. If is instantiated and populated when the app
+    is built::
 
         config = {}
 
@@ -35,7 +36,7 @@ class Config(dict):
             'foo': 'bar',
         }
 
-        app = Tipfy(rules=[Rule('/', name='home', handler=MyHandler)],
+        app = App(rules=[Rule('/', name='home', handler=MyHandler)],
             config=config)
 
     Then to read configuration values, use :meth:`RequestHandler.get_config`::

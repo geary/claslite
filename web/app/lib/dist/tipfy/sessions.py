@@ -7,7 +7,7 @@
     cookies and supports flash messages. For App Engine's datastore and
     memcache based sessions, see tipfy.appengine.sessions.
 
-    :copyright: 2010 by tipfy.org.
+    :copyright: 2011 by tipfy.org.
     :license: Apache Sotware License, see LICENSE for details.
 """
 import hashlib
@@ -15,8 +15,8 @@ import hmac
 import logging
 import time
 
-from . import APPENGINE, DEFAULT_VALUE, REQUIRED_VALUE
-from .utils import json_b64encode, json_b64decode
+from tipfy import APPENGINE, DEFAULT_VALUE, REQUIRED_VALUE
+from tipfy.utils import json_b64encode, json_b64decode
 
 from werkzeug import cached_property
 from werkzeug.contrib.sessions import ModificationTrackingDict
@@ -148,7 +148,7 @@ class SecureCookieStore(object):
         """Returns the given signed cookie if it validates, or None.
 
         :param request:
-            A :class:`tipfy.Request` object.
+            A :class:`tipfy.app.Request` object.
         :param name:
             Cookie name.
         :param max_age:
@@ -186,7 +186,7 @@ class SecureCookieStore(object):
         To read a cookie set with this method, use get_cookie().
 
         :param response:
-            A :class:`tipfy.Response` instance.
+            A :class:`tipfy.app.Response` instance.
         :param name:
             Cookie name.
         :param value:
@@ -235,10 +235,10 @@ class SessionStore(object):
         'securecookie': SecureCookieSession,
     }
 
-    def __init__(self, handler, backends=None):
-        self.request = handler.request
+    def __init__(self, request, backends=None):
+        self.request = request
         # Base configuration.
-        self.config = handler.app.config[__name__]
+        self.config = request.app.config[__name__]
         # A dictionary of support backend classes.
         self.backends = backends or self.default_backends
         # The default backend to use when none is provided.
@@ -348,7 +348,7 @@ class SessionStore(object):
         """Sets a secure cookie in the response.
 
         :param response:
-            A :class:`tipfy.Response` object.
+            A :class:`tipfy.app.Response` object.
         :param name:
             Cookie name.
         :param value:

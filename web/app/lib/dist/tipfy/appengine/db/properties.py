@@ -5,11 +5,12 @@
 
     Extra db.Model property classes.
 
-    :copyright: 2010 by tipfy.org.
+    :copyright: 2011 by tipfy.org.
     :license: BSD, see LICENSE.txt for more details.
 """
 import hashlib
 import pickle
+import decimal
 
 from google.appengine.ext import db
 
@@ -98,19 +99,7 @@ class KeyProperty(db.Property):
 
 class JsonProperty(db.Property):
     """Stores a value automatically encoding to JSON on set and decoding
-    on get. Example::
-
-        >>> class JsonModel(db.Model):
-        ... data = JsonProperty()
-        >>> model = PickleModel()
-        >>> model.data = {"foo": "bar"}
-        >>> model.data
-        {'foo': 'bar'}
-        >>> model.put() # doctest: +ELLIPSIS
-        datastore_types.Key.from_path(u'PickleModel', ...)
-        >>> model2 = PickleModel.all().get()
-        >>> model2.data
-        {'foo': 'bar'}
+    on get.
     """
     data_type = db.Text
 
@@ -215,4 +204,26 @@ class TimezoneProperty(db.Property):
             return pytz.timezone(value)
 
         raise db.BadValueError("Property %s must be a pytz timezone or string."
+            % self.name)
+
+
+class DecimalProperty(db.Property):
+    """Stores a decimal value."""
+    data_type = decimal.Decimal
+
+    def get_value_for_datastore(self, model_instance):
+        return str(super(DecimalProperty, self).get_value_for_datastore(
+            model_instance))
+
+    def make_value_from_datastore(self, value):
+        return decimal.Decimal(value)
+
+    def validate(self, value):
+        value = super(DecimalProperty, self).validate(value)
+
+        if value is None or isinstance(value, decimal.Decimal):
+            return value
+        elif isinstance(value, basestring):
+            return decimal.Decimal(value)
+        raise db.BadValueError("Property %s must be a Decimal or string"
             % self.name)

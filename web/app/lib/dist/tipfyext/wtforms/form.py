@@ -5,8 +5,8 @@
 
     Form object.
 
-    :copyright: 2010 tipfy.org.
-    :copyright: 2010 WTForms authors.
+    :copyright: 2011 tipfy.org.
+    :copyright: 2011 WTForms authors.
     :license: BSD, see LICENSE.txt for more details.
 """
 import uuid
@@ -39,7 +39,7 @@ class Form(BaseForm):
         process them.
 
         :param formdata:
-            A :class:`tipfy.Request` object or a multidict of form data coming
+            A :class:`tipfy.app.Request` object or a multidict of form data coming
             from the enduser, usually `request.form` or equivalent.
         :param obj:
             If `formdata` has no data for a field, the form will try to get it
@@ -57,7 +57,7 @@ class Form(BaseForm):
             filedata = request.files
             formdata = request.form
 
-            if self.csrf_protection_enabled and not request.is_xhr:
+            if self.csrf_protection_enabled:
                 kwargs['csrf_token'] = self._get_csrf_token(request)
         else:
             if self.csrf_protection_enabled:
@@ -87,7 +87,7 @@ class Form(BaseForm):
 
     def _get_csrf_token(self, request):
         token = str(uuid.uuid4())
-        token_list = self._get_session(request).setdefault('_csrf_token', [])
+        token_list = self._get_session().setdefault('_csrf_token', [])
         token_list.append(token)
         # Store a maximum number of tokens.
         maximum_tokens = current_handler.get_config('tipfyext.wtforms',

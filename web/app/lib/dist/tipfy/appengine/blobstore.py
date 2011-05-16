@@ -17,7 +17,7 @@
 
     :copyright: 2007 Google Inc.
     :copyright: 2009 Accense Technology, Inc. All rights reserved.
-    :copyright: 2010 tipfy.org.
+    :copyright: 2011 tipfy.org.
     :license: Apache 2.0 License, see LICENSE.txt for more details.
 """
 import cgi
@@ -133,7 +133,7 @@ class BlobstoreDownloadMixin(object):
             to save-as. If string is provided, use string as filename. If
             None or False, do not send as attachment.
         :returns:
-            A :class:`tipfy.Response` object.
+            A :class:`tipfy.app.Response` object.
         :raises:
             ``ValueError`` on invalid save_as parameter.
         """

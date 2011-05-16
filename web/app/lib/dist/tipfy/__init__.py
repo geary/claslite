@@ -5,7 +5,7 @@
 
     Minimalist WSGI application and utilities for App Engine.
 
-    :copyright: 2010 by tipfy.org.
+    :copyright: 2011 by tipfy.org.
     :license: BSD, see LICENSE.txt for more details.
 """
 __version__ = '0.7'
@@ -14,7 +14,7 @@ __version_info__ = tuple(int(n) for n in __version__.split('.'))
 #: Default configuration values for this module. Keys are:
 #:
 #: auth_store_class
-#:     The default auth store class to use in :class:`tipfy.Request`.
+#:     The default auth store class to use in :class:`tipfy.app.Request`.
 #:     Default is `tipfy.appengine.auth.AuthStore`.
 #:
 #: i18n_store_class
@@ -22,7 +22,7 @@ __version_info__ = tuple(int(n) for n in __version__.split('.'))
 #:     Default is `tipfy.i18n.I18nStore`.
 #:
 #: session_store_class
-#:     The default session store class to use in :class:`tipfy.Request`.
+#:     The default session store class to use in :class:`tipfy.app.Request`.
 #:     Default is `tipfy.sessions.SessionStore`.
 #:
 #: server_name
@@ -45,8 +45,10 @@ default_config = {
     'enable_debugger':     True,
 }
 
-from .app import (HTTPException, Request, RequestHandler, Response, Tipfy,
-    abort, current_app, current_handler, APPENGINE, APPLICATION_ID,
-    CURRENT_VERSION_ID, DEV_APPSERVER)
-from .config import DEFAULT_VALUE, REQUIRED_VALUE
-from .routing import HandlerPrefix, NamePrefix, Rule, Subdomain, Submount
+from tipfy.app import (HTTPException, Request, Response, Tipfy, abort,
+    current_app, current_handler)
+from tipfy.handler import RequestHandler
+from tipfy.appengine import (APPENGINE, APPLICATION_ID, CURRENT_VERSION_ID,
+    DEV_APPSERVER)
+from tipfy.config import DEFAULT_VALUE, REQUIRED_VALUE
+from tipfy.routing import HandlerPrefix, NamePrefix, Rule, Subdomain, Submount

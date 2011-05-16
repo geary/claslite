@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """URL definitions."""
-
-from tipfy import Rule
+from tipfy.routing import Rule
 
 rules = [
 	Rule( '/', name='claslite', handler='claslite.handlers.ClasliteHandler' ),

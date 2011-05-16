@@ -13,7 +13,6 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
 """Escaping/unescaping methods for HTML, JSON, URLs, and others."""
 import base64
 import htmlentitydefs
@@ -22,23 +21,10 @@ import unicodedata
 import urllib
 import xml.sax.saxutils
 
-from .app import current_handler
-
-try:
-    # Preference for installed library with updated fixes.
-    import simplejson
-except ImportError:
-    try:
-        # Standard library module in Python 2.6.
-        import json as simplejson
-        assert hasattr(simplejson, 'loads') and hasattr(simplejson, 'dumps')
-    except (ImportError, AssertionError):
-        try:
-            # Google App Engine.
-            from django.utils import simplejson
-        except ImportError:
-            raise RuntimeError('A JSON parser is required, e.g., '
-                'simplejson at http://pypi.python.org/pypi/simplejson/')
+# Imported here for compatibility.
+from .json import json_encode, json_decode, json_b64encode, json_b64decode
+from .local import get_request
+from .routing import url_for
 
 
 def xhtml_escape(value):
@@ -63,64 +49,6 @@ def xhtml_unescape(value):
     return re.sub(r"&(#?)(\w+?);", _convert_entity, _unicode(value))
 
 
-def json_encode(value, *args, **kwargs):
-    """Serializes a value to JSON.
-
-    :param value:
-        A value to be serialized.
-    :param args:
-        Extra arguments to be passed to `simplejson.dumps()`.
-    :param kwargs:
-        Extra keyword arguments to be passed to `simplejson.dumps()`.
-    :returns:
-        The serialized value.
-    """
-    # JSON permits but does not require forward slashes to be escaped.
-    # This is useful when json data is emitted in a <script> tag
-    # in HTML, as it prevents </script> tags from prematurely terminating
-    # the javscript.  Some json libraries do this escaping by default,
-    # although python's standard library does not, so we do it here.
-    # http://stackoverflow.com/questions/1580647/json-why-are-forward-slashes-escaped
-    return simplejson.dumps(value, *args, **kwargs).replace("</", "<\\/")
-
-
-def json_decode(value, *args, **kwargs):
-    """Deserializes a value from JSON.
-
-    :param value:
-        A value to be deserialized.
-    :param args:
-        Extra arguments to be passed to `simplejson.loads()`.
-    :param kwargs:
-        Extra keyword arguments to be passed to `simplejson.loads()`.
-    :returns:
-        The deserialized value.
-    """
-    return simplejson.loads(_unicode(value), *args, **kwargs)
-
-
-def json_b64encode(value):
-    """Serializes a value to JSON and encodes it to base64.
-
-    :param value:
-        A value to be encoded.
-    :returns:
-        The encoded value.
-    """
-    return base64.b64encode(json_encode(value, separators=(',', ':')))
-
-
-def json_b64decode(value):
-    """Decodes a value from base64 and deserializes it from JSON.
-
-    :param value:
-        A value to be decoded.
-    :returns:
-        The decoded value.
-    """
-    return json_decode(base64.b64decode(value))
-
-
 def render_json_response(*args, **kwargs):
     """Renders a JSON response.
 
@@ -132,7 +60,7 @@ def render_json_response(*args, **kwargs):
         A :class:`Response` object with a JSON string in the body and
         mimetype set to ``application/json``.
     """
-    return current_handler.app.response_class(json_encode(*args, **kwargs),
+    return get_request().app.response_class(json_encode(*args, **kwargs),
         mimetype='application/json')
 
 
@@ -196,14 +124,6 @@ def _convert_entity(m):
 def _build_unicode_map():
     return dict((name, unichr(value)) for \
         name, value in htmlentitydefs.name2codepoint.iteritems())
-
-
-def url_for(_name, **kwargs):
-    """A proxy to :meth:`RequestHandler.url_for`.
-
-    .. seealso:: :meth:`Router.build`.
-    """
-    return current_handler.url_for(_name, **kwargs)
 
 
 def slugify(value, max_length=None, default=None):

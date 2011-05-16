@@ -5,10 +5,12 @@
 
     Unit test utilities.
 
-    :copyright: 2010 by tipfy.org.
+    :copyright: 2011 by tipfy.org.
     :license: BSD, see LICENSE.txt for more details.
 """
-from .app import local
+from werkzeug.utils import import_string
+
+from tipfy.app import local
 
 
 class CurrentHandlerContext(object):
@@ -20,9 +22,9 @@ class CurrentHandlerContext(object):
 
         from __future__ import with_statement
 
-        from tipfy import Tipfy, Rule
+        from tipfy import App, Rule
 
-        app = Tipfy(rules=[
+        app = App(rules=[
             Rule('/about', name='home', handler='handlers.AboutHandler'),
         ])
 
@@ -37,10 +39,10 @@ class CurrentHandlerContext(object):
         """Initializes the handler context.
 
         :param app:
-            A :class:`tipfy.Tipfy` instance.
+            A :class:`tipfy.app.App` instance.
         :param args:
-            Arguments to build a :class:`tipfy.Request` instance if a request
-            is not passed explicitly.
+            Arguments to build a :class:`tipfy.app.Request` instance if a
+            request is not passed explicitly.
         :param kwargs:
             Keyword arguments to build a :class:`Request` instance if a request
             is not passed explicitly. A few keys have special meaning:
@@ -54,6 +56,9 @@ class CurrentHandlerContext(object):
             - `handler`: a handler instance. If passed, the handler is simply
               set and reset as current_handler during the context execution.
         """
+        from warnings import warn
+        warn(DeprecationWarning("CurrentHandlerContext: this class "
+            "is deprecated. Use tipfy.app.RequestContext instead."))
         self.app = app
         self.handler = kwargs.pop('handler', None)
         self.handler_class = kwargs.pop('handler_class', None)
@@ -62,17 +67,20 @@ class CurrentHandlerContext(object):
             self.request = app.request_class.from_values(*args, **kwargs)
 
     def __enter__(self):
+        local.request = self.request
+        local.app = self.request.app = self.app
         if self.handler is not None:
             local.current_handler = self.handler
         else:
             if self.handler_class is None:
-                match = self.app.router.match(self.request)
-                spec = self.app.router.get_dispatch_spec(self.request, match)
-                handler_class, method, kwargs = spec
+                rule, rule_args = self.app.router.match(self.request)
+                handler_class = rule.handler
+                if isinstance(handler_class, basestring):
+                    handler_class = import_string(handler_class)
             else:
                 handler_class = self.handler_class
 
-            local.current_handler = handler_class(self.app, self.request)
+            local.current_handler = handler_class(self.request)
 
         return local.current_handler
 
