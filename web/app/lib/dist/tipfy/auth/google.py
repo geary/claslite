@@ -8,7 +8,7 @@
     Ported from `tornado.auth`_.
 
     :copyright: 2009 Facebook.
-    :copyright: 2010 tipfy.org.
+    :copyright: 2011 tipfy.org.
     :license: Apache License Version 2.0, see LICENSE.txt for more details.
 """
 from __future__ import absolute_import
@@ -18,8 +18,8 @@ import urllib
 from google.appengine.api import urlfetch
 
 from tipfy import REQUIRED_VALUE
-from .oauth import OAuthMixin
-from .openid import OpenIdMixin
+from tipfy.auth.oauth import OAuthMixin
+from tipfy.auth.openid import OpenIdMixin
 
 #: Default configuration values for this module. Keys are:
 #:
@@ -46,7 +46,7 @@ class GoogleMixin(OpenIdMixin, OAuthMixin):
     Example usage::
 
         from tipfy import RequestHandler
-        from tipfyext.auth.google import GoogleMixin
+        from tipfy.auth.google import GoogleMixin
 
         class GoogleHandler(RequestHandler, GoogleMixin):
             def get(self):

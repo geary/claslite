@@ -5,7 +5,7 @@
 
     Base model for authenticated users.
 
-    :copyright: 2010 by tipfy.org.
+    :copyright: 2011 by tipfy.org.
     :license: BSD, see LICENSE.txt for more details.
 """
 from __future__ import absolute_import
@@ -140,12 +140,12 @@ class User(db.Model):
         :returns:
             None.
         """
-        if force is False:
+        if not force:
             # Only renew the session id if it is too old.
             expires = datetime.timedelta(seconds=max_age)
             force = (self.session_updated + expires < datetime.datetime.now())
 
-        if force is True:
+        if force:
             self.session_id = create_session_id()
             self.session_updated = datetime.datetime.now()
             self.put()
