@@ -845,11 +845,30 @@
 		) );
 	}
 	function clearDateSelects() {
+		makeDateSelectsDotty( false );
 		fillDateSelectsDisabled( '&nbsp;' );
 	}
 	
 	function fillDateSelectsNone() {
+		makeDateSelectsDotty( false );
 		fillDateSelectsDisabled( 'None' );
+	}
+	
+	function makeDateSelectsDotty( dotty ) {
+		var dot = '&bull;';
+		var my = makeDateSelectsDotty;
+		if( my.timer ) {
+			clearInterval( my.timer );
+			delete my.timer;
+		}
+		if( dotty ) {
+			my.dots = dot;
+			my.timer = setInterval( function() {
+				fillDateSelectsDisabled( my.dots );
+				my.dots += dot;
+				if( my.dots.length / dot.length > 6 ) my.dots = dot;
+			}, 1000 );
+		}
 	}
 	
 	//var satboxLatest;
@@ -872,6 +891,7 @@
 		}
 		
 		function fillSelects( years ) {
+			makeDateSelectsDotty( false );
 			fill( app.$fractCoverDate, years );
 			fill( app.$forestCoverDate, years );
 			if( years.length > 1 ) {
@@ -894,6 +914,7 @@
 		//	fillSelects( satboxesDateSelects[satbox] );
 		//}
 		//else {
+			makeDateSelectsDotty( true );
 			$.jsonRPC.request(
 				'earthengine_getyears', [{ sat:sat, bbox:bbox }],
 				{
