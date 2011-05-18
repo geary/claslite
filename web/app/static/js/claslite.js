@@ -872,6 +872,7 @@
 		}
 		
 		function fillSelects( years ) {
+			fill( app.$fractCoverDate, years );
 			fill( app.$forestCoverDate, years );
 			if( years.length > 1 ) {
 				fill( app.$forestChangeDateStart,
