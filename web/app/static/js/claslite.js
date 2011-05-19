@@ -764,6 +764,10 @@
 						minZoom: 3,
 						maxZoom: 14,
 						opacity: getOpacity( opt.type ),
+						spinner: {
+							img: 'images/spinner32.gif',
+							opacity: .5
+						},
 						tiles: S(
 							'https://earthengine.googleapis.com/map/', tiles.mapid,
 							'/{Z}/{X}/{Y}?token=', tiles.token
