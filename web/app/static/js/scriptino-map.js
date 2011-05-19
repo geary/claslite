@@ -390,7 +390,6 @@
 						tile.style.height = opt.tileSize.height + 'px';
 						tile.style.backgroundRepeat = 'no-repeat';
 						tile.style.backgroundPosition = 'center center';
-						console.dir( opt.spinner );
 						if( opt.spinner ) {
 							tile.style.backgroundImage = 'url(' + opt.spinner.img + ')';
 							tile.style.opacity = opt.spinner.opacity;
