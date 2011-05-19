@@ -121,6 +121,16 @@
 	}
 	
 	var tileBase = 'http://claslite.geary.joyeurs.com/tiles/';
+	
+	function clickTab( id, full ) {
+		id = getSubTab( id );
+		var activate = activateTab[id];
+		activate && activate( id, /*full*/true );
+		// TODO: without the setTimeout, it doesn't get the correct height
+		// the first time, not sure why
+		setTimeout( resizeSidebarHeight, 1 );
+	}
+	
 	// TODO: use tab hiders to simplify this code
 	var activateTab = {
 		project: function() {
@@ -133,10 +143,10 @@
 			removeLayers();
 		},
 		// TODO: refactor!
-		fractcover: function( id ) {
+		fractcover: function( id, full ) {
 			disableGeoclick();
 			removeLayers();
-			loadDateSelects();
+			if( full ) loadDateSelects();
 			if( app.$outermost.is('.stats') ) {
 				addStatistics( id );
 			}
@@ -144,10 +154,10 @@
 				addFractCoverLayer( id );
 			}
 		},
-		forestcover: function( id ) {
+		forestcover: function( id, full ) {
 			disableGeoclick();
 			removeLayers();
-			loadDateSelects();
+			if( full ) loadDateSelects();
 			if( app.$outermost.is('.stats') ) {
 				addStatistics( id );
 			}
@@ -155,10 +165,10 @@
 				addForestCoverLayer( id );
 			}
 		},
-		forestchange: function( id ) {
+		forestchange: function( id, full ) {
 			disableGeoclick();
 			removeLayers();
-			loadDateSelects();
+			if( full ) loadDateSelects();
 			if( app.$outermost.is('.stats') ) {
 				addStatistics( id );
 			}
@@ -212,12 +222,7 @@
 				forestchange: 'forestview'
 			},
 			click: function( id ) {
-				id = getSubTab( id );
-				var activate = activateTab[id];
-				activate && activate( id );
-				// TODO: without the setTimeout, it doesn't get the correct height
-				// the first time, not sure why
-				setTimeout( resizeSidebarHeight, 1 );
+				clickTab( id, true );
 			}
 		};
 		app.tabs = S.Tabs( app.tabOpts );
@@ -227,7 +232,7 @@
 			// TODO: this could be cleaner
 			if( app.$outermost.is('.map') )
 				app.viewed[app.tabs.selected] = true;
-			app.tabOpts.click( app.tabs.selected );
+			clickTab( app.tabs.selected, false );
 		});
 	}
 	
