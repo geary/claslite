@@ -872,7 +872,7 @@
 				fillDateSelectsDisabled( my.dots );
 				my.dots += dot;
 				if( my.dots.length / dot.length > 6 ) my.dots = dot;
-			}, 1000 );
+			}, 500 );
 		}
 	}
 	
