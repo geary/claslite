@@ -378,6 +378,7 @@
 						var img = new Image;
 						img.src = url;
 						img.onload = function() {
+							delete tile.loading;
 							tile.style.backgroundImage = 'url(' + url + ')';
 							tile.style.opacity = opacity;
 							img.onload = null;
@@ -391,6 +392,7 @@
 						tile.style.backgroundRepeat = 'no-repeat';
 						tile.style.backgroundPosition = 'center center';
 						if( opt.spinner ) {
+							tile.loading = true;
 							tile.style.backgroundImage = 'url(' + opt.spinner.img + ')';
 							tile.style.opacity = opt.spinner.opacity;
 						}
@@ -402,8 +404,11 @@
 					},
 					setOpacity: function( _opacity ) {
 						opacity = _opacity;
-						for( var id in tiles )
-							tiles[id].style.opacity = opacity;
+						for( var id in tiles ) {
+							var tile = tiles[id];
+							if( ! tile.loading )
+								tile.style.opacity = opacity;
+						}
 					}
 				});
 			}
