@@ -804,12 +804,12 @@
 	//}
 	
 	function makeFractCoverPalette() {
-		return makePalette([
+		return [
 			/* TODO */
-			'#000000',
-			'#888888',
-			'#FFFFFF'
-		]);
+			'000000',
+			'888888',
+			'FFFFFF'
+		];
 	}
 	
 	function makeForestCoverPalette() {

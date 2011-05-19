@@ -63,6 +63,32 @@ class JsonService( object ):
 			'ymd': ymd
 		}
 	
+	# TODO: refactor the earthengine_map_* functions
+	
+	def earthengine_map_fractcover( self, opt ):
+		ee = EarthEngine( current_handler )
+		ei =  EarthImage()
+		modImage = ei.obj( 'Image', 'MOD44B_C4_TREE_2000' )
+		collection = ei.obj( 'ImageCollection', opt['sat'][1] )
+		sensor = opt['sat'][0]
+		
+		mosaic = ei.step(
+			CLASLITE+'MosaicScene',
+			collection, modImage, sensor,
+			opt['starttime'], opt['endtime']
+		)
+		
+		params = 'image=%s&bbox=%s' %(
+			json_encode(mosaic), str(opt['bbox'])
+		)
+		
+		tiles = ee.post( 'mapid', params )
+		
+		if 'error' in tiles:
+			return tiles
+		else:
+			return { 'tiles': tiles['data'] }
+	
 	def earthengine_map_forestcover( self, opt ):
 		ee = EarthEngine( current_handler )
 		ei =  EarthImage()
