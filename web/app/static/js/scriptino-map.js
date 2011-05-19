@@ -169,7 +169,8 @@
 						tileSize: new gm.Size( 256, 256 ),
 						isPng: true,
 						getTileUrl: getTileUrl,
-						opacity: opt.opacity
+						opacity: opt.opacity,
+						spinner: opt.spinner
 					});
 					sm.map.overlayMapTypes.insertAt( 0, mapType );
 					
@@ -374,13 +375,26 @@
 					maxZoom: opt.maxZoom,
 					getTile: function( coord, zoom, doc ) {
 						var url = opt.getTileUrl( coord, zoom );
+						var img = new Image;
+						img.src = url;
+						img.onload = function() {
+							tile.style.backgroundImage = 'url(' + url + ')';
+							tile.style.opacity = opacity;
+							img.onload = null;
+							img = null;
+						};
 						var id = url.replace( /\W+/g, '-' );
 						var tile = doc.createElement('tile');
 						tile.id = id;
 						tile.style.width = opt.tileSize.width + 'px';
 						tile.style.height = opt.tileSize.height + 'px';
-						tile.style.backgroundImage = 'url(' + url + ')';
-						tile.style.opacity = opacity;
+						tile.style.backgroundRepeat = 'no-repeat';
+						tile.style.backgroundPosition = 'center center';
+						console.dir( opt.spinner );
+						if( opt.spinner ) {
+							tile.style.backgroundImage = 'url(' + opt.spinner.img + ')';
+							tile.style.opacity = opt.spinner.opacity;
+						}
 						tiles[id] = tile;
 						return tile;
 					},
