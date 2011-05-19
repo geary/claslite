@@ -876,7 +876,7 @@
 		}
 	}
 	
-	//var satboxLatest;
+	var satboxLatest;
 	//var satboxesDateSelects = {};
 	function loadDateSelects() {
 		
@@ -912,8 +912,8 @@
 		var bbox = getMapBbox();
 		var satbox = sat[1] + bbox;
 		
-		//if( satbox == satboxLatest ) return;
-		//satboxLatest = satbox;
+		if( satbox == satboxLatest ) return;
+		satboxLatest = satbox;
 		
 		//if( satboxesDateSelects[satbox] ) {
 		//	fillSelects( satboxesDateSelects[satbox] );
