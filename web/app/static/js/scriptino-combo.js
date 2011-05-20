@@ -34,15 +34,17 @@
 			onchange();
 		});
 		$list
-			.delegate( 'li', 'mouseenter', function( event ) {
-				$(this).addClass('hover');
-			})
-			.delegate( 'li', 'mouseleave', function( event ) {
-				$(this).removeClass('hover');
-			})
-			.delegate( 'li', 'click', function( event ) {
-				$input.val( $(this).find('.text').text() );
-				onchange();
+			.delegate( 'li', {
+				mouseenter: function( event ) {
+					$(this).addClass('hover');
+				},
+				mouseleave: function( event ) {
+					$(this).removeClass('hover');
+				},
+				click: function( event ) {
+					$input.val( $(this).find('.text').text() );
+					onchange();
+				}
 			})
 			.delegate( 'div.delete', 'click', function( event ) {
 				var $li = $(this).parent();
