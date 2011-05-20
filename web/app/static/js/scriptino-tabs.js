@@ -20,15 +20,17 @@
 			'</li>'
 		) );
 		var $list = $.S( '<ul class="', a.tabsClass || 'tabs', '">', items.join(''), '</ul>' )
-			.delegate( 'a', 'mouseenter', function( event ) {
-				$(this).addClass('hover');
-			})
-			.delegate( 'a', 'mouseleave', function( event ) {
-				$(this).removeClass('hover');
-			})
-			.delegate( 'a', 'click', function( event ) {
-				event.preventDefault();
-				select( this.parentNode.id, true );
+			.delegate( 'a', {
+				mouseenter: function( event ) {
+					$(this).addClass('hover');
+				},
+				mouseleave: function( event ) {
+					$(this).removeClass('hover');
+				},
+				click: function( event ) {
+					event.preventDefault();
+					select( this.parentNode.id, true );
+				}
 			})
 			.appendTo( a.parent );
 		$('<div style="clear:left;">').appendTo( a.parent );  // must be a better way
