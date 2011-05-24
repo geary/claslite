@@ -949,7 +949,7 @@
 	function addFractCoverLayer( type ) {
 		var year = +app.$fractCoverDate.val();
 		addEarthEngineLayer({
-			proc: 'forestcover',
+			proc: 'fractcover',
 			type: type,
 			sat: $('#sat-select').val().split('|'),
 			starttime: Date.UTC( year, 0, 1 ),
