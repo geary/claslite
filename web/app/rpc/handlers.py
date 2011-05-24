@@ -81,7 +81,7 @@ class JsonService( object ):
 		params = 'image=%s&bbox=%s' %(
 			json_encode(mosaic), str(opt['bbox'])
 		)
-		params = 'image=%s&bands=npv,pv,sub&bias=0&gain=255&gamma=1&bbox=%s' %(
+		params = 'image=%s&bands=sub,pv,npv&bias=0&gain=255&gamma=1&bbox=%s' %(
 			json_encode(mosaic), str(opt['bbox'])
 		)
 		
