@@ -955,6 +955,9 @@
 			starttime: Date.UTC( year, 0, 1 ),
 			endtime: Date.UTC( year+1, 0, 1 ),
 			palette: makeFractCoverPalette(),
+			bias: $('#fractcover-bias').val(),
+			gain: $('#fractcover-gain').val(),
+			gamma: $('#fractcover-gamma').val(),
 			bbox: getMapBbox()
 		});
 	}

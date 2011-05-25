@@ -81,8 +81,9 @@ class JsonService( object ):
 		params = 'image=%s&bbox=%s' %(
 			json_encode(mosaic), str(opt['bbox'])
 		)
-		params = 'image=%s&bands=sub,pv,npv&bias=0&gain=255&gamma=1&bbox=%s' %(
-			json_encode(mosaic), str(opt['bbox'])
+		params = 'image=%s&bbox=%s&bands=sub,pv,npv&bias=%f&gain=%f&gamma=%f' %(
+			json_encode(mosaic), str(opt['bbox']),
+			float(opt['bias']), float(opt['gain']), float(opt['gamma'])
 		)
 		
 		tiles = ee.post( 'mapid', params )
