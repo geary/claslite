@@ -41,6 +41,36 @@
 </head>
 <body>
 	
+	<!-- Macros -->
+	
+	{% macro opensaveform() -%}
+						<form id="project-form" class="relative">
+							
+							<label for="project-input" class="project-label">Open or Save a Project:</label>
+							
+							<div class="float-left">
+								
+								<input id="project-input" class="notranslate project-input combo-input" />
+								
+								<ul id="project-list" class="notranslate project-list combo-list">
+								</ul>
+								
+							</div>
+							
+							<div class="float-left">
+								
+								<button type="submit" class="submit icon-button project-button" id="project-open-button"><div class="inline-block sprite icon16 icon16-open"></div>&nbsp;Open</button>
+								
+								<button type="submit" class="submit icon-button project-button" id="project-save-button"><div class="inline-block sprite icon16 icon16-save"></div>&nbsp;Save</button>
+								
+							</div>
+							
+							<div class="clear-left">
+							</div>
+							
+						</form>
+	{%- endmacro %}
+	
 	<!-- Begin Page -->
 	
 	<div id="outermost" style="display:none;">
@@ -138,31 +168,7 @@
 					
 					<div class="tab-panel project-panel" id="project-panel">
 						
-						<form id="project-form" class="relative">
-							
-							<label for="project-input" class="project-label">Open or Save a Project:</label>
-							
-							<div class="float-left">
-								
-								<input id="project-input" class="notranslate project-input combo-input" />
-								
-								<ul id="project-list" class="notranslate project-list combo-list">
-								</ul>
-								
-							</div>
-							
-							<div class="float-left">
-								
-								<button type="submit" class="submit icon-button project-button" id="project-open-button"><div class="inline-block sprite icon16 icon16-open"></div>&nbsp;Open</button>
-								
-								<button type="submit" class="submit icon-button project-button" id="project-save-button"><div class="inline-block sprite icon16 icon16-save"></div>&nbsp;Save</button>
-								
-							</div>
-							
-							<div class="clear-left">
-							</div>
-							
-						</form>
+						{{ opensaveform() }}
 						
 					</div>
 					
