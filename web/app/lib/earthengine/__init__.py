@@ -6,7 +6,7 @@
 	:See UNLICENSE or http://unlicense.org/ for public domain notice.
 """
 
-import cgi, sys
+import cgi, logging, sys
 
 from google.appengine.api import urlfetch, users
 from google.appengine.ext import db
@@ -22,6 +22,7 @@ class EarthEngine( object ):
 		self.auth = handler.get_config( 'earth-engine', 'auth' )
 	
 	def _http( self, method, url, params=None ):
+		logging.info( 'EarthEngine %s:\n%s', url, params )
 		try:
 			response = urlfetch.fetch(
 				method = method,
