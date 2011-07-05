@@ -8,8 +8,10 @@
 
 import cgi, sys
 
-from google.appengine.api import urlfetch
+from google.appengine.api import urlfetch, users
+from google.appengine.ext import db
 
+from tipfy import current_handler
 from tipfy.utils import json_decode
 
 
@@ -67,3 +69,16 @@ class EarthImage( object ):
 			'creator': creator,
 			'args': args,
 		}
+	
+	def clip( self, image ):
+		key = db.Key( current_handler.session['current_place'] )
+		if key is None:
+			return image
+		place = db.get( key )
+		if place is None:
+			return image
+		if place.owner != users.get_current_user():
+			return image
+		g = json_decode( place.geojson )
+		coords = g['features'][0]['geometry']['coordinates']
+		return self.image( 'ClipToMultiPolygon', image, coords )
