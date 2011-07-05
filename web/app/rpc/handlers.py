@@ -77,9 +77,11 @@ class JsonService( object ):
 			collection, modImage, sensor,
 			opt['starttime'], opt['endtime']
 		)
+		#clipped = ei.clip( mosaic )
+		clipped = mosaic
 		
 		params = 'image=%s&bbox=%s' %(
-			json_encode(mosaic), str(opt['bbox'])
+			json_encode(clipped), str(opt['bbox'])
 		)
 		params = 'image=%s&bbox=%s&bands=sub,pv,npv&bias=%f&gain=%f&gamma=%f' %(
 			json_encode(mosaic), str(opt['bbox']),
@@ -106,9 +108,11 @@ class JsonService( object ):
 			opt['starttime'], opt['endtime']
 		)
 		forest = ei.step( CLASLITE+'ForestMask', mosaic )
+		#clipped = ei.clip( forest )
+		clipped = forest
 		
 		params = 'image=%s&bands=%s&min=0&max=2&palette=%s&bbox=%s' %(
-			json_encode(forest), 'Forest_NonForest',
+			json_encode(clipped), 'Forest_NonForest',
 			str( ','.join(opt['palette']) ), str(opt['bbox'])
 		)
 		logging.info( 'Forest_NonForest %d bytes' %(
@@ -137,7 +141,9 @@ class JsonService( object ):
 				time['starttime'], time['endtime']
 			) )
 		
-		forest = ei.step( CLASLITE+'ForestCoverChange', mosaics )
+		change = ei.step( CLASLITE+'ForestCoverChange', mosaics )
+		#clipped = ei.clip( change )
+		clipped = change
 		
 		if opt['type'] == 'deforestation':
 			band = 'deforest'
@@ -145,7 +151,7 @@ class JsonService( object ):
 			band = 'disturb'
 		palette = opt['palette']
 		params = 'image=%s&bands=%s&min=1&max=%d&palette=%s&bbox=%s' %(
-			json_encode(forest), band, len(palette), str( ','.join(palette) ), str(opt['bbox'])
+			json_encode(clipped), band, len(palette), str( ','.join(palette) ), str(opt['bbox'])
 		)
 		
 		tiles = ee.post( 'mapid', params )
