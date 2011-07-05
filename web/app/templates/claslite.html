@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	
 	<title>CLASlite Forest Monitoring - Carnegie Institution for Science</title>
@@ -27,6 +28,7 @@
 	</script>
 	
 	<script type="text/javascript" src="js/jquery.jsonrpc.js"></script>
+	<script type="text/javascript" src="js/polygonzo.js"></script>
 	<script type="text/javascript" src="js/scriptino-base.js"></script>
 	<script type="text/javascript" src="js/scriptino-color.js"></script>
 	<script type="text/javascript" src="js/scriptino-combo.js"></script>
@@ -39,6 +41,7 @@
 	<script type="text/javascript" src="js/claslite.js"></script>
 	
 </head>
+
 <body>
 	
 	<!-- Macros -->
@@ -149,6 +152,16 @@
 				
 				<div id="sidebar-top-panel">
 					
+					<div class="location-panel">
+						<div class="tab-base-extension center">
+							<form class="input-form location" id="location-input-form-top">
+								<button class="icon-button subtab-button-searchmap view-button submit" type="submit" id="view-location-searchmap"><div class="inline-block sprite button-icon icon16 icon16-tick"></div>Search Map</button>
+								&nbsp;&nbsp;
+								<button class="icon-button subtab-button-useshape view-button" id="view-location-useshape"><div class="inline-block sprite button-icon icon16 hide"></div>Load KML</button>
+							</form>
+						</div>
+					</div>
+					
 					<div class="forestview-panel">
 						<div class="tab-base-extension center">
 							<form class="input-form forestview" id="forestview-input-form-top">
@@ -178,23 +191,40 @@
 					
 					<div id="location-panel" class="tab-panel location-panel">
 						
-						<form id="location-search-form">
+						<div class="location-searchmap">
 							
-							<label for="location-search-input">Click the map or search for a location:</label>
-							<input id="location-search-input" class="notranslate" />
+							<form id="location-search-form">
+								
+								<label for="location-search-input">Click the map or search for a location:</label>
+								<input id="location-search-input" class="notranslate" />
+								
+								<div id="location-search-buttons">
+									<a href="#" id="show-search-options">Advanced search&#8230;</a>
+									<button class="submit" type="submit" id="view-location-map">Search</button>
+									<div class="clear-right"></div>
+								</div>
+								
+							</form>
 							
-							<div id="location-search-buttons">
-								<a href="#" id="show-search-options">Advanced search&#8230;</a>
-								<button class="submit" type="submit" id="view-location-map">Search</button>
-								<div class="clear-right"></div>
+							<div id="location-results-list" class="notranslate">
 							</div>
 							
-						</form>
-						
-						<div id="location-results-list" class="notranslate">
+							<div id="assets-list">
+							</div>
+							
 						</div>
 						
-						<div id="assets-list">
+						<div class="location-useshape">
+							
+							<form id="location-shape-form" method="post" enctype="multipart/form-data" action="/shape/upload">
+								
+								<label for="location-shape-file">Upload a KML file:</label>
+								<input type="file" name="shape_file" id="location-shape-file" class="notranslate" />
+								
+								<button class="submit" type="submit" id="location-shape-submit">Upload</button>
+								
+							</form>
+							
 						</div>
 						
 					</div>
@@ -424,4 +454,5 @@
 	<!-- End Page -->
 	
 </body>
+
 </html>
