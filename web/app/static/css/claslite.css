@@ -173,6 +173,10 @@ img.icon16 {
 	position: relative;
 }
 
+p {
+	margin: 8px 0;
+}
+
 /* Sprites */
 
 div.sprite {
@@ -227,6 +231,14 @@ div.icon16-open {
 
 div.icon16-save {
 	background-position: -160px 0;
+}
+
+div.icon16-question {
+	background-position: -176px 0;
+}
+
+div.icon16-question-hover {
+	background-position: -192px 0;
 }
 
 div.icon14x17 {
@@ -893,3 +905,32 @@ div.details-wrapper {
 	background: url(../images/claslite-logo.png) no-repeat;
 }
 
+/* Tooltip */
+
+#tip {
+	position: absolute;
+	z-index: 10;
+	border: 1px solid #333;
+	background: #f7f5d1;
+	color: #333;
+	min-width: 200px;
+	max-width: 400px;
+	display: none;
+}
+
+.tiptitle {
+	padding: 8px;
+	border-bottom: 1px solid #CCC;
+	font-weight: bold;
+	font-size: 115%;
+}
+
+.tipcontent {
+	padding: 0 8px;
+}
+
+.tipfooter {
+	font-size: 80%;
+	padding: 8px;
+	border-top: 1px solid #CCC;
+}

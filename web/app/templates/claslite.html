@@ -78,6 +78,9 @@
 	
 	<div id="outermost" style="display:none;">
 		
+		<div id="tip">
+		</div>
+		
 		<!-- Begin Header -->
 		
 		<div id="header">
@@ -196,6 +199,7 @@
 							<form id="location-search-form">
 								
 								<label for="location-search-input">Click the map or search for a location:</label>
+								<div class="inline-block sprite icon16 icon16-question help-icon" id="help-icon-search-map"></div>
 								<input id="location-search-input" class="notranslate" />
 								
 								<div id="location-search-buttons">
@@ -219,6 +223,7 @@
 							<form id="location-shape-form" method="post" enctype="multipart/form-data" action="/shape/upload">
 								
 								<label for="location-shape-file">Upload a KML file:</label>
+								<div class="inline-block sprite icon16 icon16-question help-icon" id="help-icon-upload-kml"></div>
 								<input type="file" name="shape_file" id="location-shape-file" class="notranslate" />
 								
 								<button class="submit" type="submit" id="location-shape-submit">Upload</button>
@@ -448,6 +453,50 @@
 			<img id="earth-engine-logo-img" src="http://www.google.com/images/logos/google_logo_powered_by.png" style="border:none; vertical-align:middle;" />
 			Earth Engine
 		</a>
+		
+		<div id="tips" style="display:none;">
+			
+			<div id="tip-search-map">
+				<div class="tiptitle">
+					Search Map
+				</div>
+				<div class="tipcontent">
+					<p>
+						This is how to search the map.
+					</p>
+					<p>
+						Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+					</p>
+					<p>
+						Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+					</p>
+				</div>
+				<div class="tipfooter">
+					Optional footer
+				</div>
+			</div>
+		</div>
+		
+			<div id="tip-upload-kml">
+				<div class="tiptitle">
+					Upload KML
+				</div>
+				<div class="tipcontent">
+					<p>
+						This is how to upload a KML file.
+					</p>
+					<p>
+						Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+					</p>
+					<p>
+						Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+					</p>
+				</div>
+				<div class="tipfooter">
+					Optional footer
+				</div>
+			</div>
+		</div>
 		
 	</div>
 	
