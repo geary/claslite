@@ -50,6 +50,7 @@
 	function initUI() {
 		initGoogleTranslate();
 		initVars();
+		initHelp();
 		initTabs();
 		initHider();
 		initProject();
@@ -1426,8 +1427,9 @@
 	}
 	
 	function resize() {
-		var ww = app.$window.width(), wh = app.$window.height();
-		var mh = wh - app.$main.offset().top;
+		app.ww = app.$window.width();
+		app.wh = app.$window.height();
+		var mh = app.wh - app.$main.offset().top;
 		app.$main.css({ height: mh });
 		
 		if( app.$main.is('.show-sidebar') ) {
@@ -1442,7 +1444,7 @@
 			app.$sidebarHider.css({ left: 0 });
 		}
 		
-		app.$mapstatswrap.css({ left: sbw, width: ww - sbw - 1 });
+		app.$mapstatswrap.css({ left: sbw, width: app.ww - sbw - 1 });
 		app.map && app.map.resize();
 	}
 	
@@ -1544,6 +1546,77 @@
 			}, 'google-translator' );
 		};
 		$.getScript( '//translate.google.com/translate_a/element.js?cb=googleTranslateInit' );
+	}
+	
+	// Tooltip
+	
+	function initHelp() {
+		var hc = 'icon16-question-hover';
+		$('div.help-icon').each$( function( $element ) {
+			$element
+				.hover(
+					function() {
+						$element.addClass( hc );
+						var sel = $element[0].id.replace( 'help-icon', '#tip' );
+						showTip( $(sel).html() );
+					},
+					function() {
+						$element.removeClass( hc );
+						showTip( false );
+					}
+				)
+				.click( function() {
+				});
+		});
+		$('body').bind( 'click mousemove', moveTip );
+	}
+	
+	var tipOffset = { x:10, y:20 };
+	var $tip, tipHtml, tipLeft, tipTop;
+	
+	function showTip( html ) {
+		$tip = $tip || $('#tip');
+		tipHtml = html;
+		if( html ) {
+			$tip.html( html ).show();
+		}
+		else {
+			$tip.hide();
+		}
+	}
+	
+	function moveTip( event ) {
+		console.log( tipHtml );
+		if( ! tipHtml ) return;
+		var x = event.pageX, y = event.pageY;
+		x += tipOffset.x;
+		y += tipOffset.y;
+		var pad = 2;
+		var width = $tip.width(), height = $tip.height();
+		var offsetLeft = width + tipOffset.x * 1.5;
+		var offsetTop = height + tipOffset.y * 1.5;
+		if( tipLeft ) {
+			if( x - offsetLeft < pad )
+				tipLeft = false;
+			else
+				x -= offsetLeft;
+		}
+		else {
+			if( x + width > app.ww - pad )
+				tipLeft = true,  x -= offsetLeft;
+		}
+		if( tipTop ) {
+			if( y - offsetTop < pad )
+				tipTop = false;
+			else
+				y -= offsetTop;
+		}
+		else {
+			if( y + height > app.wh - pad )
+				tipTop = true,  y -= offsetTop;
+		}
+		console.log( x, y );
+		$tip.css({ left:x, top:y });
 	}
 	
 //})();
