@@ -53,6 +53,7 @@
 		initTabs();
 		initHider();
 		initProject();
+		initShapeForm();
 		initViewButtons();
 		initCalcButtons();
 		initRangeInputs();
@@ -191,16 +192,19 @@
 	
 	function getSubTab( id ) {
 		var subst = app.tabOpts.subst[id] || id;
-		app.$outermost.removeClass().addClass( id ).addClass( subst );
-		var view = 'map';
-		switch( subst ) {
-			case 'forestview':
-				view = $('#'+subst+'-input-form-top button.submit')[0].id.split('-')[2];
-			case 'project':
-			case 'location':
-				app.$outermost.addClass( id + '-' + view ).addClass( subst + '-' + view ).addClass( view );
-				break;
+		var $outer = app.$outermost;
+		$outer.removeClass().addClass( id ).addClass( subst );
+		function addView( view ) {
+			$outer
+				.addClass( view )
+				.addClass( id + '-' + view )
+				.addClass( subst + '-' + view );
 		}
+		var button = $('#'+subst+'-input-form-top button.submit')[0];
+		var split = button && button.id.split('-')[2];
+		addView( split );
+		if( subst != 'forestview' )
+			addView( 'map' );
 		return id;
 	}
 	
@@ -319,6 +323,51 @@
 		function onchange() {
 			$('#project-form').toggleClass( 'inlist', !! combo.inlist() );
 		}
+	}
+	
+	function initShapeForm() {
+		$('#location-shape-form').iform({
+			success: function( data ) {
+				var geo = data.geo;
+				if( geo.type != 'FeatureCollection' ) return;
+				var b, f;
+				geo.features.forEach( function( feature ) {
+					f = feature;
+					b = feature.bbox;
+					feature.fillColor = '#000000';
+					feature.fillOpacity = .1;
+					feature.strokeColor = '#000000';
+					feature.strokeOpacity = .7;
+					feature.strokeWidth = 1;
+				});
+				// TODO: let user select from list. For now, just use one.
+				if( geo.features.length == 1 ) {
+					app.map.fitBounds( b[1], b[0], b[3], b[2] );
+					app.gonzo = new PolyGonzo.PgOverlay({
+						map: app.map.map,
+						geo: geo,
+						events: {
+							mousemove: function( event, where ) {
+								var feature = where && where.feature;
+								// TODO: add mouseenter/leave to PG and
+								// use instead of mousemove/overFeature
+								if( feature != app.overFeature ) {
+									//if( feature ) feature.container = geo;
+									//trigger( 'over', feature );
+									app.overFeature = feature;
+								}
+							},
+							click: function( event, where ) {
+								var feature = where && where.feature;
+								//if( feature ) feature.container = geo;
+								//trigger( 'click', feature );
+							}
+						}
+					});
+					app.gonzo.setMap( app.map.map );
+				}
+			}
+		});
 	}
 	
 	// Temp
@@ -584,11 +633,17 @@
 	}
 	
 	function enableGeoclick() {
-		app.geoclick && app.geoclick.enable();
+		if( app.$outermost.is('.searchmap') ) {
+			app.geoclick && app.geoclick.enable();
+		}
+		else {
+			app.gonzo && app.gonzo.setMap( app.map.map );
+		}
 	}
 	
 	function disableGeoclick() {
 		app.geoclick && app.geoclick.disable();
+		app.gonzo && app.gonzo.setMap( null );
 	}
 	
 	function EarthImage() {

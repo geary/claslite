@@ -382,6 +382,15 @@ ul.tabs a.hover span {
 
 /* Visibility selectors */
 
+.location-searchmap, .location-useshape {
+	display: none;
+}
+
+#outermost.location-searchmap .location-searchmap,
+#outermost.location-useshape .location-useshape {
+	display: block;
+}
+
 #outermost.map #mapwrap {
 	visibility: visible;
 }
@@ -430,7 +439,15 @@ ul.tabs a.hover span {
 	padding: 8px;
 }
 
-/* Locations */
+/* Location */
+
+button.subtab-button-searchmap {
+	width: 9em;
+}
+
+button.subtab-button-useshape {
+	width: 9em;
+}
 
 #location-search-form {
 	width: 330px;
