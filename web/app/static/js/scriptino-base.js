@@ -601,6 +601,15 @@ var Scriptino, S;
 				return had;
 			},
 			
+			hoverClass: function( cls ) {
+				return this.each$( function( $element ) {
+					$element.hover(
+						function() { $element.addClass( cls ); },
+						function() { $element.removeClass( cls ); }
+					);
+				});
+			},
+			
 			//html: function( a ) {
 			//	return a == null ?
 			//		this[0] && this[0].innerHTML :
