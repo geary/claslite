@@ -591,6 +591,8 @@ var Scriptino, S;
 				}
 			},
 			
+			forEach: Array.prototype.forEach,
+			
 			// Toggle a classname on or off, and return whether the
 			// classname was previously on.
 			hadClass: function( cls, state ) {
@@ -604,6 +606,53 @@ var Scriptino, S;
 			//		this[0] && this[0].innerHTML :
 			//		this.empty().append( Array.prototype.join.call( a.charAt ? arguments : a ) );
 			//},
+			
+			// Inspired by jQuery iFramer by Trent Richardson
+			// http://trentrichardson.com/2009/06/05/meet-jquery-iframer/
+			//iform: function( opt ) {
+			//	return this.each$( function( $form ) {
+			//		var id = ( $form[0].id || Math.random() ) +'-iframe';
+			//		var $frame = $('<iframe>').attr({
+			//			name: id,
+			//			style: 'display:none;'
+			//		});
+			//		$form
+			//			.append( $frame )
+			//			.attr( 'target', id )
+			//			.submit( function() {
+			//				$frame.one( 'load', function() {
+			//					var $body = $frame.contents().find('body');
+			//					var data = $body.html();
+			//					$body.empty();
+			//					if( data.charAt(0) in { '{':1, '[':1 } )
+			//						data = $.parseJSON( data );
+			//					opt.success && opt.success( data );
+			//				});
+			//			});			
+			//	});
+			//},
+			
+			iform: function( opt ) {
+				return this.each$( function( $form ) {
+					$form.submit( function() {
+						if( $form[0].target ) return;
+						var name = 'iform-iframe-' + (
+							$.fn.iform.seq = ( $.fn.iform.seq || 0 ) + 1
+						);
+						var $frame = $('<iframe>').attr({
+							name: name,
+							style: 'display:none;',
+							'class': 'iform-iframe'
+						}).load( function() {
+							var data = $frame.contents().find('body').html();
+							if( data.charAt(0) in { '{':1, '[':1 } )
+								data = $.parseJSON( data );
+							opt.success && opt.success( data );
+						});
+						$form.append( $frame ).attr( 'target', name );
+					});
+				});
+			},
 			
 			// Like .appendTo() but replaces existing content instead
 			// of appending the new content.
