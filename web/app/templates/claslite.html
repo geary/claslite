@@ -160,7 +160,7 @@
 							<form class="input-form location" id="location-input-form-top">
 								<button class="icon-button subtab-button-searchmap view-button submit" type="submit" id="view-location-searchmap"><div class="inline-block sprite button-icon icon16 icon16-tick"></div>Search Map</button>
 								&nbsp;&nbsp;
-								<button class="icon-button subtab-button-useshape view-button" id="view-location-useshape"><div class="inline-block sprite button-icon icon16 hide"></div>Load KML</button>
+								<button class="icon-button subtab-button-useshape view-button" id="view-location-useshape"><div class="inline-block sprite button-icon icon16 hide"></div>Upload KML</button>
 							</form>
 						</div>
 					</div>
@@ -462,17 +462,19 @@
 				</div>
 				<div class="tipcontent">
 					<p>
-						This is how to search the map.
+						Enter a place name below and click the <b>Search</b> button.
 					</p>
 					<p>
-						Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+						If there is a single match, the map will zoom to that location. If the search lists multiple matches, click one of them in the list to zoom there.
 					</p>
 					<p>
-						Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+						Or, zoom and pan to the area you want using the map controls, then <b>click the map</b>.
 					</p>
 				</div>
 				<div class="tipfooter">
-					Optional footer
+					<p>
+						To use a precise (non-rectangular) boundary, obtain or create a KML file with the boundary and use the <b>Upload KML</b> button to upload it.
+					</p>
 				</div>
 			</div>
 		</div>
@@ -483,18 +485,20 @@
 				</div>
 				<div class="tipcontent">
 					<p>
-						This is how to upload a KML file.
+						Upload a KML file with boundaries of the area(s) to study.
 					</p>
 					<p>
-						Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+						Click the <b>Browse&#8230;</b> button to select your KML file, then <b>Upload</b> to view it.
 					</p>
 					<p>
-						Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+						The KML file should contain one or more <code class="notranslate">&lt;Placemark&gt;</code> elements with <code class="notranslate">&lt;MultiGeometry&gt;</code> or <code class="notranslate">&lt;Polygon&gt;</code> boundaries.
 					</p>
 				</div>
+<!--
 				<div class="tipfooter">
 					Optional footer
 				</div>
+-->
 			</div>
 		</div>
 		
