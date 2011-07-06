@@ -1586,7 +1586,6 @@
 	}
 	
 	function moveTip( event ) {
-		console.log( tipHtml );
 		if( ! tipHtml ) return;
 		var x = event.pageX, y = event.pageY;
 		x += tipOffset.x;
@@ -1615,7 +1614,6 @@
 			if( y + height > app.wh - pad )
 				tipTop = true,  y -= offsetTop;
 		}
-		console.log( x, y );
 		$tip.css({ left:x, top:y });
 	}
 	
