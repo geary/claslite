@@ -796,45 +796,57 @@
 		});
 	}
 	
-	function addEarthEngineLayer( opt ) {
-		// Call earthengine_map_forestcover or earthengine_map_forestchange
-		$.jsonRPC.request(
-			'earthengine_map_' + opt.proc, [ opt ],
-			{
-				success: function( rpc ) {
-					var error = rpc.result.error;
-					if( error ) {
-						// TODO: better error reporting
-						alert(
-							error.type == 'no_images' ?
-								'No images available for the selected year.' :
-							error.code && error.message ?
-								'Error ' + error.code + ':\n' + error.message :
-							// else
-								'Error'
-						);
-						return;
-					}
-					var tiles = rpc.result.tiles;
-					app.layers[opt.type] = app.map.addLayer({
-						minZoom: 3,
-						maxZoom: 14,
-						opacity: getOpacity( opt.type ),
-						spinner: {
-							img: 'images/spinner32.gif',
-							opacity: .5
-						},
-						tiles: S(
-							'https://earthengine.googleapis.com/map/', tiles.mapid,
-							'/{Z}/{X}/{Y}?token=', tiles.token
-						)
-					});
-				},
-				error: function( result ) {
-					alert( 'Error loading Earth Engine layer' );  // TODO: better errors
+	function callEarthEngine( opt, on ) {
+		$.jsonRPC.request( 'earthengine_map', [ opt ], {
+			success: function( rpc ) {
+				var error = rpc.result.error;
+				if( error ) {
+					// TODO: better error reporting
+					alert(
+						error.type == 'no_images' ?
+							'No images available for the selected year.' :
+						error.code && error.message ?
+							'Error ' + error.code + ':\n' + error.message :
+						// else
+							'Error'
+					);
+					return;
 				}
+				on.success && on.success( rpc.result );
+			},
+			error: function( result ) {
+				alert( 'Error loading Earth Engine layer' );  // TODO: better errors
+				on.error && on.error( result );
 			}
-		);
+		});
+	}
+	
+	function addEarthEngineLayer( opt ) {
+		opt = S.extend({
+			sat: $('#sat-select').val().split('|'),
+			bbox: getMapBbox()
+		}, opt );
+		
+		callEarthEngine( opt, {
+			success: function( result ) {
+				var tiles = result.tiles;
+				app.layers[opt.type] = app.map.addLayer({
+					minZoom: 3,
+					maxZoom: 14,
+					opacity: getOpacity( opt.type || opt.mode ),
+					spinner: {
+						img: 'images/spinner32.gif',
+						opacity: .5
+					},
+					tiles: S(
+						'https://earthengine.googleapis.com/map/', tiles.mapid,
+						'/{Z}/{X}/{Y}?token=', tiles.token
+					)
+				});
+			},
+			error: function( result ) {
+			}
+		});
 	}
 	
 	//function listEarthEngineAssets( year, bounds, callback ) {
@@ -1005,16 +1017,12 @@
 	function addFractCoverLayer( type ) {
 		var year = +app.$fractCoverDate.val();
 		addEarthEngineLayer({
-			proc: 'fractcover',
-			type: type,
-			sat: $('#sat-select').val().split('|'),
-			starttime: Date.UTC( year, 0, 1 ),
-			endtime: Date.UTC( year+1, 0, 1 ),
+			mode: 'fractcover',
+			times: [ getYearTimes(year) ],
 			palette: makeFractCoverPalette(),
 			bias: $('#fractcover-bias').val(),
 			gain: $('#fractcover-gain').val(),
-			gamma: $('#fractcover-gamma').val(),
-			bbox: getMapBbox()
+			gamma: $('#fractcover-gamma').val()
 		});
 	}
 	
@@ -1027,32 +1035,26 @@
 		}
 		// END TEST
 		addEarthEngineLayer({
-			proc: type,
-			type: type,
-			sat: $('#sat-select').val().split('|'),
-			starttime: Date.UTC( year, 0, 1 ),
-			endtime: Date.UTC( year+1, 0, 1 ),
-			palette: makeForestCoverPalette(),
-			bbox: getMapBbox()
+			mode: 'forestcover',
+			times: [ getYearTimes(year) ],
+			palette: makeForestCoverPalette()
 		});
 	}
 	
 	function addForestChangeLayer( type ) {
-		var years = getForestChangeYears(true).map( function( year ) {
-			return {
-				starttime: Date.UTC( year, 0, 1 ),
-				endtime: Date.UTC( year+1, 0, 1 )
-			}
-		});
-		
 		addEarthEngineLayer({
-			proc: 'forestchange',
+			mode: 'forestchange',
 			type: type,
-			sat: $('#sat-select').val().split('|'),
-			times: years,
-			palette: makeForestChangePalette( type ),
-			bbox: getMapBbox()
+			times: getForestChangeYears( true ).map( getYearTimes ),
+			palette: makeForestChangePalette( type )
 		});
+	}
+	
+	function getYearTimes( year ) {
+		return {
+			starttime: Date.UTC( year, 0, 1 ),
+			endtime: Date.UTC( year+1, 0, 1 )
+		}
 	}
 	
 	function addLayer( id, path ) {
