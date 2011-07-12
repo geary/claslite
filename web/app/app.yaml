@@ -1,5 +1,6 @@
 application: claslite
-version: stable
+#version: stable
+version: test
 runtime: python
 api_version: 1
 
