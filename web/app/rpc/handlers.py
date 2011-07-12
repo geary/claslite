@@ -63,95 +63,69 @@ class JsonService( object ):
 			'ymd': ymd
 		}
 	
-	# TODO: refactor the earthengine_map_* functions
-	
-	def earthengine_map_fractcover( self, opt ):
+	def earthengine_map( self, opt ):
+		'''	Create an Earth Engine map as tiles or as a download image.
+			opt = {
+				'sat': [ satname, sensor ],
+				'mode': 'fractcover' or 'forestcover' or 'forestchange',
+				'bbox': [ west, south, east, north ],
+				'times': [
+					{ 'starttime': n, 'endtime': n },
+					/* ... */
+				],
+				# for fractcover:
+				'bias': n,
+				'gain': n,
+				'gamma': n,
+				# for forestcover:
+				# (nothing extra)
+				# for forestchange:
+				'type': 'deforestation' or 'disturbance',
+				# for forestcover or forestchange:
+				'palette': [ rrggbb, ..., rrggbb ],
+			}
+		'''
+		palette = opt.get('palette')
+		mode = opt['mode']
+		if mode == 'fractcover':
+			step = None
+			params = 'bands=sub,pv,npv&bias=%f&gain=%f&gamma=%f' %(
+				float(opt['bias']), float(opt['gain']), float(opt['gamma'])
+			)
+		elif mode == 'forestcover':
+			step = 'ForestMask'
+			params = 'bands=Forest_NonForest&min=0&max=2&palette=%s' %(
+				str( ','.join(palette) )
+			)
+		elif mode == 'forestchange':
+			step = 'ForestCoverChange'
+			params = 'bands=%s&min=1&max=%d&palette=%s' %(
+				( 'disturb', 'deforest' )[ opt['type'] == 'deforestation' ],
+				len(palette), str( ','.join(palette) )
+			)
+		
 		ee = EarthEngine( current_handler )
 		ei =  EarthImage()
 		modImage = ei.obj( 'Image', 'MOD44B_C4_TREE_2000' )
 		collection = ei.obj( 'ImageCollection', opt['sat'][1] )
 		sensor = opt['sat'][0]
 		
-		mosaic = ei.step(
-			CLASLITE+'MosaicScene',
-			collection, modImage, sensor,
-			opt['starttime'], opt['endtime']
-		)
-		#clipped = ei.clip( mosaic )
-		clipped = mosaic
-		
-		params = 'image=%s&bbox=%s' %(
-			json_encode(clipped), str(opt['bbox'])
-		)
-		params = 'image=%s&bbox=%s&bands=sub,pv,npv&bias=%f&gain=%f&gamma=%f' %(
-			json_encode(mosaic), str(opt['bbox']),
-			float(opt['bias']), float(opt['gain']), float(opt['gamma'])
-		)
-		
-		tiles = ee.post( 'mapid', params )
-		
-		if 'error' in tiles:
-			return tiles
-		else:
-			return { 'tiles': tiles['data'] }
-	
-	def earthengine_map_forestcover( self, opt ):
-		ee = EarthEngine( current_handler )
-		ei =  EarthImage()
-		modImage = ei.obj( 'Image', 'MOD44B_C4_TREE_2000' )
-		collection = ei.obj( 'ImageCollection', opt['sat'][1] )
-		sensor = opt['sat'][0]
-		
-		mosaic = ei.step(
-			CLASLITE+'MosaicScene',
-			collection, modImage, sensor,
-			opt['starttime'], opt['endtime']
-		)
-		forest = ei.step( CLASLITE+'ForestMask', mosaic )
-		#clipped = ei.clip( forest )
-		clipped = forest
-		
-		params = 'image=%s&bands=%s&min=0&max=2&palette=%s&bbox=%s' %(
-			json_encode(clipped), 'Forest_NonForest',
-			str( ','.join(opt['palette']) ), str(opt['bbox'])
-		)
-		logging.info( 'Forest_NonForest %d bytes' %(
-			len(params)
-		) )
-		
-		tiles = ee.post( 'mapid', params )
-		
-		if 'error' in tiles:
-			return tiles
-		else:
-			return { 'tiles': tiles['data'] }
-	
-	def earthengine_map_forestchange( self, opt ):
-		ee = EarthEngine( current_handler )
-		ei =  EarthImage()
-		modImage = ei.obj( 'Image', 'MOD44B_C4_TREE_2000' )
-		collection = ei.obj( 'ImageCollection', opt['sat'][1] )
-		sensor = opt['sat'][0]
-		
-		mosaics = []
+		image = []
 		for time in opt['times']:
-			mosaics.append( ei.step(
+			image.append( ei.step(
 				CLASLITE+'MosaicScene',
 				collection, modImage, sensor,
 				time['starttime'], time['endtime']
 			) )
+		if len(image) == 1:
+			image = image[0]
 		
-		change = ei.step( CLASLITE+'ForestCoverChange', mosaics )
-		#clipped = ei.clip( change )
-		clipped = change
+		if step:
+			image = ei.step( CLASLITE+step, image )
+		#image = ei.clip( image )
 		
-		if opt['type'] == 'deforestation':
-			band = 'deforest'
-		else:
-			band = 'disturb'
-		palette = opt['palette']
-		params = 'image=%s&bands=%s&min=1&max=%d&palette=%s&bbox=%s' %(
-			json_encode(clipped), band, len(palette), str( ','.join(palette) ), str(opt['bbox'])
+		params += '&image=%s&bbox=%s' %(
+			json_encode(image), str(opt['bbox'])
 		)
 		
 		tiles = ee.post( 'mapid', params )
