@@ -56,6 +56,7 @@
 		initProject();
 		initShapeForm();
 		initViewButtons();
+		initDownloadButtons();
 		initCalcButtons();
 		initRangeInputs();
 		initDateSelects();
@@ -153,7 +154,7 @@
 				addStatistics( id );
 			}
 			else if( app.viewed.fractcover ) {
-				addFractCoverLayer( id );
+				viewFractCoverLayer( 'tiles' );
 			}
 		},
 		forestcover: function( id, full ) {
@@ -164,7 +165,7 @@
 				addStatistics( id );
 			}
 			else if( app.viewed.forestcover ) {
-				addForestCoverLayer( id );
+				viewForestCoverLayer( 'tiles' );
 			}
 		},
 		forestchange: function( id, full ) {
@@ -176,12 +177,9 @@
 			}
 			else {
 				if( app.viewed.forestchange ) {
-					// TODO: there's probably a simpler way to do this:
-					var deforestation = app.$deforestationRadio.is(':checked');
-					var disturbance = app.$disturbanceRadio.is(':checked');
-					if( app.$bothRadio.is(':checked') ) deforestation = disturbance = true;
-					if( deforestation ) addForestChangeLayer( 'deforestation' );
-					if( disturbance ) addForestChangeLayer( 'disturbance' );
+					var t = getForestChangeTypes();
+					if( t.deforestation ) viewForestChangeLayer( 'tiles', 'deforestation' );
+					if( t.disturbance ) viewForestChangeLayer( 'tiles', 'disturbance' );
 				}
 			}
 		},
@@ -190,6 +188,15 @@
 			removeLayers();
 		}
 	};
+	
+	function getForestChangeTypes() {
+		// TODO: there's probably a simpler way to do this:
+		var both = app.$bothRadio.is(':checked');
+		return {
+			deforestation: both || app.$deforestationRadio.is(':checked'),
+			disturbance: both || app.$disturbanceRadio.is(':checked')
+		}
+	}
 	
 	function getSubTab( id ) {
 		var subst = app.tabOpts.subst[id] || id;
@@ -450,8 +457,25 @@
 			}
 			set[index] = true;
 		});
-		
 	}
+	
+	function initDownloadButtons() {
+		$('#view-forestview-download').click( function( event ) {
+			// TODO: refactor
+			if( app.$outermost.is('.fractcover') ) {
+				viewFractCoverLayer( 'download' );
+			}
+			else if( app.$outermost.is('.forestcover') ) {
+				viewForestCoverLayer( 'download' );
+			}
+			else {
+				var t = getForestChangeTypes();
+				if( t.deforestation ) viewForestChangeLayer( 'download', 'deforestation' );
+				if( t.disturbance ) viewForestChangeLayer( 'download', 'disturbance' );
+			}
+		});
+	}
+	
 	function initRangeInputs() {
 		$('input:range').rangeinput({ precision: 0 });
 	}
@@ -659,8 +683,8 @@
 		});
 	}
 	
-	function callEarthEngine( opt, on ) {
-		$.jsonRPC.request( 'earthengine_map', [ opt ], {
+	function callEarthEngine( action, opt, on ) {
+		$.jsonRPC.request( 'earthengine_map', [ action, opt ], {
 			success: function( rpc ) {
 				var error = rpc.result.error;
 				if( error ) {
@@ -684,13 +708,52 @@
 		});
 	}
 	
-	function addEarthEngineLayer( opt ) {
+	function viewEarthEngineLayer( action, opt ) {
+		var download = ( action == 'download' );
 		opt = S.extend({
 			sat: $('#sat-select').val().split('|'),
 			bbox: getMapBbox()
 		}, opt );
 		
-		callEarthEngine( opt, {
+		var bands = {
+			'fractcover': null,
+			'forestcover': 'Forest_NonForest',
+			'forestchange': 'ForestCoverChange'
+		}[opt.mode];
+		
+		if( download ) {
+			var g = getMapEdges();
+			opt.extra = S.Query.string({
+				bands: JSON.stringify([{
+					id: bands,
+					scale: 30
+				}]),
+				crs: 'EPSG:4326',
+				region: JSON.stringify({
+					type: 'LinearRing',
+					coordinates: [
+						[ g.w, g.s ], [ g.w, g.n ], [ g.e, g.n ], [ g.e, g.s ]
+					]
+				})
+			}, '=', '&', false );
+		}
+		
+		callEarthEngine( action, opt, download ? {
+			success: function( result ) {
+				//window.location = S(
+				var url = S(
+					'http://earthengine.googleapis.com/api/download?id=',
+					result.data.token,
+					opt.extra ? '&' + opt.extra : ''
+				);
+				console.dir( result.data );
+				console.log( url );
+				debugger;
+				window.location = url;
+			},
+			error: function( result ) {
+			}
+		} : action == 'tiles' ? {
 			success: function( result ) {
 				var tiles = result.tiles;
 				app.layers[opt.type] = app.map.addLayer({
@@ -709,6 +772,7 @@
 			},
 			error: function( result ) {
 			}
+		} : {
 		});
 	}
 	
@@ -877,29 +941,29 @@
 	}
 	
 	// TODO: refactor
-	function addFractCoverLayer( type ) {
+	function viewFractCoverLayer( action, opt ) {
 		var year = +app.$fractCoverDate.val();
-		addEarthEngineLayer({
+		viewEarthEngineLayer( action, S.extend({
 			mode: 'fractcover',
 			times: [ getYearTimes(year) ],
 			palette: makeFractCoverPalette(),
 			bias: $('#fractcover-bias').val(),
 			gain: $('#fractcover-gain').val(),
 			gamma: $('#fractcover-gamma').val()
-		});
+		}, opt ) );
 	}
 	
-	function addForestCoverLayer( type ) {
+	function viewForestCoverLayer( action, opt ) {
 		var year = +app.$forestCoverDate.val();
-		addEarthEngineLayer({
+		viewEarthEngineLayer( action, S.extend({
 			mode: 'forestcover',
 			times: [ getYearTimes(year) ],
 			palette: makeForestCoverPalette()
-		});
+		}, opt ) );
 	}
 	
-	function addForestChangeLayer( type ) {
-		addEarthEngineLayer({
+	function viewForestChangeLayer( action, type ) {
+		viewEarthEngineLayer( action, {
 			mode: 'forestchange',
 			type: type,
 			times: getForestChangeYears( true ).map( getYearTimes ),
@@ -1390,11 +1454,21 @@
 		setOpacity( 'disturbance', map.disturbance.opacity );
 	}
 	
+	// TODO: move getMap* to scriptino-map
+	function getMapBounds() {
+		//return app.location.bounds;
+		return app.map.map.getBounds();
+	}
+	
 	function getMapBbox() {
-		//var bounds = app.location.bounds;
-		var bounds = app.map.map.getBounds();
+		var bounds = getMapBounds();
 		return S.Map.boundsToBbox( bounds ).join();
 		//return getMapCenterTinyBbox().join();
+	}
+	
+	function getMapEdges() {
+		var bounds = getMapBounds();
+		return S.Map.boundsToEdges( bounds );
 	}
 	
 	function initGoogleTranslate() {

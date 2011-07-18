@@ -63,16 +63,20 @@ class JsonService( object ):
 			'ymd': ymd
 		}
 	
-	def earthengine_map( self, opt ):
+	def earthengine_map( self, action, opt ):
 		'''	Create an Earth Engine map as tiles or as a download image.
+			action = 'tiles', 'download', or 'click'
 			opt = {
 				'sat': [ satname, sensor ],
 				'mode': 'fractcover' or 'forestcover' or 'forestchange',
-				'bbox': [ west, south, east, north ],
 				'times': [
 					{ 'starttime': n, 'endtime': n },
 					/* ... */
 				],
+				# for tiles or download:
+				'bbox': [ west, south, east, north ],
+				# for click:
+				'points': [ lng, lat ],
 				# for fractcover:
 				'bias': n,
 				'gain': n,
@@ -89,21 +93,36 @@ class JsonService( object ):
 		mode = opt['mode']
 		if mode == 'fractcover':
 			step = None
-			params = 'bands=sub,pv,npv&bias=%f&gain=%f&gamma=%f' %(
+			bands = 'sub,pv,npv'
+			params = 'bias=%f&gain=%f&gamma=%f' %(
 				float(opt['bias']), float(opt['gain']), float(opt['gamma'])
 			)
 		elif mode == 'forestcover':
 			step = 'ForestMask'
-			params = 'bands=Forest_NonForest&min=0&max=2&palette=%s' %(
+			bands = 'Forest_NonForest'
+			params = 'min=0&max=2&palette=%s' %(
 				str( ','.join(palette) )
 			)
 		elif mode == 'forestchange':
 			step = 'ForestCoverChange'
-			params = 'bands=%s&min=1&max=%d&palette=%s' %(
-				( 'disturb', 'deforest' )[ opt['type'] == 'deforestation' ],
+			bands = ( 'disturb', 'deforest' )[ opt['type'] == 'deforestation' ]
+			params = 'min=1&max=%d&palette=%s' %(
 				len(palette), str( ','.join(palette) )
 			)
-		
+		if action == 'download':
+			#( w, s, e, n ) = map( float, opt['bbox'].split(',') )
+			#coords = [
+			#	[ w, s ],
+			#	[ w, n ],
+			#	[ e, n ],
+			#	[ e, s ],
+			#]
+			#region = json_encode({
+			#	"type": "LinearRing",
+			#	"coordinates": coords,
+			#})
+			#bands = '[{"id":"%s","scale":30}]&crs=EPSG:4326&region=%s' %( bands, region )
+			bands = opt['extra']
 		ee = EarthEngine( current_handler )
 		ei =  EarthImage()
 		modImage = ei.obj( 'Image', 'MOD44B_C4_TREE_2000' )
@@ -124,16 +143,27 @@ class JsonService( object ):
 			image = ei.step( CLASLITE+step, image )
 		#image = ei.clip( image )
 		
-		params += '&image=%s&bbox=%s' %(
-			json_encode(image), str(opt['bbox'])
+		params += '&image=%s&%s' %(
+			json_encode(image), bands
 		)
 		
-		tiles = ee.post( 'mapid', params )
-		
-		if 'error' in tiles:
-			return tiles
+		if action == 'click':
+			params += '&points=[[%s,%s]]' %( opt['lng'], opt['lat'] )
 		else:
-			return { 'tiles': tiles['data'] }
+			params += '&bbox=%s' % str(opt['bbox'])
+		
+		if action == 'download':
+			download = ee.post( 'download', params )
+			return download
+		elif action == 'tiles':
+			tiles = ee.post( 'mapid', params )
+			if 'error' in tiles:
+				return tiles
+			else:
+				return { 'tiles': tiles['data'] }
+		elif action == 'click':
+			value = ee.get( 'value', params )
+			return value
 	
 	# project_...
 	
