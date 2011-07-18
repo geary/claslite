@@ -256,14 +256,15 @@ var Scriptino, S;
 			// S.Query.parse(), with optional pair and delimiter characters.
 			// Example:
 			//     alert( S.Query.string({ a:'b', c:'d' });  // 'a=b&c=d'
-			string: function( params, pair, delim ) {
+			string: function( params, pair, delim, encode ) {
 				pair = pair || '=',  delim = delim || '&';
+				encode = encode ? this.encode : function( v ) { return v; };
 				var array = [];
 				for( var key in params ) {
 					var value = params[key];
 					if( value != null ) array.push(
-						this.encode( key ) + pair +
-						this.encode( value )
+						encode( key ) + pair +
+						encode( value )
 					);
 				}
 				return array.sort().join( delim );
