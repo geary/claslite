@@ -702,7 +702,9 @@
 				on.success && on.success( rpc.result );
 			},
 			error: function( result ) {
-				alert( 'Error loading Earth Engine layer' );  // TODO: better errors
+				window.console && console.log( S(
+					'Server error on ',  action, ' - ', result && result.error
+				) );  // TODO: better errors
 				on.error && on.error( result );
 			}
 		});
