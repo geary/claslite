@@ -740,16 +740,11 @@
 		
 		callEarthEngine( action, opt, download ? {
 			success: function( result ) {
-				//window.location = S(
-				var url = S(
-					'http://earthengine.googleapis.com/api/download?id=',
-					result.data.token,
-					opt.extra ? '&' + opt.extra : ''
+				window.location = S(
+					'http://earthengine.googleapis.com/api/download?',
+					'docid=', result.data.docid,
+					'&token=', result.data.token
 				);
-				console.dir( result.data );
-				console.log( url );
-				debugger;
-				window.location = url;
 			},
 			error: function( result ) {
 			}
