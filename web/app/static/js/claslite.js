@@ -473,6 +473,7 @@
 				if( t.deforestation ) viewForestChangeLayer( 'download', 'deforestation' );
 				if( t.disturbance ) viewForestChangeLayer( 'download', 'disturbance' );
 			}
+			return false;
 		});
 	}
 	
