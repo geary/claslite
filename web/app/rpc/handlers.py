@@ -27,7 +27,7 @@ from earthengine import EarthEngine, EarthImage
 import fusion
 
 
-CLASLITE = 'CLASLITE/com.google.earthengine.third_party.claslite.'
+CLASLITE = 'CLASLITE/com.google.earthengine.third_party.claslite.frontend.'
 
 
 class JsonService( object ):
@@ -134,7 +134,8 @@ class JsonService( object ):
 			image.append( ei.step(
 				CLASLITE+'MosaicScene',
 				collection, modImage, sensor,
-				time['starttime'], time['endtime']
+				time['starttime'], time['endtime'],
+				None
 			) )
 		if len(image) == 1:
 			image = image[0]
