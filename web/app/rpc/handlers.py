@@ -143,7 +143,7 @@ class JsonService( object ):
 			image = ei.step( CLASLITE+step, image )
 		#image = ei.clip( image )
 		
-		params += '&image=%s&%s' %(
+		params += '&image=%s&bands=%s' %(
 			json_encode(image), bands
 		)
 		
