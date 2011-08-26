@@ -93,20 +93,20 @@ class JsonService( object ):
 		polygon = [ [ polyBbox( opt['bbox'] ) ] ]
 		palette = opt.get('palette')
 		mode = opt['mode']
+		final = None
 		if mode == 'fractcover':
-			step = None
 			bands = 'sub,pv,npv'
 			visual = 'bias=%f&gain=%f&gamma=%f' %(
 				float(opt['bias']), float(opt['gain']), float(opt['gamma'])
 			)
 		elif mode == 'forestcover':
-			step = 'ForestCoverMap'
+			final = 'ForestCoverMap'
 			bands = 'Forest_NonForest'
 			visual = 'min=0&max=2&palette=%s' %(
 				str( ','.join(palette) )
 			)
 		elif mode == 'forestchange':
-			step = 'ForestCoverChange'
+			final = 'ForestCoverChange'
 			bands = ( 'disturb', 'deforest' )[ opt['type'] == 'deforestation' ]
 			visual = 'min=1&max=%d&palette=%s' %(
 				len(palette), str( ','.join(palette) )
@@ -137,15 +137,15 @@ class JsonService( object ):
 		for time in opt['times']:
 			image.append( ei.step(
 				CLASLITE+'MosaicScene',
-				collection, modImage, tempImage, sensor,
+				collection, modImage, sensor,
 				time['starttime'], time['endtime'],
 				polygon
 			) )
 		if len(image) == 1:
 			image = image[0]
 		
-		if step:
-			image = ei.step( CLASLITE+step, image, polygon )
+		if final:
+			image = ei.step( CLASLITE+final, image )
 		#image = ei.clip( image )
 		
 		params = 'image=%s' % json_encode(image)
