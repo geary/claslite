@@ -162,7 +162,8 @@
 			removeLayers();
 			if( full ) loadDateSelects();
 			if( app.$outermost.is('.stats') ) {
-				addStatistics( id );
+				//addStatistics( id );
+				//viewForestCoverLayer( 'values' );
 			}
 			else if( app.viewed.forestcover ) {
 				viewForestCoverLayer( 'tiles' );
@@ -713,6 +714,7 @@
 	
 	function viewEarthEngineLayer( action, opt ) {
 		var download = ( action == 'download' );
+		// TODO: duplicate code
 		opt = S.extend({
 			sat: $('#sat-select').val().split('|'),
 			bbox: getMapBbox()
@@ -724,7 +726,7 @@
 			'forestchange': 'ForestCoverChange'
 		}[opt.mode];
 		
-		if( download ) {
+		if( action == 'download' ) {
 			var g = getMapEdges();
 			opt.extra = S.Query.string({
 				bands: JSON.stringify([{
@@ -741,7 +743,7 @@
 			}, '=', '&', false );
 		}
 		
-		callEarthEngine( action, opt, download ? {
+		callEarthEngine( action, opt, action == 'download' ? {
 			success: function( result ) {
 				window.location = S(
 					'http://earthengine.googleapis.com/api/download?',
@@ -769,6 +771,13 @@
 				});
 			},
 			error: function( result ) {
+			}
+		} : action == 'values' ? {
+			success: function( result ) {
+				debugger;
+			},
+			error: function( result ) {
+				debugger;
 			}
 		} : {
 		});
@@ -907,7 +916,7 @@
 		var sat =  $('#sat-select').val().split('|');
 		
 		var bbox = getMapBbox();
-		var satbox = sat[1] + bbox;
+		var satbox = sat[1] + bbox.join();
 		
 		if( satbox == satboxLatest ) return;
 		satboxLatest = satbox;
@@ -1460,7 +1469,7 @@
 	
 	function getMapBbox() {
 		var bounds = getMapBounds();
-		return S.Map.boundsToBbox( bounds ).join();
+		return S.Map.boundsToBbox( bounds );
 		//return getMapCenterTinyBbox().join();
 	}
 	

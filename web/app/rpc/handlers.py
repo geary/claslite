@@ -38,7 +38,7 @@ class JsonService( object ):
 		ee = EarthEngine( current_handler )
 		
 		params = 'id=%s&fields=ACQUISITION_DATE&bbox=%s' %(
-			opt['sat'][1], opt['bbox']
+			opt['sat'][1], strBbox( opt['bbox'] )
 		)
 		
 		response = ee.get( 'list', params )
@@ -64,8 +64,9 @@ class JsonService( object ):
 		}
 	
 	def earthengine_map( self, action, opt ):
-		'''	Create an Earth Engine map as tiles or as a download image.
-			action = 'tiles', 'download', or 'click'
+		'''	Create an Earth Engine map as tiles or as a download image,
+			or requests statistics.
+			action = 'click', 'download', 'tiles', or 'values'
 			opt = {
 				'sat': [ satname, sensor ],
 				'mode': 'fractcover' or 'forestcover' or 'forestchange',
@@ -89,28 +90,29 @@ class JsonService( object ):
 				'palette': [ rrggbb, ..., rrggbb ],
 			}
 		'''
+		polygon = [ [ polyBbox( opt['bbox'] ) ] ]
 		palette = opt.get('palette')
 		mode = opt['mode']
 		if mode == 'fractcover':
 			step = None
 			bands = 'sub,pv,npv'
-			params = 'bias=%f&gain=%f&gamma=%f' %(
+			visual = 'bias=%f&gain=%f&gamma=%f' %(
 				float(opt['bias']), float(opt['gain']), float(opt['gamma'])
 			)
 		elif mode == 'forestcover':
-			step = 'ForestMask'
+			step = 'ForestCoverMap'
 			bands = 'Forest_NonForest'
-			params = 'min=0&max=2&palette=%s' %(
+			visual = 'min=0&max=2&palette=%s' %(
 				str( ','.join(palette) )
 			)
 		elif mode == 'forestchange':
 			step = 'ForestCoverChange'
 			bands = ( 'disturb', 'deforest' )[ opt['type'] == 'deforestation' ]
-			params = 'min=1&max=%d&palette=%s' %(
+			visual = 'min=1&max=%d&palette=%s' %(
 				len(palette), str( ','.join(palette) )
 			)
 		if action == 'download':
-			#( w, s, e, n ) = map( float, opt['bbox'].split(',') )
+			#( w, s, e, n ) = opt['bbox']
 			#coords = [
 			#	[ w, s ],
 			#	[ w, n ],
@@ -123,9 +125,11 @@ class JsonService( object ):
 			#})
 			#bands = '[{"id":"%s","scale":30}]&crs=EPSG:4326&region=%s' %( bands, region )
 			bands = opt['extra']
+		
 		ee = EarthEngine( current_handler )
 		ei =  EarthImage()
 		modImage = ei.obj( 'Image', 'MOD44B_C4_TREE_2000' )
+		tempImage = ei.obj( 'Image', 'LANDSAT/L7_L1T/LE72290682008245EDC00' )
 		collection = ei.obj( 'ImageCollection', opt['sat'][1] )
 		sensor = opt['sat'][0]
 		
@@ -133,38 +137,46 @@ class JsonService( object ):
 		for time in opt['times']:
 			image.append( ei.step(
 				CLASLITE+'MosaicScene',
-				collection, modImage, sensor,
+				collection, modImage, tempImage, sensor,
 				time['starttime'], time['endtime'],
-				None
+				polygon
 			) )
 		if len(image) == 1:
 			image = image[0]
 		
 		if step:
-			image = ei.step( CLASLITE+step, image )
+			image = ei.step( CLASLITE+step, image, polygon )
 		#image = ei.clip( image )
 		
-		params += '&image=%s&bands=%s' %(
-			json_encode(image), bands
-		)
+		params = 'image=%s' % json_encode(image)
 		
 		if action == 'click':
 			params += '&points=[[%s,%s]]' %( opt['lng'], opt['lat'] )
+		elif action == 'values':
+			params += '&fields=count'
 		else:
-			params += '&bbox=%s' % str(opt['bbox'])
+			params += '&bands=%s' %( bands )
 		
-		if action == 'download':
-			download = ee.post( 'download', params )
+		def vp( p ): return visual + '&' + p
+		
+		if action == 'click':
+			value = ee.get( 'value', params )
+			return value
+		elif action == 'download':
+			download = ee.post( 'download', vp(params) )
 			return download
 		elif action == 'tiles':
-			tiles = ee.post( 'mapid', params )
+			tiles = ee.post( 'mapid', vp(params) )
 			if 'error' in tiles:
 				return tiles
 			else:
 				return { 'tiles': tiles['data'] }
-		elif action == 'click':
-			value = ee.get( 'value', params )
-			return value
+		elif action == 'values':
+			values = ee.post( 'value', params )
+			if 'error' in values:
+				return values
+			else:
+				return { 'values': values['data'] }
 	
 	# project_...
 	
@@ -250,3 +262,24 @@ class JsonHandler( RequestHandler, JSONRPCMixin ):
 	jsonrpc_service = JsonService()
 	jsonrpc_name = 'CLASlite JSON-RPC Service',
 	jsonrpc_summary = 'RPC services for CLASlite web client.'
+
+
+def strBbox( bbox ):
+	return ','.join( map( str, bbox ) )
+
+def polyBbox( bbox ):
+	( w, s, e, n ) = bbox
+	return [
+		# clockwise
+		#[ w, n ],
+		#[ e, n ],
+		#[ e, s ],
+		#[ w, s ],
+		#[ w, n ],
+		# counter-clockwise
+		[ w, n ],
+		[ w, s ],
+		[ e, s ],
+		[ e, n ],
+		[ w, n ],
+	]
