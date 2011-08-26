@@ -756,7 +756,7 @@
 		} : action == 'tiles' ? {
 			success: function( result ) {
 				var tiles = result.tiles;
-				app.layers[opt.type] = app.map.addLayer({
+				app.layers[ opt.type || opt.mode ] = app.map.addLayer({
 					minZoom: 3,
 					maxZoom: 14,
 					opacity: getOpacity( opt.type || opt.mode ),
