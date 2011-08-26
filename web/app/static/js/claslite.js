@@ -720,19 +720,9 @@
 			bbox: getMapBbox()
 		}, opt );
 		
-		var bands = {
-			'fractcover': null,
-			'forestcover': 'Forest_NonForest',
-			'forestchange': 'ForestCoverChange'
-		}[opt.mode];
-		
 		if( action == 'download' ) {
 			var g = getMapEdges();
 			opt.extra = S.Query.string({
-				bands: JSON.stringify([{
-					id: bands,
-					scale: 30
-				}]),
 				crs: 'EPSG:4326',
 				region: JSON.stringify({
 					type: 'LinearRing',
@@ -755,20 +745,7 @@
 			}
 		} : action == 'tiles' ? {
 			success: function( result ) {
-				var tiles = result.tiles;
-				app.layers[ opt.type || opt.mode ] = app.map.addLayer({
-					minZoom: 3,
-					maxZoom: 14,
-					opacity: getOpacity( opt.type || opt.mode ),
-					spinner: {
-						img: 'images/spinner32.gif',
-						opacity: .5
-					},
-					tiles: S(
-						'https://earthengine.googleapis.com/map/', tiles.mapid,
-						'/{Z}/{X}/{Y}?token=', tiles.token
-					)
-				});
+				addLayer( opt.type || opt.mode, result.tiles );
 			},
 			error: function( result ) {
 			}
@@ -985,20 +962,19 @@
 		}
 	}
 	
-	function addLayer( id, path ) {
+	function addLayer( id, tiles ) {
 		app.layers[id] = app.map.addLayer({
-			minZoom: 6,
+			minZoom: 3,
 			maxZoom: 14,
 			opacity: getOpacity( id ),
-			tiles: function( coord, zoom ) {
-				return S(
-					tileBase, path,
-					zoom, '/',
-					coord.x, '/',
-					( 1 << zoom ) - coord.y - 1,
-					'.png'
-				);
-			}
+			spinner: {
+				img: 'images/spinner32.gif',
+				opacity: .5
+			},
+			tiles: S(
+				'https://earthengine.googleapis.com/map/', tiles.mapid,
+				'/{Z}/{X}/{Y}?token=', tiles.token
+			)
 		});
 	}
 	

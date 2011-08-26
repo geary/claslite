@@ -124,7 +124,8 @@ class JsonService( object ):
 			#	"coordinates": coords,
 			#})
 			#bands = '[{"id":"%s","scale":30}]&crs=EPSG:4326&region=%s' %( bands, region )
-			bands = opt['extra']
+			#bands = opt['extra']
+			pass
 		
 		ee = EarthEngine( current_handler )
 		ei =  EarthImage()
