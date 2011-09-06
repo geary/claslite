@@ -151,7 +151,7 @@
 			removeLayers();
 			if( full ) loadDateSelects();
 			if( app.$outermost.is('.stats') ) {
-				addStatistics( id );
+				//addStatistics( id );
 			}
 			else if( app.viewed.fractcover ) {
 				viewFractCoverLayer( 'tiles' );
@@ -163,7 +163,7 @@
 			if( full ) loadDateSelects();
 			if( app.$outermost.is('.stats') ) {
 				//addStatistics( id );
-				//viewForestCoverLayer( 'values' );
+				viewForestCoverLayer( 'stats' );
 			}
 			else if( app.viewed.forestcover ) {
 				viewForestCoverLayer( 'tiles' );
@@ -174,7 +174,7 @@
 			removeLayers();
 			if( full ) loadDateSelects();
 			if( app.$outermost.is('.stats') ) {
-				addStatistics( id );
+				//addStatistics( id );
 			}
 			else {
 				if( app.viewed.forestchange ) {
@@ -448,7 +448,7 @@
 				var index = app.$forestCoverDate.val();
 				var set = app.forestcover.stats.dates;
 			}
-			else {
+			else {  // forest change
 				index = app.$forestChangeDateStart.val() + '-' +
 					app.$forestChangeDateEnd.val();
 				set = app.forestchange.stats.ranges;
@@ -749,12 +749,13 @@
 			},
 			error: function( result ) {
 			}
-		} : action == 'values' ? {
+		} : action == 'stats' ? {
 			success: function( result ) {
-				debugger;
+				addStatistics( result.stats, opt );
 			},
 			error: function( result ) {
 				debugger;
+				// TODO: retry
 			}
 		} : {
 		});
@@ -1080,252 +1081,250 @@
 		) );
 	}
 	
-	function addStatistics( id ) {
-		$.getCachedJSON( 'js/statistics-test.json', function( json, cached ) {
+	function addStatistics( stats, opt ) {
+debugger;
+		var region = json.regions[0];
+		
+		if( ! cached ) {
+			region.forestChange.forEach( function( entry ) {
+				entry.daterange = [ entry.startdate, entry.enddate ].join('-');
+			});
+			S.indexArray( region.forestChange, 'daterange' );
+			S.indexArray( region.forestCover, 'date' );
+		}
+		
+		var units = app.$units.val().split('|'),
+			unit = { value:units[0], abbr:units[1], name:units[2] },
+			factor = json.pixelWidth * json.pixelHeight / unit.value;
+		function U( value ) { return value * factor; }
+		function num( value ) { return S.formatNumber( value, 2 ); }
+		
+		var height = 150, width = 600;
+		
+		var charts = {
+			fractcover: function() {
+			},
 			
-			var region = json.regions[0];
-			
-			if( ! cached ) {
-				region.forestChange.forEach( function( entry ) {
-					entry.daterange = [ entry.startdate, entry.enddate ].join('-');
+			forestcover: function() {
+				var scaleMax = 0, labels = [], rows = [],
+					forests = [], nonforests = [], unobserveds = [];
+				S.sortSet(app.forestcover.stats.dates).forEach( function( date ) {
+					var cover = region.forestCover.by_date[date];
+					if( ! cover ) return;
+					var
+						forest = U(cover.forest),
+						nonforest = U(cover.nonforest),
+						unobserved = U(cover.unobserved);
+					// Table
+					rows.push( S(
+						'<tr>',
+							'<td>', date, '</td>',
+							'<td>', num(forest), '</td>',
+							'<td>', num(nonforest), '</td>',
+							'<td>', num(unobserved), '</td>',
+						'</tr>'
+					) );
+					// Chart
+					labels.push( date );
+					scaleMax = Math.max( scaleMax, forest + nonforest + unobserved );
+					forests.push( forest );
+					nonforests.push( nonforest );
+					unobserveds.push( unobserved );
 				});
-				S.indexArray( region.forestChange, 'daterange' );
-				S.indexArray( region.forestCover, 'date' );
-			}
-			
-			var units = app.$units.val().split('|'),
-				unit = { value:units[0], abbr:units[1], name:units[2] },
-				factor = json.pixelWidth * json.pixelHeight / unit.value;
-			function U( value ) { return value * factor; }
-			function num( value ) { return S.formatNumber( value, 2 ); }
-			
-			var height = 150, width = 600;
-			
-			var charts = {
-				fractcover: function() {
-				},
 				
-				forestcover: function() {
-					var scaleMax = 0, labels = [], rows = [],
-						forests = [], nonforests = [], unobserveds = [];
-					S.sortSet(app.forestcover.stats.dates).forEach( function( date ) {
-						var cover = region.forestCover.by_date[date];
-						if( ! cover ) return;
-						var
-							forest = U(cover.forest),
-							nonforest = U(cover.nonforest),
-							unobserved = U(cover.unobserved);
-						// Table
-						rows.push( S(
-							'<tr>',
-								'<td>', date, '</td>',
-								'<td>', num(forest), '</td>',
-								'<td>', num(nonforest), '</td>',
-								'<td>', num(unobserved), '</td>',
-							'</tr>'
-						) );
-						// Chart
-						labels.push( date );
-						scaleMax = Math.max( scaleMax, forest + nonforest + unobserved );
-						forests.push( forest );
-						nonforests.push( nonforest );
-						unobserveds.push( unobserved );
-					});
-					
-					var container = '#forest-cover-chart', title = 'Forest Cover';
-					if( ! rows.length ) {
-						setEmptyChart( container, title );
-						return;
-					}
-					
-					var table = S(
-						'<table class="stats-table">',
-							'<thead>',
-								'<tr>',
-									'<th class="stats-table-topleft">&nbsp;</th>',
-									'<th colspan="3">Area (', unit.name, ')</th>',
-								'</tr>',
-								'<tr>',
-									'<th class="stats-table-x">Year</th>',
-									'<th>Forest</th>',
-									'<th>Non-Forest</th>',
-									'<th>Unobserved</th>',
-								'</tr>',
-							'</thead>',
-							'<tbody>',
-								rows.join(''),
-							'</tbody>',
-						'</table>'
-					);
-					
-					var url = S.ChartApi.barV({
-						width: width,
-						height: height,
-						labels: labels,
-						colors: [ '00FF00', 'EE9A00', '000000' ],
-						data: [ [ forests.join(), nonforests.join(), unobserveds.join() ].join('|') ],
-						scale: [ 0, scaleMax ],
-						barWidth: [ 25, 20 ],
-						legend: 'Forest|Non-Forest|Unobserved',
-						legendPos: '|r',
-						axes: 'x,y',
-						axisRange: [ 1, 0, scaleMax ],
-						axisFormat: '0,222222,13|1N*s*,222222,13'
-					});
-					
-					setChart( container, table, url, width, height, title );
-				},
-				
-				forestchange: function( a ) {
-					a = a || { chart:true, table:true, details:true };
-					var container = a.container || '#forest-change-chart';
-					var ranges = a.ranges || app.forestchange.stats.ranges;
-					var totalpix = 2753565;  // temp for demo
-					var scaleMax = 0, labels = [], rows = [],
-						deforestations = [], disturbances = [];
-					S.sortSet(ranges).forEach( function( range ) {
-						var change = region.forestChange.by_daterange[range];
-						if( ! change ) return;
-						var startdate = change.startdate, enddate = change.enddate,
-							deforestation = U(change.deforestation),
-							disturbance = U(change.disturbance);
-						// Table
-						var years = enddate - startdate;
-						function pct( value ) {
-							return S.formatNumber( value / years / totalpix * 100, 3 ) + '%';
-						}
-						rows.push( S(
-							'<tr>',
-								'<td>', startdate, '</td>',
-								'<td>', enddate, '</td>',
-								'<td>', num(deforestation), '</td>',
-								'<td>', pct(change.deforestation), '</td>',
-								'<td>', num(disturbance), '</td>',
-								'<td>', pct(change.disturbance), '</td>',
-							'</tr>'
-						) );
-						// Chart
-						labels.push( S( startdate.slice(-2), '-', enddate.slice(-2) ) );
-						//labels.push( S( '-', enddate.slice(-2) ) );
-						scaleMax = Math.max( scaleMax, deforestation, disturbance );
-						deforestations.push( deforestation );
-						disturbances.push( disturbance );
-					});
-					
-					var title = a.title != null ? a.title : S('Forest Change - Area (', unit.name, ')' );
-					if( ! rows.length ) {
-						setEmptyChart( container, title );
-						return;
-					}
-					
-					var table = ! a.table ? '' : S(
-						'<table class="stats-table">',
-							'<thead>',
-								'<tr>',
-									'<th class="stats-table-topleft">&nbsp;</th>',
-									'<th class="stats-table-topleft">&nbsp;</th>',
-									'<th colspan="2">Deforestation</th>',
-									'<th colspan="2">Disturbance</th>',
-								'</tr>',
-								'<tr>',
-									'<th class="stats-table-x">Start</th>',
-									'<th class="stats-table-x">End</th>',
-									'<th>Area (', unit.abbr, ')</th>',
-									'<th>Rate</th>',
-									'<th>Area (', unit.abbr, ')</th>',
-									'<th>Rate</th>',
-								'</tr>',
-							'</thead>',
-							'<tbody>',
-								rows.join(''),
-							'</tbody>',
-						'</table>'
-					);
-					
-					var url = ! a.chart ? '' : S.ChartApi.barV({
-						width: width,
-						height: height,
-						labels: labels,
-						colors: [ 'FF0000', 'FFD000' ],
-						data: [ [ deforestations.join(), disturbances.join() ].join('|') ],
-						scale: [ 0, scaleMax ],
-						//barWidth: [ 22, 10 ],
-						barWidth: [ 25, 20 ],
-						legend: 'Deforestation|Disturbance',
-						legendPos: '|r',
-						axes: 'x,y',
-						axisRange: [ 1, 0, scaleMax ],
-						axisFormat: '0,222222,13|1N*s*,222222,13'
-					});
-					
-					setChart( container, table, url, width, height, title );
-					
-					if( a.details )
-						addForestChangeDetails( container );
-				}
-			};
-			
-			charts[id]();
-			
-			function addForestChangeDetails( container ) {
-				var $container = $(container);
-				var minYear = +Infinity, maxYear = -Infinity;
-				for( var range in app.forestchange.stats.ranges ) {
-					var years = range.split('-');
-					minYear = Math.min( minYear, years[0] );
-					maxYear = Math.max( maxYear, years[1] );
-				}
-				if( minYear >= maxYear )
+				var container = '#forest-cover-chart', title = 'Forest Cover';
+				if( ! rows.length ) {
+					setEmptyChart( container, title );
 					return;
-				var ranges = {};
-				for( var year = minYear;  year < maxYear;  ++year )
-					ranges[ S( year, '-', year+1 ) ] = true;
-				// TODO: refactor with similar hider code
-				$.S(
-					'<div class="details-wrapper">',
-						'<div class="details-hider hider">',
-							'<div class="inline-block sprite icon16 icon16-toggle-expand">',
-							'</div>',
-							' ',
-							'<b>Details</b>',
-						'</div>',
-						'<div class="details-content">',
-						'</div>',
-					'</div>'
-				).appendTo( $container );
-				$container.setHider( '.details-hider', '.details-content', function( expand ) {
-					if( expand ) {
-						charts.forestchange({
-							container: $container.find('.details-content'),
-							title: '',
-							table: true,
-							ranges: ranges
-						});
-					}
+				}
+				
+				var table = S(
+					'<table class="stats-table">',
+						'<thead>',
+							'<tr>',
+								'<th class="stats-table-topleft">&nbsp;</th>',
+								'<th colspan="3">Area (', unit.name, ')</th>',
+							'</tr>',
+							'<tr>',
+								'<th class="stats-table-x">Year</th>',
+								'<th>Forest</th>',
+								'<th>Non-Forest</th>',
+								'<th>Unobserved</th>',
+							'</tr>',
+						'</thead>',
+						'<tbody>',
+							rows.join(''),
+						'</tbody>',
+					'</table>'
+				);
+				
+				var url = S.ChartApi.barV({
+					width: width,
+					height: height,
+					labels: labels,
+					colors: [ '00FF00', 'EE9A00', '000000' ],
+					data: [ [ forests.join(), nonforests.join(), unobserveds.join() ].join('|') ],
+					scale: [ 0, scaleMax ],
+					barWidth: [ 25, 20 ],
+					legend: 'Forest|Non-Forest|Unobserved',
+					legendPos: '|r',
+					axes: 'x,y',
+					axisRange: [ 1, 0, scaleMax ],
+					axisFormat: '0,222222,13|1N*s*,222222,13'
 				});
-			}
+				
+				setChart( container, table, url, width, height, title );
+			},
 			
-			// Old test code, save it for color bits
-			//S.chart({
-			//	container: '#statistics-chart' + ( suffix || '' ),
-			//	list: json.statistics.images.map( function( image) {
-			//		function get( sel, prop ) {
-			//			return {
-			//				color: $(sel).val(),
-			//				value: image[prop]
-			//			}
-			//		}
-			//		return {
-			//			label: image.date,
-			//			values: [
-			//				get( '#statistics-forest-color', 'forestPixels' ),
-			//				get( '#statistics-unobserved-color', 'unobservedPixels' ),
-			//				get( '#statistics-nonforest-color', 'nonForestPixels' )
-			//			]
-			//		}
-			//	})
-			//});
-		});
+			forestchange: function( a ) {
+				a = a || { chart:true, table:true, details:true };
+				var container = a.container || '#forest-change-chart';
+				var ranges = a.ranges || app.forestchange.stats.ranges;
+				var totalpix = 2753565;  // temp for demo
+				var scaleMax = 0, labels = [], rows = [],
+					deforestations = [], disturbances = [];
+				S.sortSet(ranges).forEach( function( range ) {
+					var change = region.forestChange.by_daterange[range];
+					if( ! change ) return;
+					var startdate = change.startdate, enddate = change.enddate,
+						deforestation = U(change.deforestation),
+						disturbance = U(change.disturbance);
+					// Table
+					var years = enddate - startdate;
+					function pct( value ) {
+						return S.formatNumber( value / years / totalpix * 100, 3 ) + '%';
+					}
+					rows.push( S(
+						'<tr>',
+							'<td>', startdate, '</td>',
+							'<td>', enddate, '</td>',
+							'<td>', num(deforestation), '</td>',
+							'<td>', pct(change.deforestation), '</td>',
+							'<td>', num(disturbance), '</td>',
+							'<td>', pct(change.disturbance), '</td>',
+						'</tr>'
+					) );
+					// Chart
+					labels.push( S( startdate.slice(-2), '-', enddate.slice(-2) ) );
+					//labels.push( S( '-', enddate.slice(-2) ) );
+					scaleMax = Math.max( scaleMax, deforestation, disturbance );
+					deforestations.push( deforestation );
+					disturbances.push( disturbance );
+				});
+				
+				var title = a.title != null ? a.title : S('Forest Change - Area (', unit.name, ')' );
+				if( ! rows.length ) {
+					setEmptyChart( container, title );
+					return;
+				}
+				
+				var table = ! a.table ? '' : S(
+					'<table class="stats-table">',
+						'<thead>',
+							'<tr>',
+								'<th class="stats-table-topleft">&nbsp;</th>',
+								'<th class="stats-table-topleft">&nbsp;</th>',
+								'<th colspan="2">Deforestation</th>',
+								'<th colspan="2">Disturbance</th>',
+							'</tr>',
+							'<tr>',
+								'<th class="stats-table-x">Start</th>',
+								'<th class="stats-table-x">End</th>',
+								'<th>Area (', unit.abbr, ')</th>',
+								'<th>Rate</th>',
+								'<th>Area (', unit.abbr, ')</th>',
+								'<th>Rate</th>',
+							'</tr>',
+						'</thead>',
+						'<tbody>',
+							rows.join(''),
+						'</tbody>',
+					'</table>'
+				);
+				
+				var url = ! a.chart ? '' : S.ChartApi.barV({
+					width: width,
+					height: height,
+					labels: labels,
+					colors: [ 'FF0000', 'FFD000' ],
+					data: [ [ deforestations.join(), disturbances.join() ].join('|') ],
+					scale: [ 0, scaleMax ],
+					//barWidth: [ 22, 10 ],
+					barWidth: [ 25, 20 ],
+					legend: 'Deforestation|Disturbance',
+					legendPos: '|r',
+					axes: 'x,y',
+					axisRange: [ 1, 0, scaleMax ],
+					axisFormat: '0,222222,13|1N*s*,222222,13'
+				});
+				
+				setChart( container, table, url, width, height, title );
+				
+				if( a.details )
+					addForestChangeDetails( container );
+			}
+		};
+		
+		charts[id]();
+		
+		function addForestChangeDetails( container ) {
+			var $container = $(container);
+			var minYear = +Infinity, maxYear = -Infinity;
+			for( var range in app.forestchange.stats.ranges ) {
+				var years = range.split('-');
+				minYear = Math.min( minYear, years[0] );
+				maxYear = Math.max( maxYear, years[1] );
+			}
+			if( minYear >= maxYear )
+				return;
+			var ranges = {};
+			for( var year = minYear;  year < maxYear;  ++year )
+				ranges[ S( year, '-', year+1 ) ] = true;
+			// TODO: refactor with similar hider code
+			$.S(
+				'<div class="details-wrapper">',
+					'<div class="details-hider hider">',
+						'<div class="inline-block sprite icon16 icon16-toggle-expand">',
+						'</div>',
+						' ',
+						'<b>Details</b>',
+					'</div>',
+					'<div class="details-content">',
+					'</div>',
+				'</div>'
+			).appendTo( $container );
+			$container.setHider( '.details-hider', '.details-content', function( expand ) {
+				if( expand ) {
+					charts.forestchange({
+						container: $container.find('.details-content'),
+						title: '',
+						table: true,
+						ranges: ranges
+					});
+				}
+			});
+		}
+		
+		// Old test code, save it for color bits
+		//S.chart({
+		//	container: '#statistics-chart' + ( suffix || '' ),
+		//	list: json.statistics.images.map( function( image) {
+		//		function get( sel, prop ) {
+		//			return {
+		//				color: $(sel).val(),
+		//				value: image[prop]
+		//			}
+		//		}
+		//		return {
+		//			label: image.date,
+		//			values: [
+		//				get( '#statistics-forest-color', 'forestPixels' ),
+		//				get( '#statistics-unobserved-color', 'unobservedPixels' ),
+		//				get( '#statistics-nonforest-color', 'nonForestPixels' )
+		//			]
+		//		}
+		//	})
+		//});
 	}
 	
 	function initSizer() {
