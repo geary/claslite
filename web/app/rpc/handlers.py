@@ -66,7 +66,7 @@ class JsonService( object ):
 	def earthengine_map( self, action, opt ):
 		'''	Create an Earth Engine map as tiles or as a download image,
 			or requests statistics.
-			action = 'click', 'download', 'tiles', or 'values'
+			action = 'click', 'download', 'stats', or 'tiles'
 			opt = {
 				'sat': [ satname, sensor ],
 				'mode': 'fractcover' or 'forestcover' or 'forestchange',
@@ -90,7 +90,7 @@ class JsonService( object ):
 				'palette': [ rrggbb, ..., rrggbb ],
 			}
 		'''
-		polygon = [ [ polyBbox( opt['bbox'] ) ] ]
+		polygon = [ polyBbox( opt['bbox'] ) ]
 		palette = opt.get('palette')
 		mode = opt['mode']
 		final = None
@@ -140,7 +140,7 @@ class JsonService( object ):
 				CLASLITE+'MosaicScene',
 				collection, modImage, sensor,
 				time['starttime'], time['endtime'],
-				polygon
+				[ polygon ]
 			) )
 		if len(image) == 1:
 			image = image[0]
@@ -149,11 +149,24 @@ class JsonService( object ):
 			image = ei.step( CLASLITE+final, image )
 		#image = ei.clip( image )
 		
+		if action == 'stats':
+			image = ei.step( CLASLITE+final+'Stat', image, {
+				"features": [
+					{
+						"type": "Feature",
+						"geometry": {
+							"type": "Polygon",
+							"coordinates": polygon
+						}
+					}
+				]
+			})
+		
 		params = 'image=%s' % json_encode(image)
 		
 		if action == 'click':
 			params += '&points=[[%s,%s]]' %( opt['lng'], opt['lat'] )
-		elif action == 'values':
+		elif action == 'stats':
 			params += '&fields=count'
 		else:
 			params += '&bands=%s' %( bands )
@@ -172,12 +185,12 @@ class JsonService( object ):
 				return tiles
 			else:
 				return { 'tiles': tiles['data'] }
-		elif action == 'values':
-			values = ee.post( 'value', params )
-			if 'error' in values:
-				return values
+		elif action == 'stats':
+			stats = ee.get( 'value', params )
+			if 'error' in stats:
+				return stats
 			else:
-				return { 'values': values['data'] }
+				return { 'stats': stats['data']['properties']['count'] }
 	
 	# project_...
 	
