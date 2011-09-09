@@ -11,11 +11,18 @@
 
 from main import fix_sys_path;  fix_sys_path()
 
+from google.appengine.api import urlfetch
+
 from tipfy import RequestHandler, Response
 from tipfy.auth import login_required, user_required
 from tipfy.sessions import SessionMiddleware
+from tipfy.utils import json_decode
 from tipfy.auth.google import GoogleMixin
 from tipfyext.jinja2 import Jinja2Mixin
+
+from urllib import quote
+
+import private
 
 
 class BaseHandler( RequestHandler, Jinja2Mixin ):
@@ -62,6 +69,13 @@ class LoginHandler( BaseHandler, GoogleMixin ):
 		auth_id = user['claimed_id']
 		email = user['email']
 		access_token = user['access_token']
+		
+		ok = whitelisted( email )
+		if not ok:
+			return self.redirect( private.config['whitelist']['form'] )
+		if ok == 'pending':
+			return self.redirect( 'thanks.html' )
+		
 		self.auth.login_with_auth_id( auth_id, True )
 		if not self.auth.user:
 			user = self.auth.create_user( auth_id, auth_id, email=email )
@@ -88,3 +102,31 @@ class SignupHandler( BaseHandler ):
 	@login_required
 	def post( self, **kwargs ):
 		return self.redirect()
+
+
+def whitelisted( email ):
+	sheetUrlFormat = 'http://spreadsheets.google.com/feeds/list/%s/public/values?alt=json&sq=%s'
+	whitelist = private.config['whitelist']
+	if not whitelist['enabled']:
+		return True
+	query = quote( 'emailaddress="%s"' % email )
+	url = sheetUrlFormat %( whitelist['sheet'], query )
+	try:
+		response = urlfetch.fetch(
+			method = 'GET',
+			url = url
+		)
+		if response.status_code != 200:
+			return False
+		rows = json_decode( response.content )['feed']['entry']
+		row = rows[0]
+	except:
+		return False
+	testuser = row['gsx$testuser']['$t']
+	#stableuser = row['gsx$stableuser']['$t']
+	if testuser != '':
+		return True
+	#if stableuser != '':
+	#	return True
+	return 'pending'  # email is in whitelist table but not approved
+
