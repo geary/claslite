@@ -754,7 +754,7 @@
 				addStatistics( result.stats, opt );
 			},
 			error: function( result ) {
-				debugger;
+				//debugger;
 				// TODO: retry
 			}
 		} : {
@@ -958,6 +958,7 @@
 	
 	function getYearTimes( year ) {
 		return {
+			year: year,
 			starttime: Date.UTC( year, 0, 1 ),
 			endtime: Date.UTC( year+1, 0, 1 )
 		}
@@ -1081,21 +1082,29 @@
 		) );
 	}
 	
+	var statLists = { forestCover: [], forestChange: [] };
+	statLists.forestCover.by_date = {};
+	
 	function addStatistics( stats, opt ) {
-debugger;
-		var region = json.regions[0];
+		var values = stats.values;
+		var date = '' + opt.times[0].year;
+		var pix = {
+			date: date,
+			forest: values.forest_pixel_count,
+			nonforest: values.non_forest_pixel_count,
+			unobserved: values.masked_pixel_count
+		};
+		pix.total = pix.forest + pix.nonforest + pix.unobserved;
 		
-		if( ! cached ) {
-			region.forestChange.forEach( function( entry ) {
-				entry.daterange = [ entry.startdate, entry.enddate ].join('-');
-			});
-			S.indexArray( region.forestChange, 'daterange' );
-			S.indexArray( region.forestCover, 'date' );
-		}
+		statLists.forestCover.push( pix );
+		statLists.forestCover.by_date[date] = pix;
+		app.forestcover.stats.dates[date] = true;
+		var id = 'forestcover';
 		
+		var pixelSize = { width: 30, height: 30 };
 		var units = app.$units.val().split('|'),
 			unit = { value:units[0], abbr:units[1], name:units[2] },
-			factor = json.pixelWidth * json.pixelHeight / unit.value;
+			factor = pixelSize.width * pixelSize.height / unit.value;
 		function U( value ) { return value * factor; }
 		function num( value ) { return S.formatNumber( value, 2 ); }
 		
@@ -1109,7 +1118,7 @@ debugger;
 				var scaleMax = 0, labels = [], rows = [],
 					forests = [], nonforests = [], unobserveds = [];
 				S.sortSet(app.forestcover.stats.dates).forEach( function( date ) {
-					var cover = region.forestCover.by_date[date];
+					var cover = statLists.forestCover.by_date[date];
 					if( ! cover ) return;
 					var
 						forest = U(cover.forest),
@@ -1184,7 +1193,7 @@ debugger;
 				var scaleMax = 0, labels = [], rows = [],
 					deforestations = [], disturbances = [];
 				S.sortSet(ranges).forEach( function( range ) {
-					var change = region.forestChange.by_daterange[range];
+					var change = statLists.forestChange.by_daterange[range];
 					if( ! change ) return;
 					var startdate = change.startdate, enddate = change.enddate,
 						deforestation = U(change.deforestation),
