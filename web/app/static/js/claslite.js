@@ -993,6 +993,7 @@
 		app.map = new S.Map( app.$mapwrap, {
 			v3: {
 				mapTypeId: mt.TERRAIN,
+				scaleControl: true,
 				streetViewControl: false,
 				mapTypeControlOptions: {
 					mapTypeIds: [
