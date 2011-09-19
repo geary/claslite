@@ -35,12 +35,14 @@ class EarthEngine( object ):
 				json = json_decode( response.content )
 			else:
 				json = { 'error': { 'type':'http', 'code': response.status_code } }
+		except urlfetch.DeadlineExceededError:
+			json = { 'error': { 'type':'DeadlineExceededError' } }
 		except urlfetch.DownloadError:
-			json = { 'error': { 'type':'DownloadError', 'info':sys.exc_info() } }
+			json = { 'error': { 'type':'DownloadError' } }
 		except urlfetch.ResponseTooLargeError:
-			json = { 'error': { 'type':'ResponseTooLargeError', 'info':sys.exc_info() } }
+			json = { 'error': { 'type':'ResponseTooLargeError' } }
 		except:
-			json = { 'error': { 'type':'Other', 'info':sys.exc_info() } }
+			json = { 'error': { 'type':'Other' } }
 		finally:
 			return json
 	
