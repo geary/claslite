@@ -686,30 +686,38 @@
 	}
 	
 	function callEarthEngine( action, opt, on ) {
-		$.jsonRPC.request( 'earthengine_map', [ action, opt ], {
-			success: function( rpc ) {
-				var error = rpc.result.error;
-				if( error ) {
-					// TODO: better error reporting
-					alert(
-						error.type == 'no_images' ?
-							'No images available for the selected year.' :
-						error.code && error.message ?
-							'Error ' + error.code + ':\n' + error.message :
-						// else
-							'Error'
-					);
-					return;
+		function ee() {
+			$.jsonRPC.request( 'earthengine_map', [ action, opt ], {
+				success: function( rpc ) {
+					var error = rpc.result.error;
+					if( error ) {
+						if( error.type == 'DeadlineExceededError' ) {
+							setTimeout( ee, 10000 );
+							return;
+						}
+						// TODO: better error reporting
+						alert(
+							error.type == 'no_images' ?
+								'No images available for the selected year.' :
+							error.code && error.message ?
+								'Error ' + error.code + ':\n' + error.message :
+							// else
+								'Error'
+						);
+						return;
+					}
+					on.success && on.success( rpc.result );
+				},
+				error: function( result ) {
+					window.console && console.log( S(
+						'Server error on ',  action, ' - ', result && result.error
+					) );  // TODO: better errors
+					on.error && on.error( result );
 				}
-				on.success && on.success( rpc.result );
-			},
-			error: function( result ) {
-				window.console && console.log( S(
-					'Server error on ',  action, ' - ', result && result.error
-				) );  // TODO: better errors
-				on.error && on.error( result );
-			}
-		});
+			});
+		}
+		
+		ee();
 	}
 	
 	function viewEarthEngineLayer( action, opt ) {
