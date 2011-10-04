@@ -112,20 +112,18 @@ class JsonService( object ):
 				len(palette), str( ','.join(palette) )
 			)
 		if action == 'download':
-			#( w, s, e, n ) = opt['bbox']
-			#coords = [
-			#	[ w, s ],
-			#	[ w, n ],
-			#	[ e, n ],
-			#	[ e, s ],
-			#]
-			#region = json_encode({
-			#	"type": "LinearRing",
-			#	"coordinates": coords,
-			#})
-			#bands = '[{"id":"%s","scale":30}]&crs=EPSG:4326&region=%s' %( bands, region )
-			#bands = opt['extra']
-			pass
+			( w, s, e, n ) = opt['bbox']
+			coords = [
+				[ w, s ],
+				[ w, n ],
+				[ e, n ],
+				[ e, s ],
+			]
+			region = json_encode({
+				"type": "LinearRing",
+				"coordinates": coords,
+			})
+			bands = '[{"id":"%s","scale":30}]&crs=EPSG:4326&region=%s' %( bands, region )
 		
 		ee = EarthEngine( current_handler )
 		ei =  EarthImage()
