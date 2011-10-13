@@ -94,8 +94,10 @@ class JsonService( object ):
 		palette = opt.get('palette')
 		mode = opt['mode']
 		final = None
+		bandsDown = None
 		if mode == 'fractcover':
 			bands = 'sub,pv,npv'
+			#bandsDown = 'sub,pv,npv,sdev_sub,sdev_pv,sdev_npv,rms'
 			visual = 'bias=%f&gain=%f&gamma=%f' %(
 				float(opt['bias']), float(opt['gain']), float(opt['gamma'])
 			)
@@ -123,7 +125,14 @@ class JsonService( object ):
 				"type": "LinearRing",
 				"coordinates": coords,
 			})
-			bands = '[{"id":"%s","scale":30}]&crs=EPSG:4326&region=%s' %( bands, region )
+			bands = map(
+				lambda band: { 'id': band, 'scale': 30 },
+				( bandsDown or bands ).split(',')
+			)
+			bands = '%s&crs=EPSG:4326&region=%s' %(
+				json_encode(bands),
+				region
+			)
 		
 		ee = EarthEngine( current_handler )
 		ei =  EarthImage()
