@@ -97,7 +97,7 @@ class JsonService( object ):
 		bandsDown = None
 		if mode == 'fractcover':
 			bands = 'sub,pv,npv'
-			#bandsDown = 'sub,pv,npv,sdev_sub,sdev_pv,sdev_npv,rms'
+			bandsDown = 'sub,pv,npv,sdev_sub,sdev_pv,sdev_npv,rms'
 			visual = 'bias=%f&gain=%f&gamma=%f' %(
 				float(opt['bias']), float(opt['gain']), float(opt['gamma'])
 			)
