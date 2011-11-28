@@ -1221,8 +1221,6 @@
 						'</tr>'
 					) );
 					
-					var container = '#forest-change-chart', title = 'Forest Change';
-					
 					// Chart
 					labels.push( S( startdate.slice(-2), '-', enddate.slice(-2) ) );
 					//labels.push( S( '-', enddate.slice(-2) ) );
@@ -1231,7 +1229,8 @@
 					disturbances.push( disturbance );
 				}
 				
-				var title = S('Forest Change - Area (', unit.name, ')' );
+				var container = '#forest-change-chart',
+					title = S('Forest Change - Total Area ', num(U(totalpix)), ' ', unit.name );
 				if( ! rows.length ) {
 					setEmptyChart( container, title );
 					return;
