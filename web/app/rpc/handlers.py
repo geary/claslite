@@ -107,12 +107,14 @@ class JsonService( object ):
 			visual = 'min=0&max=2&palette=%s' %(
 				str( ','.join(palette) )
 			)
+			statFields = 'count'
 		elif mode == 'forestchange':
 			final = 'ForestCoverChange'
 			bands = ( 'disturb', 'deforest' )[ opt['type'] == 'deforestation' ]
 			visual = 'min=1&max=%d&palette=%s' %(
 				len(palette), str( ','.join(palette) )
 			)
+			statFields = 'DEFORESTATION_PIX_CNT,DISTURBANCE_PIX_CNT,TOTAL_PIX_CNT'
 		if action == 'download':
 			( w, s, e, n ) = opt['bbox']
 			coords = [
@@ -174,7 +176,7 @@ class JsonService( object ):
 		if action == 'click':
 			params += '&points=[[%s,%s]]' %( opt['lng'], opt['lat'] )
 		elif action == 'stats':
-			params += '&fields=count'
+			params += '&fields=%s' % statFields
 		else:
 			params += '&bands=%s' %( bands )
 		
@@ -193,11 +195,11 @@ class JsonService( object ):
 			else:
 				return { 'tiles': tiles['data'] }
 		elif action == 'stats':
-			stats = ee.get( 'value', params )
+			stats = ee.post( 'value', params )
 			if 'error' in stats:
 				return stats
 			else:
-				return { 'stats': stats['data']['properties']['count'] }
+				return { 'stats': stats['data']['properties'] }
 	
 	# project_...
 	
