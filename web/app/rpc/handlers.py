@@ -26,7 +26,7 @@ from earthengine import EarthEngine, EarthImage
 
 import fusion
 
-from beautifulsoup.BeautifulSoup import BeautifulSoup
+from beautifulsoup.BeautifulSoup import BeautifulSoup, SoupStrainer
 
 
 CLASLITE = 'CLASLITE/com.google.earthengine.third_party.claslite.frontend.'
@@ -293,8 +293,9 @@ class JsonService( object ):
 			response = { 'status_code': 500 }
 		if response.status_code != 200:
 			return { 'error': response.status_code }
-		soup = BeautifulSoup( response.content )
-		content = soup.find( 'div', id='current' )
+		strainer = SoupStrainer( 'div', id='current' )
+		soup = BeautifulSoup( response.content, parseOnlyThese=strainer )
+		content = soup.div
 		if content is None:
 			return { 'error': 404 }
 		del( content['id'] )
