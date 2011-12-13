@@ -11,7 +11,7 @@
 
 from main import fix_sys_path;  fix_sys_path()
 
-from google.appengine.api import users
+from google.appengine.api import urlfetch, users
 from google.appengine.ext import db
 
 import logging
@@ -25,6 +25,8 @@ from models import Project
 from earthengine import EarthEngine, EarthImage
 
 import fusion
+
+from beautifulsoup.BeautifulSoup import BeautifulSoup
 
 
 CLASLITE = 'CLASLITE/com.google.earthengine.third_party.claslite.frontend.'
@@ -280,6 +282,24 @@ class JsonService( object ):
 		return {
 			'rows': rows
 		}
+	
+	# other
+	
+	def fetch_content( self, path ):
+		try:
+			response = urlfetch.fetch( 'http://claslite.ciw.edu/%s' % path )
+		except urlfetch.DownloadError, e:
+			#logging.exception( e )
+			response = { 'status_code': 500 }
+		if response.status_code != 200:
+			return { 'error': response.status_code }
+		soup = BeautifulSoup( response.content )
+		content = soup.find( 'div', id='current' )
+		if content is None:
+			return { 'error': 404 }
+		del( content['id'] )
+		return { 'content': unicode(content) }
+
 
 class JsonHandler( RequestHandler, JSONRPCMixin ):
 	jsonrpc_service = JsonService()
