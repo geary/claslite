@@ -1509,4 +1509,31 @@
 		$tip.css({ left:x, top:y });
 	}
 	
+	// Help
+	
+	var helpCache = {};
+	
+	function loadHelp( id, callback ) {
+		var path = 'en/' + id;
+		var cached = helpCache[path];
+		if( cached ) {
+			callback( cached );
+		}
+		else {
+			$.jsonRPC.request(
+				'fetch_content',
+				[ path ], {
+				success: function( rpc ) {
+					callback( rpc.result.content );
+				},
+				error: function( result ) {
+					alert( 'Error loading content' );  // TODO: better errors
+				}
+			});
+		}
+	}
+
+	// Test	
+	//loadHelp( 'projectsidebar', alert );
+	
 //})();
