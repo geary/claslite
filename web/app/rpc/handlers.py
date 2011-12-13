@@ -26,7 +26,7 @@ from earthengine import EarthEngine, EarthImage
 
 import fusion
 
-from beautifulsoup.BeautifulSoup import BeautifulSoup, SoupStrainer
+from beautifulsoup.BeautifulSoup import BeautifulStoneSoup, SoupStrainer
 
 
 CLASLITE = 'CLASLITE/com.google.earthengine.third_party.claslite.frontend.'
@@ -287,19 +287,18 @@ class JsonService( object ):
 	
 	def fetch_content( self, path ):
 		try:
-			response = urlfetch.fetch( 'http://claslite.ciw.edu/%s' % path )
+			response = urlfetch.fetch( 'http://claslite.ciw.edu/%s/.atom' % path )
 		except urlfetch.DownloadError, e:
 			#logging.exception( e )
 			response = { 'status_code': 500 }
 		if response.status_code != 200:
 			return { 'error': response.status_code }
-		strainer = SoupStrainer( 'div', id='current' )
-		soup = BeautifulSoup( response.content, parseOnlyThese=strainer )
-		content = soup.div
+		strainer = SoupStrainer( 'content' )
+		soup = BeautifulStoneSoup( response.content, parseOnlyThese=strainer )
+		content = soup.content
 		if content is None:
 			return { 'error': 404 }
-		del( content['id'] )
-		return { 'content': unicode(content) }
+		return { 'content': '<div>%s</div>' % content.text }
 
 
 class JsonHandler( RequestHandler, JSONRPCMixin ):
