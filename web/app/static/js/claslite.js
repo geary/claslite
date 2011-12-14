@@ -638,10 +638,10 @@
 		);
 	}
 	
-	function getForestChangeStaticPanel( id, label ) {
+	function getForestChangeStaticPanel( id, label, checked ) {
 		return S(
 			'<div id="', id, '-layer">',
-				'<input type="radio" name="forestchange-layer-radio" id="', id, '-radio" checked="checked" />',
+				'<input type="radio" name="forestchange-layer-radio" id="', id, '-radio" ', checked ? 'checked="checked" ' : '', '/>',
 				'<label for="', id, '-radio">', label, '</label>',
 				'<div id="', id, '-legend">',
 					'<div class="legend-wrapper">',
