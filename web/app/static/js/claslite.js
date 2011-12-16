@@ -129,6 +129,7 @@
 		id = getSubTab( id );
 		var activate = activateTab[id];
 		activate && activate( id, /*full*/true );
+		if( $('#help-content').is(':visible') ) loadSidebarHelp();
 		// TODO: without the setTimeout, it doesn't get the correct height
 		// the first time, not sure why
 		setTimeout( resizeSidebarHeight, 1 );
@@ -1463,11 +1464,12 @@
 		$('body').bind( 'click mousemove', moveTip );
 		
 		// Help expando
-		$('#help-section').setHider( '.help-hider', '.help-content', function( expand ) {
-			if( expand ) {
-				$('#help-content').html( '<div>(Help content here)</div>' );
+		$('#help-section').setHider(
+			'.help-hider', '.help-content',
+			function( expand ) {
+				if( expand ) loadSidebarHelp();
 			}
-		});
+		);
 	}
 	
 	var tipOffset = { x:10, y:20 };
@@ -1531,7 +1533,12 @@
 				'fetch_content',
 				[ path ], {
 				success: function( rpc ) {
-					callback( rpc.result.content );
+					var content = rpc.result.content;
+					// Avoid error pages
+					if( content.match(/casecapturetest/) )
+						content = '<div>Missing: ' + path + '</div>';
+					helpCache[path] = content
+					callback( content );
 				},
 				error: function( result ) {
 					alert( 'Error loading content' );  // TODO: better errors
@@ -1540,7 +1547,12 @@
 		}
 	}
 
-	// Test	
-	//loadHelp( 'projectsidebar', alert );
+	function loadSidebarHelp() {
+		function load( content ) {
+			$('#help-section .help-content').html( content );
+		}
+		load( '<div style="width:32px; height:32px; filter:alpha(opacity=50); opacity:0.50; -moz-opacity:0.50; background-image:url(images/spinner32.gif)"></div>' );
+		loadHelp( app.tabs.selected + 'sidebar', load );
+	}
 	
 //})();
