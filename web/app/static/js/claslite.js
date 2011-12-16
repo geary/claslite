@@ -225,6 +225,7 @@
 		app.tabOpts = {
 			parent: '#tabs',
 			panels: app.$tabPanels,
+			alwaysShow: '#help-section',
 			tabs: {
 				project: 'Project',
 				location: 'Location',
@@ -1440,9 +1441,8 @@
 		$.getScript( '//translate.google.com/translate_a/element.js?cb=googleTranslateInit' );
 	}
 	
-	// Tooltip
-	
 	function initHelp() {
+		// Tooltip
 		var hc = 'icon16-question-hover';
 		$('div.help-icon').each$( function( $element ) {
 			$element
@@ -1461,6 +1461,13 @@
 				});
 		});
 		$('body').bind( 'click mousemove', moveTip );
+		
+		// Help expando
+		$('#help-section').setHider( '.help-hider', '.help-content', function( expand ) {
+			if( expand ) {
+				$('#help-content').html( '<div>(Help content here)</div>' );
+			}
+		});
 	}
 	
 	var tipOffset = { x:10, y:20 };

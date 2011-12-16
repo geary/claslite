@@ -39,7 +39,7 @@
 			$list.find('li').removeClass(selectedClass);
 			$('#'+id).addClass(selectedClass);
 			a.click && a.click( id );
-			$(a.panels).children().hide();
+			$(a.panels).children().not( a.alwaysShow || '' ).hide();
 			id = a.subst[id] || id;
 			$(a.panels).find('> .'+id+'-panel').show();
 		}
