@@ -1,2 +1,6 @@
+\.komodoproject$
 \.pyc$
+\.pyproj$
+\.sln$
+\.suo$
 ^web/app/private\.py$
