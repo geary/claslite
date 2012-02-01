@@ -1,0 +1,188 @@
+{
+	"pixelWidth": 30,
+	"pixelHeight": 30,
+	"regions": [
+		{
+			"name": "surui_area",
+			"thumbnail": "demo/combined-thumb.png",
+			"forestCover": [
+				{
+					"date": "1985",
+					"forest": 2538519,
+					"nonforest": 179563,
+					"unobserved": 35483
+				},
+				{
+					"date": "2009",
+					"forest": 2603193,
+					"nonforest": 58349,
+					"unobserved": 92023
+				}
+			],
+			"forestChange": [
+				{
+					"startdate": "1985",
+					"enddate": "2009",
+					"deforestation": 56750,
+					"disturbance": 155919
+				},
+				{
+					"startdate": "1985",
+					"enddate": "1991",
+					"deforestation": 6979,
+					"disturbance": 34681
+				},
+				{
+					"startdate": "1991",
+					"enddate": "1999",
+					"deforestation": 22759,
+					"disturbance": 74023
+				},
+				{
+					"startdate": "1999",
+					"enddate": "2009",
+					"deforestation": 42590,
+					"disturbance": 92858
+				},
+				{
+					"startdate": "1985",
+					"enddate": "1986",
+					"deforestation": 1355,
+					"disturbance": 3436
+				},
+				{
+					"startdate": "1986",
+					"enddate": "1987",
+					"deforestation": 3280,
+					"disturbance": 15581
+				},
+				{
+					"startdate": "1987",
+					"enddate": "1988",
+					"deforestation": 819,
+					"disturbance": 5174
+				},
+				{
+					"startdate": "1988",	
+					"enddate": "1989",
+					"deforestation": 696,
+					"disturbance": 3727
+				},
+				{
+					"startdate": "1989",
+					"enddate": "1990",
+					"deforestation": 891,
+					"disturbance": 4825
+				},
+				{
+					"startdate": "1990",	
+					"enddate": "1991",
+					"deforestation": 320,
+					"disturbance": 4035
+				},
+				{
+					"startdate": "1991",
+					"enddate": "1992",
+					"deforestation": 6445,
+					"disturbance": 20559
+				},
+				{
+					"startdate": "1992",
+					"enddate": "1993",
+					"deforestation": 3087,
+					"disturbance": 12702
+				},
+				{
+					"startdate": "1993",
+					"enddate": "1994",
+					"deforestation": 253,
+					"disturbance": 2909
+				},
+				{
+					"startdate": "1994",
+					"enddate": "1995",
+					"deforestation": 522,
+					"disturbance": 4146
+				},
+				{
+					"startdate": "1995",
+					"enddate": "1996",
+					"deforestation": 3586,
+					"disturbance": 8057
+				},
+				{
+					"startdate": "1996",
+					"enddate": "1997",
+					"deforestation": 1289,
+					"disturbance": 4254
+				},
+				{
+					"startdate": "1997",
+					"enddate": "1998",
+					"deforestation": 6526,
+					"disturbance": 10050
+				},
+				{
+					"startdate": "1998",
+					"enddate": "1999",
+					"deforestation": 6709,
+					"disturbance": 25205
+				},
+				{
+					"startdate": "1999",
+					"enddate": "2000",
+					"deforestation": 43,
+					"disturbance": 505
+				},
+				{
+					"startdate": "2000",
+					"enddate": "2001",
+					"deforestation": 9221,
+					"disturbance": 17235
+				},
+				{
+					"startdate": "2001",
+					"enddate": "2003",
+					"deforestation": 2522,
+					"disturbance": 9161
+				},
+				{
+					"startdate": "2003",
+					"enddate": "2004",
+					"deforestation": 8636,
+					"disturbance": 15691
+				},
+				{
+					"startdate": "2004",
+					"enddate": "2005",
+					"deforestation": 6260,
+					"disturbance": 19822
+				},
+				{
+					"startdate": "2005",
+					"enddate": "2006",
+					"deforestation": 6151,
+					"disturbance": 14383
+				},
+				{
+					"startdate": "2006",
+					"enddate": "2007",
+					"deforestation": 175,
+					"disturbance": 526
+				},
+				{
+					"startdate": "2007",
+					"enddate": "2008",
+					"deforestation": 11107,
+					"disturbance": 18964
+				},
+				{
+					"startdate": "2008",
+					"enddate": "2009",
+					"deforestation": 9542,
+					"disturbance": 19143
+				}
+			]
+		}
+	]
+}

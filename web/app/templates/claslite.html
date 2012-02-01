@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	
+	<title>CLASlite Forest Monitoring - Carnegie Institution for Science</title>
+	
+	<!--
+		By Michael Geary - http://mg.to/
+		See UNLICENSE or http://unlicense.org/ for public domain notice.
+	-->
+
+	<link type="text/css" href="css/claslite.css" rel="stylesheet" />
+	
+	<script type="text/javascript">
+		if( ! window.JSON )
+			document.write( '<script type="text/javascript" src="js/json2.js"><\/script>' );
+	</script>
+	
+	<script type="text/javascript" src="http://www.google.com/jsapi">
+	</script>
+	<script type="text/javascript">
+		(function() {
+			//google.load( 'jquery', '1.6.1' );
+			google.load( 'jquery', '1.6.1', { uncompressed:true } );
+			google.load( 'maps', '3', { other_params: 'sensor=false' } );
+		})();
+	</script>
+	
+	<script type="text/javascript" src="js/jquery.jsonrpc.js"></script>
+	<script type="text/javascript" src="js/polygonzo.js"></script>
+	<script type="text/javascript" src="js/scriptino-base.js"></script>
+	<script type="text/javascript" src="js/scriptino-color.js"></script>
+	<script type="text/javascript" src="js/scriptino-combo.js"></script>
+	<script type="text/javascript" src="js/scriptino-tabs.js"></script>
+	<script type="text/javascript" src="js/scriptino-chart.js"></script>
+	<script type="text/javascript" src="js/scriptino-map.js"></script>
+	<script type="text/javascript" src="js/scriptino-earthengine.js"></script>
+	<script type="text/javascript" src="js/rangeinput.js"></script>
+	<script type="text/javascript" src="js/mColorPicker.js"></script>
+	<script type="text/javascript" src="js/claslite.js"></script>
+	
+</head>
+
+<body>
+	
+	<!-- Macros -->
+	
+	{% macro opensaveform() -%}
+						<form id="project-form" class="relative">
+							
+							<label for="project-input" class="project-label">Open or Save a Project:</label>
+							
+							<div class="float-left">
+								
+								<input id="project-input" class="notranslate project-input combo-input" />
+								
+								<ul id="project-list" class="notranslate project-list combo-list">
+								</ul>
+								
+							</div>
+							
+							<div class="float-left">
+								
+								<button type="submit" class="submit icon-button project-button" id="project-open-button"><div class="inline-block sprite icon16 icon16-open"></div>&nbsp;Open</button>
+								
+								<button type="submit" class="submit icon-button project-button" id="project-save-button"><div class="inline-block sprite icon16 icon16-save"></div>&nbsp;Save</button>
+								
+							</div>
+							
+							<div class="clear-left">
+							</div>
+							
+						</form>
+	{%- endmacro %}
+	
+	<!-- Begin Page -->
+	
+	<div id="outermost" style="display:none;">
+		
+		<div id="tip">
+		</div>
+		
+		<!-- Begin Header -->
+		
+		<div id="header">
+			
+			<a id="claslite-logo" target="_blank" href="http://claslite.ciw.edu/">
+			</a>
+			
+			<div id="header-tagline">
+				Forest<br />Monitoring
+			</div>
+			
+			<div id="header-link-block">
+				
+				<div id="header-links">
+					
+					<div id="site-links">
+						<b>CLASlite</b>
+						<span class="pipe">|</span>
+						<a target="_blank" href="http://claslite.ciw.edu/en/">Website</a>
+	<!--
+						<span class="pipe">|</span>
+						<a href="http://code.google.com/p/claslite/source/browse/web/client/claslite.html">Code</a>
+						<span class="pipe">|</span>
+						<a href="#">About</a>
+						<span class="pipe">|</span>
+						<a href="#">More</a>
+	-->
+					</div>
+					
+					<div id="user-links">
+	<!--
+						<b>{{ user_id }}</b>
+						<span class="pipe">|</span>
+						<b>{{ count }}</b>
+						<span class="pipe">|</span>
+	-->
+						<b>{{ email | e }}</b>
+						<span class="pipe">|</span>
+	<!--
+						<a href="#">My account</a>
+						<span class="pipe">|</span>
+						<a href="#">Help</a>
+						<span class="pipe">|</span>
+	-->
+						<a href="{{ logout_url }}">Sign out</a>
+					</div>
+					
+				</div>
+				
+				<div id="google-translator">
+				</div>
+				
+			</div>
+			
+		</div>
+		
+		<!-- End Header -->
+		
+		<!-- Begin Tabs -->
+		
+		<div id="tabs" class="tabs">
+		</div>
+		
+		<div id="tabs-base">
+		</div>
+		
+		<!-- End Tabs -->
+		
+		<!-- Begin Main Body -->
+		
+		<div id="main" class="show-sidebar">
+			
+			<!-- Begin Sidebar Panels -->
+			
+			<div id="sidebar-outer">
+				
+				<div id="sidebar-top-panel">
+					
+					<div class="location-panel">
+						<div class="tab-base-extension center">
+							<form class="input-form location" id="location-input-form-top">
+								<button class="icon-button subtab-button-searchmap view-button submit" type="submit" id="view-location-searchmap"><div class="inline-block sprite button-icon icon16 icon16-tick"></div>Search Map</button>
+								&nbsp;&nbsp;
+								<button class="icon-button subtab-button-useshape view-button" id="view-location-useshape"><div class="inline-block sprite button-icon icon16 hide"></div>Upload KML</button>
+							</form>
+						</div>
+					</div>
+					
+					<div class="forestview-panel">
+						<div class="tab-base-extension center">
+							<form class="input-form forestview" id="forestview-input-form-top">
+								<button class="icon-button subtab-button-map view-button submit" type="submit" id="view-forestview-map"><div class="inline-block sprite button-icon icon16 icon16-tick"></div>Map</button>
+								&nbsp;&nbsp;
+								<button class="icon-button subtab-button-stats view-button" id="view-forestview-stats"><div class="inline-block sprite button-icon icon16 hide"></div>Statistics</button>
+							</form>
+						</div>
+					</div>
+					
+				</div>
+				
+				<div id="sidebar-scrolling">
+					<div id="sidebar-padder">
+						
+						<!-- Begin Project Panel -->
+						
+						<div class="tab-panel project-panel" id="project-panel">
+							
+							{{ opensaveform() }}
+							
+						</div>
+						
+						<!-- End Project Panel -->
+						
+						<!-- Begin Location Panel -->
+						
+						<div id="location-panel" class="tab-panel location-panel">
+							
+							<div class="location-searchmap">
+								
+								<form id="location-search-form">
+									
+									<label for="location-search-input">Click the map or search for a location:</label>
+									<div class="inline-block sprite icon16 icon16-question help-icon" id="help-icon-search-map"></div>
+									<input id="location-search-input" class="notranslate" />
+									
+									<div id="location-search-buttons">
+										<a href="#" id="show-search-options">Advanced search&#8230;</a>
+										<button class="submit" type="submit" id="view-location-map">Search</button>
+										<div class="clear-right"></div>
+									</div>
+									
+								</form>
+								
+								<div id="location-results-list" class="notranslate">
+								</div>
+								
+								<div id="assets-list">
+								</div>
+								
+							</div>
+							
+							<div class="location-useshape">
+								
+								<form id="location-shape-form" method="post" enctype="multipart/form-data" action="/shape/upload">
+									
+									<label for="location-shape-file">Upload a KML file:</label>
+									<div class="inline-block sprite icon16 icon16-question help-icon" id="help-icon-upload-kml"></div>
+									<input type="file" name="shape_file" id="location-shape-file" class="notranslate" />
+									
+									<button class="submit" type="submit" id="location-shape-submit">Upload</button>
+									
+								</form>
+								
+							</div>
+							
+						</div>
+						
+						<!-- End Location Panel -->
+						
+						<!-- Begin Forest View Panel -->
+						
+						<div class="tab-panel forestview-panel" id="forestview-panel">
+							
+							<form class="input-form" id="forestview-input-form">
+								
+								<div style="text-align:right; margin-bottom:12px;">
+									<button class="submit icon-button map-only" type="submit" id="view-forestview-view"><div class="inline-block sprite icon16 icon16-arrow-circle"></div>&nbsp;View</button>
+									<button class="submit icon-button stats-only" type="submit" id="view-forestview-add"><div class="inline-block sprite icon16 icon16-plus"></div>&nbsp;Calculate</button>
+									&nbsp;
+									<button class="icon-button" id="view-forestview-download"><div class="inline-block sprite icon16 icon16-download"></div>&nbsp;Download</button>
+								</div>
+								
+								<div style="margin-bottom:16px;">
+									
+									<div class="forestview-fractcover">
+										<label class="year-source-label" for="fractcover-date">Year:</label>
+										<select class="date-select date-start" id="fractcover-date">
+										</select>
+									</div>
+									
+									<div class="forestview-forestcover">
+										<label class="year-source-label" for="forestcover-date">Year:</label>
+										<select class="date-select date-start" id="forestcover-date">
+										</select>
+									</div>
+									
+									<div class="forestview-forestchange">
+										<label class="year-source-label" for="forestchange-date-start">Years:</label>
+										<select class="date-select date-start" id="forestchange-date-start">
+										</select>
+										<label class="date-range" for="forestchange-date-end">
+											<b>&ndash;</b>
+										</label>
+										<select class="date-range date-select date-end" id="forestchange-date-end">
+										</select>
+									</div>
+									
+								</div>
+								
+								<div class="clear-right">
+								</div>
+								
+								<div style="margin-bottom:16px;">
+									<label class="year-source-label" for="sat-select">Source:</label>
+									<select id="sat-select">
+										<option value="L5|LANDSAT/L5_L1T">Landsat 5 TM</option>
+										<option value="L7|LANDSAT/L7_L1T" selected="selected">Landsat 7 ETM</option>
+										<option value="|">Landsat 5-7 combined</option>
+										<option value="MODIS|MODIS">MODIS</option>
+									</select>
+								</div>
+								
+								<div class="clear-left">
+								</div>
+								
+								<div class="forestview-forestcover map-only">
+									<!-- TODO: refactor -->
+									<div class="color-picker-row">
+										<input class="color-picker" data-hex="true" name="forest-color" id="forest-color" value="#00ff00">
+										<label for="forest-color">Forest</label>
+									</div>
+									<div class="color-picker-row">
+										<input class="color-picker" data-hex="true" name="nonforest-color" id="nonforest-color" value="#ee9a00">
+										<label for="nonforest-color">Non-forest</label>
+									</div>
+									<div class="color-picker-row">
+										<input class="color-picker" data-hex="true" name="unobserved-color" id="unobserved-color" value="#000000">
+										<label for="unobserved-color">Unobserved</label>
+									</div>
+									<!-- End TODO -->
+									
+									<div class="slider-panel map-only">
+										<script type="text/javascript">
+											document.write( opacitySlider('forestcover') );
+										</script>
+									</div>
+								</div>
+								
+								<div class="forestview-forestchange map-only">
+									<div class="section">
+										Layers:
+									</div>
+									
+									<script type="text/javascript">
+										document.write(
+											getForestChangeStaticPanel(
+												'deforestation', 'Deforestation', true
+											),
+											getForestChangeStaticPanel(
+												'disturbance', 'Forest Disturbance'
+											)
+										);
+									</script>
+									
+									<div id="both-layer">
+										<input type="radio" name="forestchange-layer-radio" id="both-radio" />
+										<label for="both-radio">Both</label>
+									</div>
+								</div>
+								
+								<div class="forestview-fractcover map-only">
+									<div class="slider-panel map-only">
+										<script type="text/javascript">
+											document.write( opacitySlider('fractcover') );
+										</script>
+									</div>
+									<table style="margin-top:10px;">
+										<tr>
+											<td><label for="fractcover-bias">Bias: </label></td>
+											<td><input id="fractcover-bias" value="0.0"></td>
+										</tr>
+										<tr>
+											<td><label for="fractcover-gain">Gain: </label></td>
+											<td><input id="fractcover-gain" value="255.0"></td>
+										</tr>
+										<tr>
+											<td><label for="fractcover-gamma">Gamma: </label></td>
+											<td><input id="fractcover-gamma" value="1.0"></td>
+										</tr>
+									</table>
+								</div>
+								
+								<div class="units stats-only" id="statistics-units">
+									<label for="statistics-units-select">
+										<b>Units:</b>
+									</label>
+									<select id="statistics-units-select">
+										<option value="0.3048|ft&#178;|square feet">Square Feet (ft&#178;)</option>
+										<option value="1|m&#178;|square meters">Square Meters (m&#178;)</option>
+										<option value="4046.85642|ac|acres">Acres</option>
+										<option value="10000|ha|hectares" selected="selected">Hectares</option>
+										<option value="1000000|km&#178;|square kilometers">Square Kilometers (km&#178;)</option>
+										<option value="2589988.11|mi&#178;|square miles">Square Miles (mi&#178;)</option>
+									</select>
+								</div>
+								
+							</form>
+							
+							<div class="section">
+								<img class="toggle-expand" src="images/toggle-expand.png" />
+								Advanced
+							</div>
+							
+						</div>
+						
+						<!-- End Forest View Panel -->
+						
+						<!-- Begin Help Panel -->
+						
+						<div class="tab-panel help-panel" id="help-panel">
+							
+							<object width="330" height="280"><param name="movie" value="http://www.youtube.com/v/TU7JjJJZi1Q?fs=1&amp;hl=en_US&amp;rel=0&amp;autoplay=0"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/TU7JjJJZi1Q?fs=1&amp;hl=en_US&amp;rel=0&amp;autoplay=0" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="330" height="280"></embed></object>
+							
+						</div>
+						
+						<!-- End Help Panel -->
+						
+						<!-- Begin Help Section -->
+						
+						<div id="help-section">
+							<div class="section">
+								<span class="help-hider hider">
+									<div class="inline-block sprite icon16 icon16-toggle-expand">
+									</div>
+									Help
+								</span>
+							</div>
+							<div id="help-content" class="help-content" style="display:none">
+							</div>
+						</div>
+						
+						<!-- End Help Section -->
+						
+					</div>
+				</div>
+			</div>
+			
+			<!-- End Sidebar Panels -->
+			
+			<!-- Begin Map -->
+			
+			<div id="mapwrap">
+			</div>
+			
+			<!-- End Map -->
+			
+			<!-- Begin Statistics -->
+			
+			<div id="statswrap">
+				<div id="stats-scroll">
+					
+					<div class="statistics-section forestview-forestcover" id="forest-cover-chart">
+					</div>
+					
+					<div class="statistics-section forestview-forestchange" id="forest-change-chart">
+					</div>
+					
+				</div>
+			</div>
+			
+			<!-- End Statistics -->
+			
+			<!-- Map Hider -->
+			
+			<div id="sidebar-hider" class="sprite icon14x17 sidebar-hider">
+			</div>
+			
+			<!-- End Map Hider -->
+			
+		</div>
+		
+		<!-- End Main Body -->
+		
+		<div id="spinner">
+		</div>
+		
+		<a id="cis-logo" target="_blank" href="http://carnegiescience.edu/">
+		</a>
+		
+		<!--<a id="earth-engine-logo" target="_new" href="http://earthengine.googlelabs.com/">-->
+		<a id="earth-engine-logo" target="_new" href="http://earthengine.googlelabs.com/">
+			<span id="earth-engine-logo-powered-by">
+				Powered by
+			</span>
+			<img id="earth-engine-logo-img" src="http://www.google.com/images/logos/google_logo_powered_by.png" style="border:none; vertical-align:middle;" />
+			Earth Engine
+		</a>
+		
+		<div id="tips" style="display:none;">
+			
+			<div id="tip-search-map">
+				<div class="tiptitle">
+					Search Map
+				</div>
+				<div class="tipcontent">
+					<p>
+						Enter a place name below and click the <b>Search</b> button.
+					</p>
+					<p>
+						If there is a single match, the map will zoom to that location. If the search lists multiple matches, click one of them in the list to zoom there.
+					</p>
+					<p>
+						Or, zoom and pan to the area you want using the map controls, then <b>click the map</b>.
+					</p>
+				</div>
+				<div class="tipfooter">
+					<p>
+						To use a precise (non-rectangular) boundary, obtain or create a KML file with the boundary and use the <b>Upload KML</b> button to upload it.
+					</p>
+				</div>
+			</div>
+		</div>
+		
+			<div id="tip-upload-kml">
+				<div class="tiptitle">
+					Upload KML
+				</div>
+				<div class="tipcontent">
+					<p>
+						Upload a KML file with boundaries of the area(s) to study.
+					</p>
+					<p>
+						Click the <b>Browse&#8230;</b> button to select your KML file, then <b>Upload</b> to view it.
+					</p>
+					<p>
+						The KML file should contain one or more <code class="notranslate">&lt;Placemark&gt;</code> elements with <code class="notranslate">&lt;MultiGeometry&gt;</code> or <code class="notranslate">&lt;Polygon&gt;</code> boundaries.
+					</p>
+				</div>
+<!--
+				<div class="tipfooter">
+					Optional footer
+				</div>
+-->
+			</div>
+		</div>
+		
+	</div>
+	
+	<!-- End Page -->
+	
+</body>
+
+</html>

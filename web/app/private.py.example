@@ -1,0 +1,22 @@
+# -*- coding: utf-8 -*-
+'''
+    private.py
+'''
+
+config = {
+	
+	'earth-engine': {
+		'api': 'http://earthengine.googleapis.com/api/',
+		'auth': 'YOUR_AUTH_KEY_HERE',
+	},
+	
+	'tipfy.sessions': {
+		'secret_key': 'YOUR_SECRET_KEY_HERE',
+	},
+	
+	'whitelist': {
+		'enabled': True,
+		'form': 'YOUR_USER_REQUEST_FORM',
+		'sheet': 'YOUR_SPREADSHEET_KEY/AND_SHEET_NUMBER',
+	},
+}
