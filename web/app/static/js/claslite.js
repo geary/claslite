@@ -123,8 +123,6 @@
 		};
 	}
 	
-	var tileBase = 'http://claslite.geary.joyeurs.com/tiles/';
-	
 	function clickTab( id, full ) {
 		id = getSubTab( id );
 		var activate = activateTab[id];
