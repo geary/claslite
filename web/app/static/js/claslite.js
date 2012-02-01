@@ -904,7 +904,7 @@
 		
 		var sat =  $('#sat-select').val().split('|');
 		
-		var bbox = getMapBbox();
+		var bbox = getMapCenterTinyBbox();
 		var satbox = sat[1] + bbox.join();
 		
 		if( satbox == satboxLatest ) return;
