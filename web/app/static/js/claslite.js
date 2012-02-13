@@ -1440,26 +1440,42 @@
 		$.getScript( '//translate.google.com/translate_a/element.js?cb=googleTranslateInit' );
 	}
 	
+	var hoverClass = 'icon16-question-hover';
+	var helpOneshot = S.oneshot();
+	var $tip, $iconHelp;
+	
+	function helpOn( $icon ) {
+		helpOneshot( function() {
+			if( $iconHelp  &&  ! $icon ) return;
+			$iconHelp = $icon;
+			$iconHelp.addClass( hoverClass );
+			var sel = $iconHelp[0].id.replace( 'help-icon', '#tip' );
+			showTip( $(sel).html(), $iconHelp );
+		}, 250 );
+	}
+	
+	function helpOff() {
+		helpOneshot( function() {
+			if( ! $iconHelp ) return;
+			$iconHelp.removeClass( hoverClass );
+			$iconHelp = null;
+			showTip( false );
+		}, 250 );
+	}
+	
 	function initHelp() {
 		// Tooltip
-		var hc = 'icon16-question-hover';
-		$('div.help-icon').each$( function( $element ) {
-			$element
-				.hover(
-					function() {
-						$element.addClass( hc );
-						var sel = $element[0].id.replace( 'help-icon', '#tip' );
-						showTip( $(sel).html() );
-					},
-					function() {
-						$element.removeClass( hc );
-						showTip( false );
-					}
-				)
-				.click( function() {
-				});
+		$tip = $('#tip');
+		$('div.help-icon').each$( function( $icon ) {
+			$icon.hover(
+				function() { helpOn( $icon ); },
+				helpOff
+			);
 		});
-		$('body').bind( 'click mousemove', moveTip );
+		$('#tip').hover(
+			function() { helpOn(); },
+			helpOff
+		);
 		
 		// Help expando
 		$('#help-section').setHider(
@@ -1470,23 +1486,23 @@
 		);
 	}
 	
-	var tipOffset = { x:10, y:20 };
-	var $tip, tipHtml, tipLeft, tipTop;
+	var tipOffset = { x:20, y:20 };
+	var tipHtml, tipLeft, tipTop;
 	
-	function showTip( html ) {
-		$tip = $tip || $('#tip');
+	function showTip( html, $element ) {
 		tipHtml = html;
 		if( html ) {
 			$tip.html( html ).show();
+			var offset = $element.offset();
+			moveTip( offset.left, offset.top );
 		}
 		else {
 			$tip.hide();
 		}
 	}
 	
-	function moveTip( event ) {
+	function moveTip( x, y ) {
 		if( ! tipHtml ) return;
-		var x = event.pageX, y = event.pageY;
 		x += tipOffset.x;
 		y += tipOffset.y;
 		var pad = 2;
