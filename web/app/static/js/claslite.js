@@ -268,10 +268,13 @@
 	}
 	
 	function initProject() {
+		var $projectDeleteButton = $('#project-delete-button');
 		var combo = S.Combo({
 			input: '#project-input',
 			list: '#project-list',
-			onchange: onchange
+			onchange: onchange,
+			ondelete: ondelete,
+			onundelete: ondelete
 		});
 		app.project = { combo: combo }
 		
@@ -336,6 +339,35 @@
 		function onchange() {
 			$('#project-form').toggleClass( 'inlist', !! combo.inlist() );
 		}
+		function ondelete() {
+			$projectDeleteButton.toggle(
+				$('#project-list > li.deleted').length > 0
+			);
+		}
+		
+		$projectDeleteButton.click( function() {
+			function error() {
+				$projectDeleteButton.show();
+				$('#project-list > li.deleted').show();
+				alert( 'Error deleting projects' );  // TODO: better errors
+			}
+			$projectDeleteButton.hide();
+			var keys = $('#project-list > li.deleted')
+				.hide()
+				.map( function( i, e ) { return e.getAttribute('value'); })
+				.toArray();
+			$.jsonRPC.request(
+				'project_delete',
+				[ keys ], {
+				success: function( rpc ) {
+					if( rpc.result.error ) error();
+				},
+				error: function( result ) {
+					error();
+				}
+			});
+			return false;
+		});
 	}
 	
 	function initShapeForm() {

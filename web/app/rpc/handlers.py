@@ -205,16 +205,17 @@ class JsonService( object ):
 	
 	# project_...
 	
-	def project_delete( self, keytext ):
-		key = db.Key( keytext )
-		project = db.get( key )
-		if project.owner != current_handler.auth.user.auth_id:
-			return {
-				'error': 'Wrong owner'
-			}
-		db.delete( project )
+	def project_delete( self, keytexts ):
+		for keytext in keytexts:
+			key = db.Key( keytext )
+			project = db.get( key )
+			if project.owner != current_handler.auth.user.auth_id:
+				return {
+					'error': 'Wrong owner'
+				}
+			db.delete( project )
 		return {
-			'deleted': keytext
+			'deleted': keytexts
 		}
 	
 	def project_get( self, keytext ):

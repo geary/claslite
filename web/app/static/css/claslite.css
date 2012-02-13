@@ -245,6 +245,10 @@ div.icon16-download {
 	background-position: -208px 0;
 }
 
+div.icon16-cross-baseline {
+	background-position: -224px 0;
+}
+
 div.icon14x17 {
 	width: 14px;
 	height: 17px;
@@ -714,6 +718,8 @@ ul.combo-list li.deleted div.undelete {
 	visibility: visible;
 }
 
+/* Project */
+
 #project-open-button {
 	display: none;
 }
@@ -730,7 +736,9 @@ ul.combo-list li.deleted div.undelete {
 	display: none;
 }
 
-/* Project */
+#project-delete-button {
+	display: none;
+}
 
 label.project-label {
 	display: block;
