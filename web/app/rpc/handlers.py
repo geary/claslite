@@ -208,7 +208,7 @@ class JsonService( object ):
 	def project_delete( self, keytext ):
 		key = db.Key( keytext )
 		project = db.get( key )
-		if project.owner != users.get_current_user():
+		if project.owner != current_handler.auth.user.auth_id:
 			return {
 				'error': 'Wrong owner'
 			}
@@ -220,7 +220,7 @@ class JsonService( object ):
 	def project_get( self, keytext ):
 		key = db.Key( keytext )
 		project = db.get( key )
-		if project.owner != users.get_current_user():
+		if project.owner != current_handler.auth.user.auth_id:
 			return {
 				'error': 'Wrong owner'
 			}
@@ -231,7 +231,7 @@ class JsonService( object ):
 		}
 	
 	def project_list( self ):
-		owner = users.get_current_user()
+		owner = current_handler.auth.user.auth_id
 		projects = Project.gql(
 			'WHERE owner = :1 ORDER BY name',
 			owner
@@ -247,7 +247,7 @@ class JsonService( object ):
 		}
 	
 	def project_new( self, name, settings ):
-		owner = users.get_current_user()
+		owner = current_handler.auth.user.auth_id
 		project = Project( name=name, owner=owner, settings=settings )
 		project.put()
 		return {
