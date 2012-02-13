@@ -65,7 +65,7 @@ class ShapeUploadHandler( BaseHandler ):
 		return self.app.response_class( json_encode(dict) )
 	
 	def save_place( self, name, geojson ):
-		owner = users.get_current_user()
+		owner = self.auth.user.auth_id
 		place = Place( name=name, owner=owner, geojson=geojson )
 		place.put()
 		key = str( place.key() )

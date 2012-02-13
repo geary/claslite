@@ -80,7 +80,7 @@ class EarthImage( object ):
 		place = db.get( key )
 		if place is None:
 			return image
-		if place.owner != users.get_current_user():
+		if place.owner != current_handler.auth.user.auth_id:
 			return image
 		g = json_decode( place.geojson )
 		coords = g['features'][0]['geometry']['coordinates']
