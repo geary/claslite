@@ -763,7 +763,7 @@
 			bbox: getMapBbox()
 		}, opt );
 		
-		if( action == 'download' ) {
+		if( download ) {
 			var g = getMapEdges();
 			opt.extra = S.Query.string({
 				crs: 'EPSG:4326',
@@ -776,7 +776,7 @@
 			}, '=', '&', false );
 		}
 		
-		callEarthEngine( action, opt, action == 'download' ? {
+		callEarthEngine( action, opt, download ? {
 			success: function( result ) {
 				window.location = S(
 					'http://earthengine.googleapis.com/api/download?',
