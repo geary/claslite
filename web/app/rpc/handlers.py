@@ -78,6 +78,7 @@ class JsonService( object ):
 				],
 				# for tiles or download:
 				'bbox': [ west, south, east, north ],
+				'crs': 'EPSG:nnnn',
 				# for click:
 				'points': [ lng, lat ],
 				# for fractcover:
@@ -133,8 +134,9 @@ class JsonService( object ):
 				lambda band: { 'id': band, 'scale': 30 },
 				( bandsDown or bands ).split(',')
 			)
-			bands = '%s&crs=EPSG:4326&region=%s' %(
+			bands = '%s&crs=%s&region=%s' %(
 				json_encode(bands),
+				opt['crs'],
 				region
 			)
 		

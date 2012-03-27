@@ -757,24 +757,24 @@
 	
 	function viewEarthEngineLayer( action, opt ) {
 		var download = ( action == 'download' );
+		var g = getMapEdges();
 		// TODO: duplicate code
-		opt = S.extend({
-			sat: $('#sat-select').val().split('|'),
-			bbox: getMapBbox()
-		}, opt );
-		
-		if( download ) {
-			var g = getMapEdges();
-			opt.extra = S.Query.string({
-				crs: 'EPSG:4326',
+		opt = S.extend(
+			{
+				sat: $('#sat-select').val().split('|'),
+				bbox: getMapBbox()
+			},
+			download && {
+				crs: $('#projection-select').val(),
 				region: JSON.stringify({
 					type: 'LinearRing',
 					coordinates: [
 						[ g.w, g.s ], [ g.w, g.n ], [ g.e, g.n ], [ g.e, g.s ]
 					]
 				})
-			}, '=', '&', false );
-		}
+			},
+			opt
+		);
 		
 		callEarthEngine( action, opt, download ? {
 			success: function( result ) {
