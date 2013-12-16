@@ -1,17 +1,35 @@
-application: claslite
+#application: claslite
+application: claslite-prototype
 #version: stable
+#version: v01
 version: test
-runtime: python
+runtime: python27
 api_version: 1
+threadsafe: no
+
+libraries:
+- name: pycrypto
+  version: "2.3"
+- name: django
+  version: "1.2"
+
+
+default_expiration: "5d"
 
 builtins:
-- appstats: on
-- deferred: on
-- datastore_admin: on
 - remote_api: on
+- deferred: on
 
 inbound_services:
 - warmup
+
+skip_files:
+- config.rb
+- Gemfile
+- ^(.*/)?.*\.swp$
+- static/bb
+- content/css
+- ^(.*/)?.*\.sqlite$
 
 error_handlers:
 - file: templates/error_handlers/default_error.html
@@ -42,5 +60,9 @@ handlers:
   script: main.py
   login: admin
 
-- url: /.*
+- url: .*
   script: main.py
+
+- url: /remote_api
+  script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
+  login: admin

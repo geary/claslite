@@ -696,6 +696,7 @@
 				success: function( rpc ) {
 					var error = rpc.result.error;
 					if( error ) {
+						console.log('error: ' + error.type);
 						if( error.type == 'DeadlineExceededError' ) {
 							setTimeout( ee, 10000 );
 							return;
@@ -749,7 +750,7 @@
 		callEarthEngine( action, opt, action == 'download' ? {
 			success: function( result ) {
 				window.location = S(
-					'http://earthengine.googleapis.com/api/download?',
+					'https://earthengine.googleapis.com/api/download?',
 					'docid=', result.data.docid,
 					'&token=', result.data.token
 				);
@@ -978,6 +979,10 @@
 	}
 	
 	function addLayer( id, tiles ) {
+		console.log('tiles')
+		console.log(tiles)
+		console.log('mapid: ' + tiles.mapid);
+		console.log('token: ' + tiles.token);
 		app.layers[id] = app.map.addLayer({
 			minZoom: 3,
 			maxZoom: 14,
