@@ -6,7 +6,9 @@
 	:See UNLICENSE or http://unlicense.org/ for public domain notice.
 """
 
-import cgi, logging, sys
+import cgi, logging, sys, os
+import ee
+from oauth2client import appengine
 
 from google.appengine.api import urlfetch, users
 from google.appengine.ext import db
@@ -19,7 +21,24 @@ class EarthEngine( object ):
 	
 	def __init__( self, handler ):
 		self.url = handler.get_config( 'earth-engine', 'api' )
-		self.auth = handler.get_config( 'earth-engine', 'auth' )
+		account = handler.get_config( 'earth-engine', 'ee_account' )
+		key = handler.get_config( 'earth-engine', 'ee_private_key_file' )
+		DEBUG_MODE = ('SERVER_SOFTWARE' in os.environ and
+              		os.environ['SERVER_SOFTWARE'].startswith('Dev'))
+
+		if DEBUG_MODE:
+    			EE_API_URL = 'https://earthengine.sandbox.google.com'
+			EE_CREDENTIALS = ee.ServiceAccountCredentials(account, key)
+		else:
+			EE_API_URL = 'https://earthengine.googleapis.com'
+    			EE_CREDENTIALS = appengine.AppAssertionCredentials(ee.OAUTH2_SCOPE)
+
+		# Initialize the EE API
+		EE_TILE_SERVER = EE_API_URL + '/map/'
+		ee.data.DEFAULT_DEADLINE = 60 * 20
+		logging.info('Initializing with ' + EE_API_URL)
+		ee.Initialize(EE_CREDENTIALS, EE_API_URL)
+
 	
 	def _http( self, method, url, params=None ):
 		logging.info( 'EarthEngine %s:\n%s', url, params )
@@ -27,7 +46,6 @@ class EarthEngine( object ):
 			response = urlfetch.fetch(
 				method = method,
 				url = self.url + url,
-				headers = { 'Authorization': 'GoogleLogin auth=' + self.auth },
 				payload = params,
 				deadline = 10
 			)

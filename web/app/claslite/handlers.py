@@ -68,7 +68,7 @@ class LoginHandler( BaseHandler, GoogleMixin ):
 			self.abort( 403 )
 		auth_id = user['claimed_id']
 		email = user['email']
-		access_token = user['access_token']
+		#access_token = user['access_token']
 		
 		ok = whitelisted( email )
 		if not ok:
@@ -79,7 +79,7 @@ class LoginHandler( BaseHandler, GoogleMixin ):
 		self.auth.login_with_auth_id( auth_id, True )
 		if not self.auth.user:
 			user = self.auth.create_user( auth_id, auth_id, email=email )
-		self.session['google_access_token'] = access_token
+		#self.session['google_access_token'] = access_token
 		return self.redirect()
 
 
