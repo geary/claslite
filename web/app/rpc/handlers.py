@@ -15,6 +15,8 @@ from google.appengine.api import urlfetch, users
 from google.appengine.ext import db
 
 import logging
+import ee
+import datetime
 
 from tipfy import RequestHandler, current_handler
 from tipfy.ext.jsonrpc import JSONRPCMixin
@@ -37,20 +39,22 @@ class JsonService( object ):
 	# earthengine_...
 	
 	def earthengine_getyears( self, opt ):
-		ee = EarthEngine( current_handler )
+		EarthEngine( current_handler )
 		
-		params = 'id=%s&fields=ACQUISITION_DATE&bbox=%s' %(
-			opt['sat'][1], strBbox( opt['bbox'] )
-		)
-		
-		response = ee.get( 'list', params )
+		poly = ee.Geometry.Rectangle(-69.9365234375,-11.6928965625,-69.8161621094,-11.4097965708)
+		collection = ee.ImageCollection(opt['sat'][1]).filterBounds(poly)
+		newCollection = collection.map(lambda img: ee.Feature(poly).set({'date':img.get('system:time_start')}))
+		response = newCollection.getInfo()
+
 		if 'error' in response:
 			return response
 		
 		years = {}
 		ymd = {}
-		for image in response['data']:
-			date = image['properties']['ACQUISITION_DATE']
+		for image in response['features']:
+			seconds_since_epoch = image['properties']['date']
+			date = datetime.datetime.fromtimestamp(int(seconds_since_epoch / 1000)).strftime('%Y-%m-%d') 
+			logging.info(date)
 			year = int( date.split('-')[0] )
 			years[year] = True
 			ymd[date] = True
@@ -65,7 +69,49 @@ class JsonService( object ):
 			'ymd': ymd
 		}
 	
-	def earthengine_map( self, action, opt ):
+	def make_mosaic( self, opt):
+		EarthEngine( current_handler )
+		collection = ee.ImageCollection(opt['sat'][1])
+		vcf = ee.Image('MOD44B_C4_TREE_2000')
+		elevation = ee.Image('srtm90_v4')
+		sensor = opt['sat'][0]
+		starttime = opt['times'][0]['starttime']
+		endtime = opt['times'][0]['endtime']
+		#polygon = [ polyBbox( opt['bbox'] ) ]
+		polygon = ee.Geometry.Rectangle(-69.9365234375,-11.6928965625,-69.8161621094,-11.4097965708)
+		call = CLASLITE + 'MosaicScene'
+		mosaic = ee.call(call,
+			collection, 
+			vcf, 
+			elevation,
+			sensor,
+			starttime,
+			endtime, 
+			polygon)
+		return mosaic
+
+	#def make_mosaic(self, opt):
+	#	EarthEngine(current_handler)
+	#	image = ee.Image('srtm90_v4')
+	#	return image
+
+	def earthengine_map( self, action, opt):
+		mosaic = self.make_mosaic(opt)
+		result = _get_raw_mapid(mosaic.getMapId({'bands':'vis-red,vis-green,vis-blue'}))
+		logging.info('mosaic')
+		logging.info(result)
+		return {'tiles':result}
+
+		#polygon = [ polyBbox( opt['bbox'] ) ]
+		#palette = opt.get('palette')
+		#mode = opt['mode']
+		#mosaic = self.make_mosaic(opt)
+		#return _get_raw_mapid(mosaic.getMapId({
+		#	'bands': 'vis-red,vis-green,vis-blue'
+		#}))
+			
+		
+	def old_earthengine_map( self, action, opt ):
 		'''	Create an Earth Engine map as tiles or as a download image,
 			or requests statistics.
 			action = 'click', 'download', 'stats', or 'tiles'
@@ -329,3 +375,10 @@ def polyBbox( bbox ):
 		[ e, n ],
 		[ w, n ],
 	]
+
+def _get_raw_mapid(mapid):
+	"""Strips any fields other than "mapid" and "token" from a MapId object."""
+	return {
+		'token': mapid['token'],
+		'mapid': mapid['mapid']
+	}

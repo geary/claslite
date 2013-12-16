@@ -28,10 +28,11 @@ def enable_appstats(app):
 
 def enable_jinja2_debugging():
     """Enables blacklisted modules that help Jinja2 debugging."""
-    if not debug:
-        return
-    from google.appengine.tools.dev_appserver import HardenedModulesHook
-    HardenedModulesHook._WHITE_LIST_C_MODULES += ['_ctypes', 'gestalt']
+    PRODUCTION_MODE = not os.environ.get(
+      'SERVER_SOFTWARE', 'Development').startswith('Development')
+    if debug:
+      from google.appengine.tools.devappserver2.python import sandbox
+      sandbox._WHITE_LIST_C_MODULES += ['_ctypes', 'gestalt']
 
 # Is this the development server?
 debug = os.environ.get('SERVER_SOFTWARE', '').startswith('Dev')
